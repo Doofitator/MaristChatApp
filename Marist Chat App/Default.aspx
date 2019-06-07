@@ -10,7 +10,7 @@
     <title></title>
 </head>
 <body>
-    <div class='sidebar'>
+    <div class="sidebar">
         <ul>
             <li><a href="/">Ash's Test Page</a></li>
             <li><a href="/Another.aspx">Another page</a></li>
