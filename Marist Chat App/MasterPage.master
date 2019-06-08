@@ -1,0 +1,28 @@
+﻿<%@ Master Language="VB" CodeFile="MasterPage.master.vb" Inherits="MasterPage" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<head runat="server">
+    <link rel="Stylesheet" href="/Styles.css" />
+    <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet">
+    <title></title>
+</head>
+<body>
+    <div class="sidebar">
+        <ul>
+             <asp:ContentPlaceHolder id="Sidebar" runat="server">
+
+             </asp:ContentPlaceHolder>
+        </ul>
+    </div>
+    <div class="content">
+        <form id="form1" runat="server">
+             <asp:ContentPlaceHolder id="BodyContent" runat="server">
+ 
+             </asp:ContentPlaceHolder>
+        </form>
+     </div>
+</body>
+</html>

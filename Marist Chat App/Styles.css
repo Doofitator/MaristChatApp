@@ -8,7 +8,7 @@
 .sidebar {
     position: fixed;
     width: 200px;
-    height: calc(100vh);
+    height: 94vh;
     background: #006064;
     color: #DDD;
 }

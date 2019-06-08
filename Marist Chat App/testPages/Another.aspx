@@ -12,9 +12,9 @@
 <body>
     <div class="sidebar">
         <ul>
-            <li><a href="/">Ash's Test Page</a></li>
-            <li><a href="/Another.aspx">Another page</a></li>
-            <li><a href="/Database.aspx">Database test page</a></li>
+            <li><a href="/testPages/">Ash's Test Page</a></li>
+            <li><a href="/testPages/Another.aspx">Another page</a></li>
+            <li><a href="/testPages/Database.aspx">Database test page</a></li>
         </ul>
     </div>
     <div class="content">
