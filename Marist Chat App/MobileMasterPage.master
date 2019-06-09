@@ -1,0 +1,39 @@
+﻿<%@ Master Language="VB" CodeFile="MobileMasterPage.master.vb" Inherits="MobileMasterPage" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<head runat="server">
+    <link rel="Stylesheet" href="/MobileStyles.css" />
+    <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet">
+    <title></title>
+</head>
+<body>
+    <div class="hamburger">
+        <asp:ContentPlaceHolder id="Sidebar" runat="server">
+
+        </asp:ContentPlaceHolder>
+    </div>
+    <div class="sidebar">
+        <div class="container" onclick="myFunction(this)">
+            <div class="bar1"></div>
+            <div class="bar2"></div>
+            <div class="bar3"></div>
+        </div>
+
+        <script>
+            function myFunction(x) {
+                x.classList.toggle("change");
+            }
+        </script>
+    </div>
+    <div class="content">
+        <form id="form1" runat="server">
+             <asp:ContentPlaceHolder id="BodyContent" runat="server">
+ 
+             </asp:ContentPlaceHolder>
+         </form>
+     </div>
+</body>
+</html>
