@@ -19,7 +19,35 @@
 
 .hamburger {
     display: none;
+    padding-top: 44px;
+    position: fixed;
+    width: 90vw;
+    height: 94vh;
+    background: #006064;
+    color: #DDD;
 }
+
+.hamburger > ul > li > a {
+    color: #DDD;
+}
+
+.hamburger > ul {
+    width: 90vw;
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+}
+
+    .hamburger > ul > li {
+        padding: 16px;
+        transition: 0.5s;
+    }
+
+        .hamburger > ul > li:hover {
+            background: #00838f;
+            color: #fff;
+            cursor: pointer;
+        }
 
 /* Menu icon from https://www.w3schools.com/howto/howto_css_menu_icon.asp */
 .container {
