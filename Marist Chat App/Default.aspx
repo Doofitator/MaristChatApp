@@ -1,11 +1,13 @@
 ﻿<%@ Page Title="" Language="VB" MasterPageFile="~/MasterPage.master" AutoEventWireup="false" CodeFile="Default.aspx.vb" Inherits="_Default" %>
 
-<%-- Add content controls here --%>
-
 <asp:Content ID="Content1" ContentPlaceHolderID="Sidebar" Runat="Server">
-    <li><a href="/TestPages/">Testpages</a></li>
+     <li>Please login.</li>
+</asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="BodyContent" Runat="Server">
+
+    <asp:Login ID="frmLogin" runat="server" CreateUserText="Register" CreateUserUrl="~/Register.aspx" DestinationPageUrl="~/web.aspx" >
+        <TextBoxStyle />
+    </asp:Login>
+
 </asp:Content>
 
-<asp:Content ID="Content2" ContentPlaceHolderID="BodyContent" Runat="Server">
-    Testing body content
-</asp:Content>
