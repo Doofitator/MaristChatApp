@@ -25,12 +25,17 @@ Partial Class _Default
         strEcrPw = ecrWrapper.EncryptData(strPw)                   'encrypt the password with the key of the username
 
         'send to database
-        If DatabaseFunctions.readUserPassword(strEml) = strEcrPw Then
+        Dim connection As String = DatabaseFunctions.readUserPassword(strEml)
+        If connection = strEcrPw Then
             'password is correct
             e.Authenticated = True
+        ElseIf connection.StartsWith("FailConnOpen") Then
+            'Database unreachable
+            frmLogin.FailureText = "There was an error logging on. Please check your Internet connection." & connection
         Else
-            'password is incorrect / database unreachable
-            frmLogin.FailureText = "There was an error logging on. Please check your details and internet connection."
+            'password incorrect
+            frmLogin.FailureText = "Your login attempt was not successful. Please try again." & connection
+            'e.Authenticated = False
         End If
     End Sub
 End Class
