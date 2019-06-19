@@ -3,7 +3,7 @@
 <%-- Add content controls here --%>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="Sidebar" Runat="Server">
-    <li><a href="/TestPages/">Testpages</a></li>
+    <li><a href="/">Sidebar Content</a></li>
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="BodyContent" Runat="Server">
