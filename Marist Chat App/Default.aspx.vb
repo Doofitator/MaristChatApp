@@ -25,11 +25,12 @@ Partial Class _Default
         strEcrPw = ecrWrapper.EncryptData(strPw)                   'encrypt the password with the key of the username
 
         'send to database
-        frmLogin.FailureText = strEcrPw
-        'get result
-
-        'e.Authenticated = True
-
-        'redirect to /web.aspx
+        If DatabaseFunctions.readUserPassword(strEml) = strEcrPw Then
+            'password is correct
+            e.Authenticated = True
+        Else
+            'password is incorrect / database unreachable
+            frmLogin.FailureText = "There was an error logging on. Please check your details and internet connection."
+        End If
     End Sub
 End Class
