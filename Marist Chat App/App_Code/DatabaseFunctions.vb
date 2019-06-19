@@ -2,7 +2,7 @@
 Imports Microsoft.VisualBasic
 
 Public Class DatabaseFunctions
-    Public Function MakeSQLSafe(ByVal sql As String) As String
+    Public Shared Function MakeSQLSafe(ByVal sql As String) As String
         If sql.Contains("'") Then
             sql = sql.Replace("'", "''")
         End If
