@@ -25,7 +25,7 @@ Partial Class _Default
         strEcrPw = ecrWrapper.EncryptData(strPw)                   'encrypt the password with the key of the username
 
         'send to database
-
+        frmLogin.FailureText = strEcrPw
         'get result
 
         'e.Authenticated = True
