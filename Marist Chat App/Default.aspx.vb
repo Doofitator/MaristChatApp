@@ -5,6 +5,10 @@ Partial Class _Default
     Protected Sub Page_PreInit(sender As Object, e As EventArgs) Handles Me.PreInit
         'check if device is mobile & set master page accordingly
         If Request.Browser.IsMobileDevice Then MasterPageFile = "~/MobileMasterPage.master"
+        Response.Write("<script>console.log('" & User.Identity.IsAuthenticated & " / " & User.Identity.Name & "')</script>")
+        If User.Identity.IsAuthenticated = True Then 'if remember me was checked
+            Response.Redirect("web.aspx") 'login
+        End If
     End Sub
     Protected Sub frmLogin_Authenticate(sender As Object, e As AuthenticateEventArgs) Handles frmLogin.Authenticate
         Dim strEml As String = frmLogin.UserName 'get username
@@ -28,13 +32,14 @@ Partial Class _Default
         Dim connection As String = DatabaseFunctions.readUserPassword(strEml)
         If connection = strEcrPw Then
             'password is correct
-            e.Authenticated = True
+            FormsAuthentication.SetAuthCookie(frmLogin.UserName, frmLogin.RememberMeSet)
+            e.Authenticated = True 'login
         ElseIf connection.StartsWith("FailConnOpen") Then
             'Database unreachable
-            frmLogin.FailureText = "There was an error logging on. Please check your Internet connection." & connection
+            frmLogin.FailureText = "There was an error logging on. Please check your Internet connection."
         Else
             'password incorrect
-            frmLogin.FailureText = "Your login attempt was not successful. Please try again." & connection
+            frmLogin.FailureText = "Your login attempt was not successful. Please try again."
             'e.Authenticated = False
         End If
     End Sub

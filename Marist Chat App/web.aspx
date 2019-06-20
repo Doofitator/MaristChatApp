@@ -3,9 +3,10 @@
 <%-- Add content controls here --%>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="Sidebar" Runat="Server">
-    <li><a href="/">Sidebar Content</a></li>
+    <input type="text" placeholder="Search" id="sbox" />
+    <li><a>xyz</a></li>
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="BodyContent" Runat="Server">
-    Testing body content
+    <asp:LoginStatus ID="LoginStatus1" runat="server" />
 </asp:Content>
