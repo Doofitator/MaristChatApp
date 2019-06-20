@@ -11,6 +11,7 @@
     <title></title>
 </head>
 <body>
+    <form id="form1" runat="server">
     <div id="menuIcon" class="hamburger">
         <ul>
             <asp:ContentPlaceHolder id="Sidebar" runat="server">
@@ -23,14 +24,16 @@
             <div class="bar1"></div>
             <div class="bar2"></div>
             <div class="bar3"></div>
-        </div>
+        </div>  
+        <asp:ContentPlaceHolder id="topBar" runat="server">
+        
+        </asp:ContentPlaceHolder>
     </div>
     <div class="content">
-        <form id="form1" runat="server">
-             <asp:ContentPlaceHolder id="BodyContent" runat="server">
+         <asp:ContentPlaceHolder id="BodyContent" runat="server">
  
-             </asp:ContentPlaceHolder>
-         </form>
+         </asp:ContentPlaceHolder>
      </div>
+    </form>
 </body>
 </html>

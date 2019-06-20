@@ -9,6 +9,7 @@
     <title></title>
 </head>
 <body>
+    <form id="form1" runat="server">
     <div class="sidebar">
         <ul>
              <asp:ContentPlaceHolder id="Sidebar" runat="server">
@@ -16,12 +17,16 @@
              </asp:ContentPlaceHolder>
         </ul>
     </div>
+    <div class="topBar">
+        <asp:ContentPlaceHolder id="topBar" runat="server">
+        
+        </asp:ContentPlaceHolder>
+    </div>
     <div class="content">
-        <form id="form1" runat="server">
              <asp:ContentPlaceHolder id="BodyContent" runat="server">
  
              </asp:ContentPlaceHolder>
-        </form>
      </div>
+    </form>
 </body>
 </html>

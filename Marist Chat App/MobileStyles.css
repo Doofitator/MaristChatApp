@@ -13,6 +13,13 @@
     color: #DDD;
 }
 
+#topBar_LoginStatus {
+    color: #DDD;
+    float: right;
+    padding-right: 6px;
+    padding-top: 8px;
+}
+
 .content {
     padding-top: 44px;
 }

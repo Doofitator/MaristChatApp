@@ -7,6 +7,10 @@
     <li><a>xyz</a></li>
 </asp:Content>
 
-<asp:Content ID="Content2" ContentPlaceHolderID="BodyContent" Runat="Server">
-    <asp:LoginStatus ID="LoginStatus1" runat="server" />
+<asp:Content ID="Content2" ContentPlaceHolderID="topBar" Runat="Server">
+    <asp:LoginStatus id="LoginStatus" runat="server" />
+
+</asp:Content>
+
+<asp:Content ID="Content3" ContentPlaceHolderID="BodyContent" Runat="Server">
 </asp:Content>

@@ -11,7 +11,9 @@
     height: 94vh;
     background: #006064;
     color: #DDD;
-    border-radius: 12px;
+    border-bottom-left-radius: 12px;
+    border-top-left-radius: 12px;
+    border-bottom-right-radius: 12px;
 }
 
 .sidebar > ul > li > a {
@@ -28,6 +30,24 @@
     #sbox:focus {
         outline-width: 0;
     }
+
+.topBar {
+    margin-left: 200px;
+    height: 25px;
+    position: fixed;
+    background: #006064;
+    color: #DDD;
+    border-bottom-right-radius: 12px;
+    border-top-right-radius: 12px;
+    width: calc(100vw - 230px);
+    padding-top: 5px;
+}
+
+#topBar_LoginStatus {
+    color: #DDD;
+    float: right;
+    padding-right: 6px;
+}
 
 .sidebar > ul {
     width: 200px;
@@ -49,4 +69,5 @@
 
 .content {
   padding-left: 220px;
+  padding-top: 40px;
 }
