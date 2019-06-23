@@ -9,7 +9,7 @@
     position: fixed;
     width: 200px;
     height: 94vh;
-    background: #006064;
+    background: #001f5f;
     color: #DDD;
     border-bottom-left-radius: 12px;
     border-top-left-radius: 12px;
@@ -31,7 +31,7 @@
     margin-left: 200px;
     height: 25px;
     position: fixed;
-    background: #006064;
+    background: #001f5f;
     color: #DDD;
     border-bottom-right-radius: 12px;
     border-top-right-radius: 12px;
@@ -53,7 +53,7 @@
 }
 
     .sidebar > ul > li {
-        background: #004d51;
+        background: #001033;
         border: 0px;
         color: #DDD;
         padding: 10px;
@@ -63,7 +63,7 @@
     }
 
     .sidebar > ul > input[type=submit], .sidebar > ul > input[type=button] {
-        background: #006064;
+        background: #001f5f;
         border: 0px;
         color: #DDD;
         padding: 10px;
@@ -73,7 +73,7 @@
     }
 
         .sidebar > ul > input[type=submit]:hover, .sidebar > ul > input[type=button]:hover {
-            background: #00838f;
+            background: #0036a3;
             color: #fff;
             cursor: pointer;
         }
