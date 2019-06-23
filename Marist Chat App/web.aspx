@@ -27,7 +27,7 @@
         <asp:TextBox ID="txtClassID" runat="server"></asp:TextBox>
         <br />
         <asp:Label ID="lblUserList" runat="server" Text="CSV User list: "></asp:Label>
-        <asp:TextBox ID="TextBox1" runat="server" TextMode="MultiLine"></asp:TextBox>
+        <asp:TextBox ID="txtUserLst" runat="server" TextMode="MultiLine"></asp:TextBox>
         <br />
         <br />
         <asp:Button ID="btnWriteClass" runat="server" Text="Write Class" />
