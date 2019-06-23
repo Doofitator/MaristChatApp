@@ -20,6 +20,17 @@
     padding-top: 8px;
 }
 
+#sbox {
+    width: 100%;
+    height: 30px;
+    border-radius: 10px;
+    border-style: none;
+}
+
+    #sbox:focus {
+        outline-width: 0;
+    }
+
 .content {
     padding-top: 44px;
 }

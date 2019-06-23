@@ -4,12 +4,10 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="Sidebar" Runat="Server">
     <input type="text" placeholder="Search" id="sbox" />
-    <li><a>xyz</a></li>
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="topBar" Runat="Server">
-    <asp:LoginStatus id="LoginStatus" runat="server" />
-
+        <asp:LoginStatus id="LoginStatus" runat="server" />
 </asp:Content>
 
 <asp:Content ID="Content3" ContentPlaceHolderID="BodyContent" Runat="Server">

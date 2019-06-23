@@ -9,5 +9,14 @@ Partial Class _Default
         If Not User.Identity.IsAuthenticated Then
             Response.Redirect("/Default.aspx")
         End If
+
+        addSidebarBtn("PP", "XYZ")
     End Sub
+
+    Function addSidebarBtn(ByVal controlID As String, ByVal controlContent As String)
+        Dim btn As New Button
+        btn.ID = controlID
+        btn.Text = controlContent
+        Me.Master.FindControl("sidebar").Controls.Add(btn)
+    End Function
 End Class

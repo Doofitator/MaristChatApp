@@ -5,7 +5,7 @@ Partial Class _Default
     Protected Sub Page_PreInit(sender As Object, e As EventArgs) Handles Me.PreInit
         'check if device is mobile & set master page accordingly
         If Request.Browser.IsMobileDevice Then MasterPageFile = "~/MobileMasterPage.master"
-        Response.Write("<script>console.log('" & User.Identity.IsAuthenticated & " / " & User.Identity.Name & "')</script>")
+
         If User.Identity.IsAuthenticated = True Then 'if remember me was checked
             Response.Redirect("web.aspx") 'login
         End If
