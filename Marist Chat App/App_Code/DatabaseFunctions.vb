@@ -47,6 +47,40 @@ Public Class DatabaseFunctions
         Return result
     End Function
 
+    Public Shared Function readUserRole(ByVal email As String) As String 'function to read passwords from database.
+        'Create a Connection object.
+        Dim oleConn = New OleDb.OleDbConnection
+        oleConn.ConnectionString = strConn
+
+        'Create a Command object.
+        Dim oleCmd = oleConn.CreateCommand
+        oleCmd.CommandText = "select int_role from tbl_users where str_email = '" & MakeSQLSafe(email) & "'"
+
+        'Open the connection.
+
+        Try
+            oleConn.Open()
+        Catch ex As Exception
+            Return "FailConnOpen " & ex.Message
+        End Try
+
+        Dim result As String = "False" 'this is what the function will return
+
+        Try
+            Dim reader As OleDb.OleDbDataReader = oleCmd.ExecuteReader() 'run sql script
+            While reader.Read
+                result = reader.GetInt32(0) 'get first value of field (because there should only be one record returned as there shouldn't be username doubleups).
+            End While
+            oleConn.Close() 'close connection
+        Catch ex As Exception 'if a catastrophic error occurs
+            'console.writeline(ex.ToString)
+            oleConn.Close() 'close the connection
+            Return "Fail due to " & ex.Message & ex.StackTrace
+        End Try
+
+        Return result
+    End Function
+
     Public Shared Function runSQL(ByVal sql As String) As String 'function to write to the database
         'create connection object
         Dim oleConn = New OleDb.OleDbConnection
@@ -101,5 +135,4 @@ Public Class DatabaseFunctions
             Return False
         End If
     End Function
-
 End Class

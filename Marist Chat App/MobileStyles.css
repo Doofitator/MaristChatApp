@@ -13,7 +13,7 @@
     color: #DDD;
 }
 
-#topBar_LoginStatus {
+.loginStatus {
     color: #DDD;
     float: right;
     padding-right: 6px;

@@ -39,7 +39,7 @@
     padding-top: 5px;
 }
 
-#topBar_LoginStatus {
+.loginStatus {
     color: #DDD;
     float: right;
     padding-right: 6px;
@@ -52,23 +52,42 @@
     padding: 0px;
 }
 
-.sidebar > ul > input[type=submit] {
-    background: #006064;
-    border: 0px;
-    color: #DDD;
-    padding: 10px;
-    width:100%;
-    text-align: left;
-    border-bottom: 1px solid #DDD;
-}
-
-    .sidebar > ul > input[type=submit]:hover {
-        background: #00838f;
-        color: #fff;
-        cursor: pointer;
+    .sidebar > ul > li {
+        background: #004d51;
+        border: 0px;
+        color: #DDD;
+        padding: 10px;
+        font-weight: 900;
+        text-align: left;
+        border-bottom: 1px solid #DDD;
     }
 
+    .sidebar > ul > input[type=submit], .sidebar > ul > input[type=button] {
+        background: #006064;
+        border: 0px;
+        color: #DDD;
+        padding: 10px;
+        width: 100%;
+        text-align: left;
+        border-bottom: 1px solid #DDD;
+    }
+
+        .sidebar > ul > input[type=submit]:hover, .sidebar > ul > input[type=button]:hover {
+            background: #00838f;
+            color: #fff;
+            cursor: pointer;
+        }
+
 .content {
-  padding-left: 220px;
-  padding-top: 40px;
+    padding-left: 220px;
+    padding-top: 40px;
+}
+
+.wizard {
+    position: fixed;
+    -webkit-box-shadow: 4px 4px 5px 0px rgba(0,0,0,0.75);
+    -moz-box-shadow: 4px 4px 5px 0px rgba(0,0,0,0.75);
+    box-shadow: 4px 4px 5px 0px rgba(0,0,0,0.75);
+    padding: 5px;
+    display: none;
 }
