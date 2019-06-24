@@ -1,4 +1,11 @@
-﻿body {
+﻿:root {
+    --main-colour: #001f5f;
+    --light-colour: #0036a3;
+    --dark-colour: #001033;
+    --text-colour: #DDD;
+}
+
+body {
     font-family: 'Raleway', sans-serif;
     background-color: #f5f5f5;
     padding: 10px;
@@ -9,8 +16,8 @@
     position: fixed;
     width: 200px;
     height: 94vh;
-    background: #001f5f;
-    color: #DDD;
+    background: var(--main-colour);
+    color: var(--text-colour);
     border-bottom-left-radius: 12px;
     border-top-left-radius: 12px;
     border-bottom-right-radius: 12px;
@@ -31,8 +38,8 @@
     margin-left: 200px;
     height: 25px;
     position: fixed;
-    background: #001f5f;
-    color: #DDD;
+    background: var(--main-colour);
+    color: var(--text-colour);
     border-bottom-right-radius: 12px;
     border-top-right-radius: 12px;
     width: calc(100vw - 230px);
@@ -40,7 +47,7 @@
 }
 
 .loginStatus {
-    color: #DDD;
+    color: var(--text-colour);
     float: right;
     padding-right: 6px;
 }
@@ -53,27 +60,27 @@
 }
 
     .sidebar > ul > li {
-        background: #001033;
+        background: var(--dark-colour);
         border: 0px;
-        color: #DDD;
+        color: var(--text-colour);
         padding: 10px;
         font-weight: 900;
         text-align: left;
-        border-bottom: 1px solid #DDD;
+        border-bottom: 1px solid var(--text-colour);
     }
 
     .sidebar > ul > input[type=submit], .sidebar > ul > input[type=button] {
-        background: #001f5f;
+        background: var(--main-colour);
         border: 0px;
-        color: #DDD;
+        color: var(--text-colour);
         padding: 10px;
         width: 100%;
         text-align: left;
-        border-bottom: 1px solid #DDD;
+        border-bottom: 1px solid var(--text-colour);
     }
 
         .sidebar > ul > input[type=submit]:hover, .sidebar > ul > input[type=button]:hover {
-            background: #0036a3;
+            background: var(--light-colour);
             color: #fff;
             cursor: pointer;
         }

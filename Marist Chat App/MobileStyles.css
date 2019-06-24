@@ -1,4 +1,11 @@
-﻿body {
+﻿:root {
+    --main-colour: #001f5f;
+    --light-colour: #0036a3;
+    --dark-colour: #001033;
+    --text-colour: #DDD;
+}
+
+body {
     font-family: 'Raleway', sans-serif;
     background-color: #f5f5f5;
     padding: 10px;
@@ -9,12 +16,12 @@
     position: fixed;
     width: 90vw;
     height: 40px;
-    background: #001f5f;
-    color: #DDD;
+    background: var(--main-colour);
+    color: var(--text-colour);
 }
 
 .loginStatus {
-    color: #DDD;
+    color: var(--text-colour);
     float: right;
     padding-right: 6px;
     padding-top: 8px;
@@ -41,12 +48,12 @@
     position: fixed;
     width: 90vw;
     height: 94vh;
-    background: #001f5f;
-    color: #DDD;
+    background: var(--main-colour);
+    color: var(--text-colour);
 }
 
 .hamburger > ul > li > a {
-    color: #DDD;
+    color: var(--text-colour);
 }
 
 .hamburger > ul {
@@ -62,7 +69,7 @@
     }
 
         .hamburger > ul > li:hover {
-            background: #00838f;
+            background: var(--light-colour);
             color: #fff;
             cursor: pointer;
         }
@@ -77,7 +84,7 @@
 .bar1, .bar2, .bar3 {
     width: 35px;
     height: 5px;
-    background-color: #DDD;
+    background-color: var(--text-colour);
     margin: 6px 0;
     transition: 0.4s;
 }
