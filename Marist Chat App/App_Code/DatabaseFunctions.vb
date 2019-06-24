@@ -111,6 +111,14 @@ Public Class DatabaseFunctions
         Return "Success"
     End Function
 
+    Public Shared Function NewColumn(ByVal table As String, ByVal columnName As String, ByVal fieldType As String, ByVal defaultValue As String, ByVal NullOption As String) As String
+        'TODO: this is hard work. What's an ADO object?
+        Dim strOutput As String = DatabaseFunctions.runSQL("ALTER TABLE tbl_classes ADD COLUMN " & columnName & " " & fieldType & " " & NullOption & " DEFAULT " & defaultValue)
+        'https://stackoverflow.com/questions/14057085/sql-set-default-not-working-in-ms-access
+
+        Return strOutput
+    End Function
+
     Public Shared Function userExists(ByVal eml As String) As Boolean
         'Create a Connection object.
         Dim oleConn = New OleDb.OleDbConnection

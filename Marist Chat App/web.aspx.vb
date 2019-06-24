@@ -56,9 +56,7 @@ Partial Class _Default
         If btn.ID = "btnWriteClass" Then
             ' make a New field in tbl_classes called classIdentifier
 
-            Dim strOutput As String = DatabaseFunctions.runSQL("ALTER TABLE tbl_classes ADD COLUMN " & txtClassID.Text & " NUMBER NOT NULL DEFAULT 0 WITH VALUES 0")
-            Response.Write("<script>alert(""" & strOutput & """);</script>") 'debugging
-            'https://stackoverflow.com/questions/14057085/sql-set-default-not-working-in-ms-access
+            DatabaseFunctions.NewColumn("tbl_classes", txtClassID.Text, "YESNO", "NO", "NOT NULL")
 
             ' update tbl_classes set classIdentifier = 1 where userID = getUserID(student1), getUserID(student2), etc.
             '   that could be "update tbl_classes set classIdentifier = 1 where userID in ('getUserID(user1)', 'getUserID(user2)', etc.)"
