@@ -47,14 +47,14 @@ Public Class DatabaseFunctions
         Return result
     End Function
 
-    Public Shared Function readUserRole(ByVal email As String) As String 'function to read passwords from database.
+    Public Shared Function readUserInfo(ByVal email As String, ByVal column As String) As String 'function to read passwords from database.
         'Create a Connection object.
         Dim oleConn = New OleDb.OleDbConnection
         oleConn.ConnectionString = strConn
 
         'Create a Command object.
         Dim oleCmd = oleConn.CreateCommand
-        oleCmd.CommandText = "select int_role from tbl_users where str_email = '" & MakeSQLSafe(email) & "'"
+        oleCmd.CommandText = "select " & column & " from tbl_users where str_email = '" & MakeSQLSafe(email) & "'"
 
         'Open the connection.
 
@@ -112,9 +112,21 @@ Public Class DatabaseFunctions
     End Function
 
     Public Shared Function NewColumn(ByVal table As String, ByVal columnName As String, ByVal fieldType As String, ByVal defaultValue As String, ByVal NullOption As String) As String
-        'TODO: this is hard work. What's an ADO object?
-        Dim strOutput As String = DatabaseFunctions.runSQL("ALTER TABLE tbl_classes ADD COLUMN " & columnName & " " & fieldType & " " & NullOption & " DEFAULT " & defaultValue)
-        'https://stackoverflow.com/questions/14057085/sql-set-default-not-working-in-ms-access
+        'TODO: this is kinda dodgey because it has the posibility of a command running between the other two. Can the default value be put in the first command?
+
+        Dim strCmd1 As String = runSQL("ALTER TABLE " & table & " ADD COLUMN " & columnName & " " & fieldType & " " & NullOption)
+        Dim strCmd2 As String = runSQL("ALTER TABLE " & table & " ALTER COLUMN " & columnName & " SET DEFAULT " & defaultValue)
+        Dim strOutput
+
+        If (strCmd1 = "Success") And (strCmd2 = "Success") Then
+            strOutput = "Success"
+        ElseIf strCmd1 = "Success" Then
+            strOutput = strCmd2
+        ElseIf strCmd2 = "Success" Then
+            strOutput = strCmd1
+        Else
+            strOutput = strCmd1
+        End If
 
         Return strOutput
     End Function

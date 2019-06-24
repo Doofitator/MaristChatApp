@@ -33,7 +33,7 @@ Partial Class _Default
     End Function
 
     Function LoadSidebar()
-        Dim intRole As Integer = CInt(DatabaseFunctions.readUserRole(User.Identity.Name))
+        Dim intRole As Integer = CInt(DatabaseFunctions.readUserInfo(User.Identity.Name, "int_role"))
         If intRole = 0 Then 'user is a parent
             'load just alerts
         ElseIf intRole = 1 Then 'user is a student
@@ -56,10 +56,18 @@ Partial Class _Default
         If btn.ID = "btnWriteClass" Then
             ' make a New field in tbl_classes called classIdentifier
 
-            DatabaseFunctions.NewColumn("tbl_classes", txtClassID.Text, "YESNO", "NO", "NOT NULL")
+            Response.Write("<script>alert(""" & DatabaseFunctions.NewColumn("tbl_classes", DatabaseFunctions.MakeSQLSafe(txtClassID.Text), "YESNO", "NO", "NOT NULL") & """);</script>") 'debugging
 
-            ' update tbl_classes set classIdentifier = 1 where userID = getUserID(student1), getUserID(student2), etc.
-            '   that could be "update tbl_classes set classIdentifier = 1 where userID in ('getUserID(user1)', 'getUserID(user2)', etc.)"
+            Dim strUsers As String = txtUserLst.Text.Replace(",", "@marist.vic.edu.au,")    'add email domains to each username
+            Dim arrEmls As String() = strUsers.Replace(" ", "").Split(",")                  'remove spaces between commas if the user put them there & split the string up into an array
+            Dim lstUserIDs As New Generic.List(Of Integer)                                  'new list
+            For Each strEmail In arrEmls                                                    'for each email in our array
+                lstUserIDs.Add(DatabaseFunctions.readUserInfo(strEmail, "int_ID"))          'add the userID from tbl_users to our list
+            Next
+            Dim strSql As String = "update tbl_classes set "                                'begin writing sql
+            For Each intID In lstUserIDs                                                    'for each id in the list
+                'update table set classidentifier =1 where int_userid = intid               'add it's data to our sql command
+            Next
         End If
 
         'if button is a new alert button
