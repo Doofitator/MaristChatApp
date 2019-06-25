@@ -67,6 +67,7 @@ Partial Class _Default
             Dim strSql As String = "update tbl_classes set "                                'begin writing sql
             For Each intID In lstUserIDs                                                    'for each id in the list
                 'update table set classidentifier =1 where int_userid = intid               'add it's data to our sql command
+                'TODO: Do this
             Next
         End If
 
