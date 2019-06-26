@@ -13,26 +13,26 @@ Partial Class _Default
         LoadSidebar()
     End Sub
 
-    Function addSidebarBtn(ByVal controlID As String, ByVal controlContent As String)
+    Sub addSidebarBtn(ByVal controlID As String, ByVal controlContent As String)
         Dim btn As New Button                               'New button
         btn.ID = controlID                                  'set button ID
         btn.Text = controlContent                           'set button text
         AddHandler btn.Click, AddressOf Me.btn_Click        'add button onclick event
         Me.Master.FindControl("sidebar").Controls.Add(btn)  'add button to sidebar
-    End Function
-    Function addSidebarLbl(ByVal controlID As String, ByVal controlContent As String)
+    End Sub
+    Sub addSidebarLbl(ByVal controlID As String, ByVal controlContent As String)
         Dim lbl As New Literal                              'New Label
         lbl.ID = controlID                                  'set Label ID
         lbl.Text = "<li>" & controlContent & "</li>"        'set Label text
         Me.Master.FindControl("sidebar").Controls.Add(lbl)  'add Label to sidebar
-    End Function
-    Function addSidebarClientBtn(ByVal controlOnclick As String, ByVal controlText As String) 'basically addSidebarBtn except it runs javascript instead of VB code
+    End Sub
+    Sub addSidebarClientBtn(ByVal controlOnclick As String, ByVal controlText As String) 'basically addSidebarBtn except it runs javascript instead of VB code
         Dim lit As New Literal
         lit.Text = "<input type=""button"" onclick=""" & controlOnclick & """ value=""" & controlText & """ />"
         Me.Master.FindControl("sidebar").Controls.Add(lit)
-    End Function
+    End Sub
 
-    Function LoadSidebar()
+    Sub LoadSidebar()
         Dim intRole As Integer = CInt(DatabaseFunctions.readUserInfo(User.Identity.Name, "int_role"))
         If intRole = 0 Then 'user is a parent
             'load just alerts
@@ -43,11 +43,12 @@ Partial Class _Default
         ElseIf intRole = 3 Then 'user is an administrator
             'load alerts (including new alert buttons), class streams (including add class buttons)
             addSidebarLbl("lblAlerts", "Alerts")
-            addSidebarBtn("btnNewAlert", "NEW ALERT")
+            addSidebarClientBtn("HideShow('divNewAlert')", "NEW ALERT")
             addSidebarLbl("lblClasses", "Classes")
             addSidebarClientBtn("HideShow('divNewClass')", "NEW CLASS")
+            Response.Write("<script src=""/Scripts/admin.js""></script>")
         End If
-    End Function
+    End Sub
 
     Sub btn_Click(sender As Object, e As EventArgs) Handles btnWriteClass.Click
         Dim btn As Button = CType(sender, Button)  'get button that called the event
@@ -72,7 +73,11 @@ Partial Class _Default
         End If
 
         'if button is a new alert button
-
+        If btn.ID = "btnWriteAlert" Then
+            'run script to update tbl_alerts with new message
+            DatabaseFunctions.runSQL("INSERT INTO tbl_notifications ( str_message, int_userGroup, bool_urgent, dt_timeStamp ) VALUES (""" & DatabaseFunctions.MakeSQLSafe(txtMessage.Text) & """, " & ddlRoles.SelectedValue & ", " & cbxUrgent.Checked & ", """ & DateTime.Now & """)")
+            'TODO: The above script will not work - the checkbox needs to be YES / NO (as opposed to TRUE / FALSE) and the dropdown will not output the correct values.
+        End If
         'if button is a new stream button
 
         'if button is a regular, existing stream button

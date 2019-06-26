@@ -116,7 +116,7 @@ Public Class DatabaseFunctions
 
         Dim strCmd1 As String = runSQL("ALTER TABLE " & table & " ADD COLUMN " & columnName & " " & fieldType & " " & NullOption)
         Dim strCmd2 As String = runSQL("ALTER TABLE " & table & " ALTER COLUMN " & columnName & " SET DEFAULT " & defaultValue)
-        Dim strOutput
+        Dim strOutput As String
 
         If (strCmd1 = "Success") And (strCmd2 = "Success") Then
             strOutput = "Success"

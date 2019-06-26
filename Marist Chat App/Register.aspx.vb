@@ -79,6 +79,6 @@ Partial Class Register
                 Exit Function
             End If
         Next iCnt
-
+        HasNumber = False
     End Function
 End Class
