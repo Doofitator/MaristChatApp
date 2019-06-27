@@ -6,7 +6,7 @@
 <head runat="server">
     <link rel="Stylesheet" href="/Styles.css" />
     <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet">
-    <title></title>
+    <title>Marist Chat App</title>
 </head>
 <body>
     <form id="form1" runat="server">

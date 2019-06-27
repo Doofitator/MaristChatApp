@@ -10,7 +10,8 @@ Partial Class _Default
             Response.Redirect("/Default.aspx")
         End If
 
-        LoadSidebar()
+        Dim intRole As Integer = CInt(DatabaseFunctions.readUserInfo(User.Identity.Name, "int_role"))
+        LoadSidebar(intRole)
     End Sub
 
     Sub addSidebarBtn(ByVal controlID As String, ByVal controlContent As String)
@@ -32,41 +33,167 @@ Partial Class _Default
         Me.Master.FindControl("sidebar").Controls.Add(lit)
     End Sub
 
-    Sub LoadSidebar()
-        Dim intRole As Integer = CInt(DatabaseFunctions.readUserInfo(User.Identity.Name, "int_role"))
-        If intRole = 0 Then 'user is a parent
-            'load just alerts
-        ElseIf intRole = 1 Then 'user is a student
-            'load alerts and class streams
-        ElseIf intRole = 2 Then 'user is an educator
-            'load alerts and class streams (including add class buttons)
-        ElseIf intRole = 3 Then 'user is an administrator
-            'load alerts (including new alert buttons), class streams (including add class buttons)
-            addSidebarLbl("lblAlerts", "Alerts")
-            addSidebarClientBtn("HideShow('divNewAlert')", "NEW ALERT")
-            addSidebarLbl("lblClasses", "Classes")
-            addSidebarClientBtn("HideShow('divNewClass')", "NEW CLASS")
-            Response.Write("<script src=""/Scripts/admin.js""></script>")
-        End If
+    Sub debug(ByVal strOutput As String)
+        Response.Write("<script>console.log('" & strOutput & "')</script>")
     End Sub
 
-    Sub btn_Click(sender As Object, e As EventArgs) Handles btnWriteClass.Click
-        Dim btn As Button = CType(sender, Button)  'get button that called the event
+    Sub addNewAlertsDiv()
+        'Todo: document this
 
+        Dim divNewAlert As New HtmlGenericControl("div")
+        divNewAlert.ID = "divNewAlert"
+        divNewAlert.Attributes.Add("class", "wizard")
+
+        Me.Master.FindControl("BodyContent").Controls.Add(divNewAlert)
+
+        Dim divNewAlertTitleBar = New HtmlGenericControl("div")
+        divNewAlertTitleBar.ID = "divNewAlertTitleBar"
+        divNewAlertTitleBar.Attributes.Add("class", "titleBar")
+        divNewAlertTitleBar.InnerHtml = "<h3>New Alert Wizard<input style=""float: right;"" type=""button"" onclick=""HideShow('BodyContent_divNewAlert')"" value=""X"" /></h3>"
+        divNewAlert.Controls.Add(divNewAlertTitleBar)
+
+        Dim lblMessage As New Label
+        lblMessage.Text = "Message:"
+        divNewAlert.Controls.Add(lblMessage)
+
+        Dim txtMessage As New TextBox
+        txtMessage.TextMode = TextBoxMode.MultiLine
+        txtMessage.ID = "txtMessage"
+        divNewAlert.Controls.Add(txtMessage)
+
+        Dim newLine1 As New LiteralControl("<br>") : divNewAlert.Controls.Add(newLine1)
+
+        Dim cbxUrgent As New CheckBox
+        cbxUrgent.ID = "cbxUrgent"
+        cbxUrgent.Text = "Urgent?"
+        cbxUrgent.TextAlign = TextAlign.Left
+        divNewAlert.Controls.Add(cbxUrgent)
+
+        Dim newLine2 As New LiteralControl("<br>") : divNewAlert.Controls.Add(newLine2)
+
+        Dim lblRoles As New Label
+        lblRoles.Text = "User groups:"
+        divNewAlert.Controls.Add(lblRoles)
+
+        Dim ddlRoles As New DropDownList
+        ddlRoles.ID = "ddlRoles"
+        divNewAlert.Controls.Add(ddlRoles)
+
+        Dim newLine3 As New LiteralControl("<br>") : divNewAlert.Controls.Add(newLine3)
+        Dim newLine4 As New LiteralControl("<br>") : divNewAlert.Controls.Add(newLine4)
+
+        Dim btnWriteAlert As New Button
+        btnWriteAlert.Text = "Write Alert"
+        btnWriteAlert.ID = "btnWriteAlert"
+        AddHandler btnWriteAlert.Click, AddressOf Me.btn_Click
+        divNewAlert.Controls.Add(btnWriteAlert)
+    End Sub
+    Sub addNewClassDiv()
+        'Todo: document this
+
+        Dim divNewClass As New HtmlGenericControl("div")
+        divNewClass.ID = "divNewClass"
+        divNewClass.Attributes.Add("class", "wizard")
+
+        Me.Master.FindControl("BodyContent").Controls.Add(divNewClass)
+
+        Dim divNewClassTitleBar = New HtmlGenericControl("div")
+        divNewClassTitleBar.ID = "divNewClassTitleBar"
+        divNewClassTitleBar.Attributes.Add("class", "titleBar")
+        divNewClassTitleBar.InnerHtml = "<h3>New Class Wizard<input style=""float: right;"" type=""button"" onclick=""HideShow('BodyContent_divNewClass')"" value=""X"" /></h3>"
+        divNewClass.Controls.Add(divNewClassTitleBar)
+
+        Dim lblClassID As New Label
+        lblClassID.Text = "Class Identifier:"
+        divNewClass.Controls.Add(lblClassID)
+
+        Dim txtClassID As New TextBox
+        txtClassID.TextMode = TextBoxMode.SingleLine
+        txtClassID.ID = "txtClassID"
+        divNewClass.Controls.Add(txtClassID)
+
+        Dim newLine1 As New LiteralControl("<br>") : divNewClass.Controls.Add(newLine1)
+
+        Dim lblUserList As New Label
+        lblUserList.Text = "CSV user list:"
+        divNewClass.Controls.Add(lblUserList)
+
+        Dim txtUserList As New TextBox
+        txtUserList.TextMode = TextBoxMode.MultiLine
+        txtUserList.ID = "txtUserList"
+        divNewClass.Controls.Add(txtUserList)
+
+        Dim newLine3 As New LiteralControl("<br>") : divNewClass.Controls.Add(newLine3)
+        Dim newLine4 As New LiteralControl("<br>") : divNewClass.Controls.Add(newLine4)
+
+        Dim btnWriteClass As New Button
+        btnWriteClass.Text = "Write Class"
+        btnWriteClass.ID = "btnWriteClass"
+        AddHandler btnWriteClass.Click, AddressOf Me.btn_Click
+        divNewClass.Controls.Add(btnWriteClass)
+    End Sub
+
+    Sub LoadSidebar(ByVal intRole As Integer)
+        Select Case intRole
+            Case 0 'user is a parent
+            'load just alerts
+
+            Case 1 'user is a student
+            'load alerts and class streams
+
+            Case 2 'user is an educator
+            'load alerts and class streams (including add class buttons)
+
+            Case 3 'user is an administrator
+                'load alerts (including new alert buttons), class streams (including add class buttons)
+                addSidebarLbl("lblAlerts", "Alerts")
+                addSidebarClientBtn("HideShow('BodyContent_divNewAlert')", "NEW ALERT")
+                addSidebarLbl("lblClasses", "Classes")
+                addSidebarClientBtn("HideShow('BodyContent_divNewClass')", "NEW CLASS")
+        End Select
+
+        LoadContent(intRole)
+    End Sub
+
+    Sub LoadContent(ByVal intRole As Integer)
+        Select Case intRole
+            Case 2 'user is an educator
+                'load new class div
+
+            Case 3 'user is an administrator
+                'load new alert and new class divs
+                addNewAlertsDiv()
+                addNewClassDiv()
+                Response.Write("<script src=""/Scripts/admin.js""></script>")
+
+            Case Else
+                'do nothing
+        End Select
+    End Sub
+
+    Sub btn_Click(sender As Object, e As EventArgs)
+        Dim btn As Button = CType(sender, Button)  'get button that called the event
+        '
         'if button is a new class button
         If btn.ID = "btnWriteClass" Then
             ' make a New field in tbl_classes called classIdentifier
 
-            Response.Write("<script>alert(""" & DatabaseFunctions.NewColumn("tbl_classes", DatabaseFunctions.MakeSQLSafe(txtClassID.Text), "YESNO", "NO", "NOT NULL") & """);</script>") 'debugging
+            Dim txtClassID As TextBox = CType(findDynamicBodyControl("divNewClass,txtClassID"), TextBox) 'find the class identifier textbox
+            'debug(DatabaseFunctions.NewColumn("tbl_classes", DatabaseFunctions.MakeSQLSafe(txtClassID.Text), "YESNO", "NO", "NOT NULL") & """)") 'debugging
 
-            Dim strUsers As String = txtUserLst.Text.Replace(",", "@marist.vic.edu.au,")    'add email domains to each username
+            Dim txtUserList As TextBox = CType(findDynamicBodyControl("divNewClass,txtUserList"), TextBox) 'find the user list textbox
+            Dim strUsers As String = txtUserList.Text.Replace(",", "@marist.vic.edu.au,")   'add email domains to each username
             Dim arrEmls As String() = strUsers.Replace(" ", "").Split(",")                  'remove spaces between commas if the user put them there & split the string up into an array
-            Dim lstUserIDs As New Generic.List(Of Integer)                                  'new list
+            Dim listUserIDs As New Generic.List(Of Integer)                                 'new list
             For Each strEmail In arrEmls                                                    'for each email in our array
-                lstUserIDs.Add(DatabaseFunctions.readUserInfo(strEmail, "int_ID"))          'add the userID from tbl_users to our list
+                Try
+                    listUserIDs.Add(DatabaseFunctions.readUserInfo(strEmail, "int_ID"))     'add the userID from tbl_users to our list
+                Catch
+                    debug("Invalid username: " & strEmail)                                  'invalid u/n error
+                End Try
             Next
             Dim strSql As String = "update tbl_classes set "                                'begin writing sql
-            For Each intID In lstUserIDs                                                    'for each id in the list
+            For Each intID In listUserIDs                                                   'for each id in the list
                 'update table set classidentifier =1 where int_userid = intid               'add it's data to our sql command
                 'TODO: Do this
             Next
@@ -75,11 +202,24 @@ Partial Class _Default
         'if button is a new alert button
         If btn.ID = "btnWriteAlert" Then
             'run script to update tbl_alerts with new message
-            DatabaseFunctions.runSQL("INSERT INTO tbl_notifications ( str_message, int_userGroup, bool_urgent, dt_timeStamp ) VALUES (""" & DatabaseFunctions.MakeSQLSafe(txtMessage.Text) & """, " & ddlRoles.SelectedValue & ", " & cbxUrgent.Checked & ", """ & DateTime.Now & """)")
+            Dim strAccessBoolFixer As String = ""
+            Dim cbxUrgent As CheckBox = CType(findDynamicBodyControl("divNewAlert,cbxUrgent"), CheckBox)
+            Dim txtMessage As TextBox = CType(findDynamicBodyControl("divNewAlert,txtMessage"), TextBox)
+            Dim ddlRoles As DropDownList = CType(findDynamicBodyControl("divNewAlert,ddlRoles"), DropDownList)
+            'If cbxUrgent.Checked Then strAccessBoolFixer = "YES" Else strAccessBoolFixer = "NO"
+            debug("The text is: " & txtMessage.Text)
+            'DatabaseFunctions.runSQL("INSERT INTO tbl_notifications ( str_message, int_userGroup, bool_urgent, dt_timeStamp ) VALUES (""" & DatabaseFunctions.MakeSQLSafe(txtMessage.Text) & """, " & ddlRoles.SelectedValue & ", " & strAccessBoolFixer & ", """ & DateTime.Now & """)")
             'TODO: The above script will not work - the checkbox needs to be YES / NO (as opposed to TRUE / FALSE) and the dropdown will not output the correct values.
         End If
         'if button is a new stream button
 
         'if button is a regular, existing stream button
     End Sub
+
+    Function findDynamicBodyControl(ByVal path As String) As Control 'a real dirty way of doing something that should be a lot easier
+        Dim strIDArray As Array = path.Split(",")   'split the inputted path
+
+        'output the control defined in the path
+        Return Me.Master.FindControl("form1").FindControl("BodyContent").FindControl(strIDArray(0)).FindControl(strIDArray(1))
+    End Function
 End Class
