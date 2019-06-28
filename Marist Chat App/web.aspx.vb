@@ -34,59 +34,68 @@ Partial Class _Default
     End Sub
 
     Sub debug(ByVal strOutput As String)
+        'write to javascript console for immediate output
         Response.Write("<script>console.log('" & strOutput & "')</script>")
     End Sub
 
+    'define role names and database codes for use when sending & recieving alerts.
+    Dim strRoleArray As String() = {"All", "Parents", "Students", "Educators", "Admins", "Parents & Students", "Parents & Educators", "Parents, Students & Educators", "Students & Educators", "Students, Educators & Admins"}
+    Dim intRoleArray As Integer() = {4, 0, 1, 2, 3, 5, 6, 7, 8, 9}
+
     Sub addNewAlertsDiv()
-        'Todo: document this
+        Dim divNewAlert As New HtmlGenericControl("div")                ' New div
+        divNewAlert.ID = "divNewAlert"                                  ' Set ID
+        divNewAlert.Attributes.Add("class", "wizard")                   ' Set CSS class
 
-        Dim divNewAlert As New HtmlGenericControl("div")
-        divNewAlert.ID = "divNewAlert"
-        divNewAlert.Attributes.Add("class", "wizard")
+        Me.Master.FindControl("BodyContent").Controls.Add(divNewAlert)  ' Add the div to the page
 
-        Me.Master.FindControl("BodyContent").Controls.Add(divNewAlert)
-
-        Dim divNewAlertTitleBar = New HtmlGenericControl("div")
-        divNewAlertTitleBar.ID = "divNewAlertTitleBar"
-        divNewAlertTitleBar.Attributes.Add("class", "titleBar")
+        Dim divNewAlertTitleBar = New HtmlGenericControl("div")         ' New 'titlebar' div
+        divNewAlertTitleBar.ID = "divNewAlertTitleBar"                  ' Set ID
+        divNewAlertTitleBar.Attributes.Add("class", "titleBar")         ' Set CSS class
+        '                                                                 Add innerHTML incl. 'close' button
         divNewAlertTitleBar.InnerHtml = "<h3>New Alert Wizard<input style=""float: right;"" type=""button"" onclick=""HideShow('BodyContent_divNewAlert')"" value=""X"" /></h3>"
-        divNewAlert.Controls.Add(divNewAlertTitleBar)
+        divNewAlert.Controls.Add(divNewAlertTitleBar)                   ' Add titlebar to div
 
-        Dim lblMessage As New Label
-        lblMessage.Text = "Message:"
-        divNewAlert.Controls.Add(lblMessage)
+        Dim lblMessage As New Label                                     '|
+        lblMessage.Text = "Message:"                                    '| New label, add to div
+        divNewAlert.Controls.Add(lblMessage)                            '|
 
-        Dim txtMessage As New TextBox
-        txtMessage.TextMode = TextBoxMode.MultiLine
-        txtMessage.ID = "txtMessage"
-        divNewAlert.Controls.Add(txtMessage)
+        Dim txtMessage As New TextBox                                   '|
+        txtMessage.TextMode = TextBoxMode.MultiLine                     '| New textbox,
+        txtMessage.ID = "txtMessage"                                    '| Add to div.
+        divNewAlert.Controls.Add(txtMessage)                            '|
 
+        'Add newline to div
         Dim newLine1 As New LiteralControl("<br>") : divNewAlert.Controls.Add(newLine1)
 
-        Dim cbxUrgent As New CheckBox
-        cbxUrgent.ID = "cbxUrgent"
-        cbxUrgent.Text = "Urgent?"
-        cbxUrgent.TextAlign = TextAlign.Left
-        divNewAlert.Controls.Add(cbxUrgent)
+        Dim cbxUrgent As New CheckBox                                   '|
+        cbxUrgent.ID = "cbxUrgent"                                      '|
+        cbxUrgent.Text = "Urgent?"                                      '| New checkbox, add to div
+        cbxUrgent.TextAlign = TextAlign.Left                            '|
+        divNewAlert.Controls.Add(cbxUrgent)                             '|
 
+        'add newline to div
         Dim newLine2 As New LiteralControl("<br>") : divNewAlert.Controls.Add(newLine2)
 
-        Dim lblRoles As New Label
-        lblRoles.Text = "User groups:"
-        divNewAlert.Controls.Add(lblRoles)
+        Dim lblRoles As New Label                                       '|
+        lblRoles.Text = "User groups:"                                  '| New label, add to div
+        divNewAlert.Controls.Add(lblRoles)                              '|
 
-        Dim ddlRoles As New DropDownList
-        ddlRoles.ID = "ddlRoles"
-        divNewAlert.Controls.Add(ddlRoles)
+        Dim ddlRoles As New DropDownList                                '|
+        ddlRoles.ID = "ddlRoles"                                        '| New combobox
+        ddlRoles.DataSource = strRoleArray                              '|
+        ddlRoles.DataBind()                                             '| Add options & add to div.
+        divNewAlert.Controls.Add(ddlRoles)                              '|
 
+        'add newlines to div
         Dim newLine3 As New LiteralControl("<br>") : divNewAlert.Controls.Add(newLine3)
         Dim newLine4 As New LiteralControl("<br>") : divNewAlert.Controls.Add(newLine4)
 
-        Dim btnWriteAlert As New Button
-        btnWriteAlert.Text = "Write Alert"
-        btnWriteAlert.ID = "btnWriteAlert"
-        AddHandler btnWriteAlert.Click, AddressOf Me.btn_Click
-        divNewAlert.Controls.Add(btnWriteAlert)
+        Dim btnWriteAlert As New Button                                 '|
+        btnWriteAlert.Text = "Write Alert"                              '|
+        btnWriteAlert.ID = "btnWriteAlert"                              '| New button, link to btn_Click & add to div.
+        AddHandler btnWriteAlert.Click, AddressOf Me.btn_Click          '|
+        divNewAlert.Controls.Add(btnWriteAlert)                         '|
     End Sub
     Sub addNewClassDiv()
         'Todo: document this
@@ -206,10 +215,11 @@ Partial Class _Default
             Dim cbxUrgent As CheckBox = CType(findDynamicBodyControl("divNewAlert,cbxUrgent"), CheckBox)
             Dim txtMessage As TextBox = CType(findDynamicBodyControl("divNewAlert,txtMessage"), TextBox)
             Dim ddlRoles As DropDownList = CType(findDynamicBodyControl("divNewAlert,ddlRoles"), DropDownList)
-            'If cbxUrgent.Checked Then strAccessBoolFixer = "YES" Else strAccessBoolFixer = "NO"
-            debug("The text is: " & txtMessage.Text)
-            'DatabaseFunctions.runSQL("INSERT INTO tbl_notifications ( str_message, int_userGroup, bool_urgent, dt_timeStamp ) VALUES (""" & DatabaseFunctions.MakeSQLSafe(txtMessage.Text) & """, " & ddlRoles.SelectedValue & ", " & strAccessBoolFixer & ", """ & DateTime.Now & """)")
-            'TODO: The above script will not work - the checkbox needs to be YES / NO (as opposed to TRUE / FALSE) and the dropdown will not output the correct values.
+            If cbxUrgent.Checked Then strAccessBoolFixer = "YES" Else strAccessBoolFixer = "NO"
+            Dim intUserCode As Integer
+            intUserCode = intRoleArray(ddlRoles.SelectedIndex)
+            debug(DatabaseFunctions.runSQL("INSERT INTO tbl_notifications ( str_message, int_userGroup, bool_urgent, dt_timeStamp ) VALUES (""" & DatabaseFunctions.MakeSQLSafe(txtMessage.Text) & """, " & intUserCode & ", " & strAccessBoolFixer & ", """ & DateTime.Now & """)"))
+            'TODO: The above script writes user groups that are not bound as they are in the database. This is instead a job for the client end to decipher if they are part of the alert's user group.
         End If
         'if button is a new stream button
 

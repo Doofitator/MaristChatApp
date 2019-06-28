@@ -112,7 +112,7 @@ Public Class DatabaseFunctions
     End Function
 
     Public Shared Function NewColumn(ByVal table As String, ByVal columnName As String, ByVal fieldType As String, ByVal defaultValue As String, ByVal NullOption As String) As String
-        'TODO: this is kinda dodgey because it has the posibility of a command running between the other two. Can the default value be put in the first command?
+        'TODO: Test & document this
 
         Dim strCmd1 As String = runSQL("ALTER TABLE " & table & " ADD COLUMN " & columnName & " " & fieldType & " " & NullOption)
         Dim strCmd2 As String = runSQL("ALTER TABLE " & table & " ALTER COLUMN " & columnName & " SET DEFAULT " & defaultValue)
