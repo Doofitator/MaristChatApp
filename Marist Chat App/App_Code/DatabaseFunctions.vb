@@ -135,4 +135,40 @@ Public Class DatabaseFunctions
             Return False
         End If
     End Function
+
+    Public Shared Function getClasses(ByVal eml As String) As Generic.List(Of String)
+        Dim strOutput As New Generic.List(Of String)
+        Dim strCommand As String = "select * from tbl_classes where int_userID = """ & readUserInfo(eml, "int_ID") & """"
+
+        Dim oleConn = New OleDb.OleDbConnection
+        oleConn.ConnectionString = strConn
+
+        'Create a Command object.
+        Dim oleCmd = oleConn.CreateCommand
+        oleCmd.CommandText = strCommand
+
+        'Open the connection.
+
+        Try
+            oleConn.Open()
+        Catch ex As Exception
+            ' "FailConnOpen " & ex.Message
+        End Try
+
+        Dim result As String = "False" 'this is what the function will return
+
+        Try
+            Dim reader As OleDb.OleDbDataReader = oleCmd.ExecuteReader() 'run sql script
+            While reader.Read
+                strOutput.Add(reader.GetBoolean(1)) 'todo: even if this worked it would only output the first column
+            End While
+            oleConn.Close() 'close connection
+        Catch ex As Exception 'if a catastrophic error occurs
+            'console.writeline(ex.ToString)
+            oleConn.Close() 'close the connection
+            ' "Fail due to " & ex.Message & ex.StackTrace
+        End Try
+
+        Return strOutput
+    End Function
 End Class
