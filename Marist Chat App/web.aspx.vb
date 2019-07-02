@@ -268,6 +268,7 @@ Partial Class _Default
                     debug("Invalid username: " & strEmail)                                  'invalid u/n error
                 End Try
             Next
+            listUserIDs.Add(DatabaseFunctions.readUserInfo(User.Identity.Name, "int_ID"))   'Add me to the class
             Dim strSql As String = "update tbl_classes set "                                'begin writing sql
             For Each intID In listUserIDs                                                   'for each id in the list
                 '                                                                            attempt to update the row
