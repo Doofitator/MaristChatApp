@@ -1,4 +1,10 @@
-﻿
+﻿function NewStream(div, btn) {
+    HideShow(div);
+    var usrClass = btn.value.replace('NEW STREAM IN ', '');
+    document.getElementById('BodyContent_txtStreamID').value = usrClass;
+}
+
+
 function HideShow(div) {
     var element = document.getElementById(div);
     if (element.style.display == "block") {

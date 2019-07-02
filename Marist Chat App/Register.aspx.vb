@@ -49,8 +49,11 @@ Partial Class Register
 
         'Response.Write("<script>console.log('Role: " & intRole & "')</script>") 'test / debug role var
 
-        'get graduation year
-        yrGraduation = New DateTime(Graduation.Text, 1, 1)
+        Try 'as they may not be a student
+            'get graduation year
+            yrGraduation = New DateTime(Graduation.Text, 1, 1)
+        Catch
+        End Try
 
         'Response.Write("<script>console.log('Date: " & yrGraduation.ToLongDateString & "')</script>") 'test / debug year var
 
@@ -62,7 +65,7 @@ Partial Class Register
         'write to database
         Dim strSql = "insert into tbl_users (str_email, str_ecrPassword, int_role, dt_graduationYear) values ('" & strEml & "', '" & DatabaseFunctions.MakeSQLSafe(strEcrPw) & "', '" & intRole & "', '" & yrGraduation & "')"
         Dim out As String = DatabaseFunctions.runSQL(strSql) 'run command
-        If out = "Success" Then 'if command worked
+        If out.StartsWith("Success") Then 'if command worked
             Response.Redirect("/Default.aspx") 'redirect to login
         Else
             ErrorMessage.Text = "There was an error creating the user: <br><br> " & out 'show error

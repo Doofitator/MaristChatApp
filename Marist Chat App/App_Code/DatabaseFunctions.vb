@@ -99,36 +99,16 @@ Public Class DatabaseFunctions
         End Try
 
         'run the command
-
+        Dim intAffectedRows As Integer
         Try
-            oleCmd.ExecuteNonQuery() 'execute query
+            intAffectedRows = oleCmd.ExecuteNonQuery() 'execute query
             oleConn.Close() 'close connection
         Catch ex As Exception
             oleConn.Close() 'close connection
             Return "Command Failed: " & ex.Message 'command failed for some reason
         End Try
 
-        Return "Success"
-    End Function
-
-    Public Shared Function NewColumn(ByVal table As String, ByVal columnName As String, ByVal fieldType As String, ByVal defaultValue As String, ByVal NullOption As String) As String
-        'TODO: Test & document this
-
-        Dim strCmd1 As String = runSQL("ALTER TABLE " & table & " ADD COLUMN " & columnName & " " & fieldType & " " & NullOption)
-        Dim strCmd2 As String = runSQL("ALTER TABLE " & table & " ALTER COLUMN " & columnName & " SET DEFAULT " & defaultValue)
-        Dim strOutput As String
-
-        If (strCmd1 = "Success") And (strCmd2 = "Success") Then
-            strOutput = "Success"
-        ElseIf strCmd1 = "Success" Then
-            strOutput = strCmd2
-        ElseIf strCmd2 = "Success" Then
-            strOutput = strCmd1
-        Else
-            strOutput = strCmd1
-        End If
-
-        Return strOutput
+        Return "Success: " & intAffectedRows
     End Function
 
     Public Shared Function userExists(ByVal eml As String) As Boolean
