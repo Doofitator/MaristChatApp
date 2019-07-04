@@ -220,8 +220,6 @@ Partial Class _Default
 
         If intRole > 0 Then
             'TODO: load classes & streams that i'm a member of
-            debug("select * from tbl_classes where int_userID = " & DatabaseFunctions.readUserInfo(User.Identity.Name, "int_ID"))
-            debug(DatabaseFunctions.getClasses(User.Identity.Name).Count)
             'query the database for the names of classes that I'm part of
             For Each item In DatabaseFunctions.getClasses(User.Identity.Name)
                 debug(item)

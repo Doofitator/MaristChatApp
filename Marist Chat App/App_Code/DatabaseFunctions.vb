@@ -136,10 +136,11 @@ Public Class DatabaseFunctions
         End If
     End Function
 
-    Public Shared Function getClasses(ByVal eml As String) As Generic.List(Of String)
-        Dim strOutput As New Generic.List(Of String)
-        Dim strCommand As String = "select * from tbl_classes where int_userID = """ & readUserInfo(eml, "int_ID") & """"
+    Public Shared Function getClasses(ByVal eml As String) As String(,) 'returns 2D array. (0,0) = class name, (0,1) = is a member or not
+        Dim strCommand As String = "select * from tbl_classes where int_userID = " & readUserInfo(eml, "int_ID")
+        'command to select the record in the class table
 
+        'create connection object
         Dim oleConn = New OleDb.OleDbConnection
         oleConn.ConnectionString = strConn
 
@@ -155,20 +156,39 @@ Public Class DatabaseFunctions
             ' "FailConnOpen " & ex.Message
         End Try
 
-        Dim result As String = "False" 'this is what the function will return
+        Dim strValues As New Generic.List(Of String)    '|this will be the first dimension of our eventual array
+        Dim strColumns As New Generic.List(Of String)   'this will be the second dimension of our eventual array
+        'TODO: Does the above line work as a list(of Boolean)?
 
         Try
             Dim reader As OleDb.OleDbDataReader = oleCmd.ExecuteReader() 'run sql script
             While reader.Read
-                strOutput.Add(reader.GetBoolean(1)) 'todo: even if this worked it would only output the first column
+                For i As Integer = 0 To reader.FieldCount - 1   'for each column
+                    Try
+                        strColumns.Add(reader.GetName(i))   'add the column name to our first dimension
+                        strValues.Add(reader.GetBoolean(i)) 'add it's boolean value to our second
+                    Catch
+                        'first column throws an error as it is not a boolean but instead the user ID integer
+                    End Try
+                Next
             End While
             oleConn.Close() 'close connection
         Catch ex As Exception 'if a catastrophic error occurs
             'console.writeline(ex.ToString)
             oleConn.Close() 'close the connection
-            ' "Fail due to " & ex.Message & ex.StackTrace
+            'Console.WriteLine("Fail due to " & ex.Message & ex.StackTrace)
         End Try
 
-        Return strOutput
+        Dim strOutput(strValues.Count, strValues.Count) As String   'New 2D string (output)
+        Dim intIndex As Integer = 0                                 'new integer
+        For Each itm In strColumns                                  'for each column
+            intIndex = strColumns.IndexOf(itm)                      'get the index of the column
+            If intIndex > 0 Then                                    'disregard the first column (user ID)
+                strOutput(intIndex - 1, 0) = itm                    'add the column name to the first dimension
+                strOutput(intIndex - 1, 1) = strValues(intIndex - 1) 'add the corresponding column value to the second dimension
+            End If
+        Next
+
+        Return strOutput 'return output 2D array
     End Function
 End Class
