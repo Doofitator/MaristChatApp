@@ -105,3 +105,37 @@ body {
     cursor: move;
     z-index: 10;
 }
+
+.messageControls {
+    width: calc(100% - 4vw - 200px);
+    position: fixed;
+    bottom: 3vh;
+}
+
+    .messageControls > input[type="button"], .messageControls > input[type="submit"] {
+        background: var(--main-colour);
+        border: 0px;
+        color: var(--text-colour);
+        height: 30px;
+        text-align: left;
+        border-top-right-radius: 10px;
+        border-bottom-right-radius: 10px;
+        width: 50px;
+    }
+
+        .messageControls > input[type="button"]:hover, .messageControls > input[type="submit"]:hover {
+            background: var(--light-colour);
+            cursor: pointer;
+        }
+
+    .messageControls > input[type="text"] {
+        height: 30px;
+        border-bottom-left-radius: 10px;
+        border-top-left-radius: 10px;
+        border-style: none;
+        width: calc(100% - 50px);
+    }
+
+        .messageControls > input[type="text"]:focus {
+            outline-width: 0;
+        }

@@ -155,7 +155,7 @@ Partial Class _Default
     Sub addNewStreamDiv()
         Dim divNewStream As New HtmlGenericControl("div")                'New div
         divNewStream.ID = "divNewStream"                                 'Set ID
-        divNewStream.Attributes.Add("Stream", "wizard")                  'Set CSS Class
+        divNewStream.Attributes.Add("class", "wizard")                   'Set CSS Class
 
         Me.Master.FindControl("BodyContent").Controls.Add(divNewStream)  'Add the div to the page
 
@@ -320,8 +320,29 @@ QueryComplete:
 
         ElseIf btn.ID = "btnNewStream" Then 'if button is a new stream button
 
+        ElseIf btn.ID = "btnSend" Then 'if button is the send message button
+
         Else 'if button is a regular, existing stream button
-            debug("You pressed the """ & btn.ID.Replace("btn", "") & """ stream!")
+            Dim strStreamName As String = btn.ID.Replace("btn", "") 'get stream name
+            debug("You pressed the """ & strStreamName & """ stream!") 'debug to make sure that worked
+
+            Dim divMessageControls As New HtmlGenericControl("div")
+            divMessageControls.ID = "divMessageControls"
+            divMessageControls.Attributes.Add("class", "messageControls")
+            Me.Master.FindControl("BodyContent").Controls.Add(divMessageControls)
+
+            Dim txtBody As New TextBox
+            Dim btnSend As New Button
+
+            btnSend.ID = "btnSend"
+            txtBody.ID = "txtBody"
+
+            txtBody.Attributes.Add("placeholder", "Message...")
+            btnSend.Text = "Send"
+            AddHandler btnSend.Click, AddressOf Me.btn_Click
+
+            divMessageControls.Controls.Add(txtBody)
+            divMessageControls.Controls.Add(btnSend)
         End If
     End Sub
 
@@ -329,6 +350,6 @@ QueryComplete:
         Dim strIDArray As Array = path.Split(",")   'split the inputted path
 
         'output the control defined in the path
-        Return Me.Master.FindControl("form1").FindControl("BodyContent").FindControl(strIDArray(0)).FindControl(strIDArray(1))
+        Return Me.Master.FindControl("frmPage").FindControl("BodyContent").FindControl(strIDArray(0)).FindControl(strIDArray(1))
     End Function
 End Class

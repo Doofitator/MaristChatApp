@@ -9,7 +9,7 @@
     <title>Marist Chat App</title>
 </head>
 <body>
-    <form id="form1" runat="server">
+    <form id="frmPage" runat="server">
     <div class="sidebar">
         <ul>
              <asp:ContentPlaceHolder id="Sidebar" runat="server">
