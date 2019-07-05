@@ -136,7 +136,7 @@ Public Class DatabaseFunctions
         End If
     End Function
 
-    Public Shared Function getClasses(ByVal eml As String) As String(,) 'returns 2D array. (0,0) = class name, (0,1) = is a member or not
+    Public Shared Function getClasses(ByVal eml As String) As String() 'returns string array of class names that the user is a member of
         Dim strCommand As String = "select * from tbl_classes where int_userID = " & readUserInfo(eml, "int_ID")
         'command to select the record in the class table
 
@@ -179,16 +179,31 @@ Public Class DatabaseFunctions
             'Console.WriteLine("Fail due to " & ex.Message & ex.StackTrace)
         End Try
 
-        Dim strOutput(strValues.Count, strValues.Count) As String   'New 2D string (output)
+        Dim strTable(strValues.Count, strValues.Count) As String   'New 2D string (output)
         Dim intIndex As Integer = 0                                 'new integer
         For Each itm In strColumns                                  'for each column
             intIndex = strColumns.IndexOf(itm)                      'get the index of the column
             If intIndex > 0 Then                                    'disregard the first column (user ID)
-                strOutput(intIndex - 1, 0) = itm                    'add the column name to the first dimension
-                strOutput(intIndex - 1, 1) = strValues(intIndex - 1) 'add the corresponding column value to the second dimension
+                strTable(intIndex - 1, 0) = itm                     'add the column name to the first dimension
+                strTable(intIndex - 1, 1) = strValues(intIndex - 1) 'add the corresponding column value to the second dimension
             End If
         Next
 
-        Return strOutput 'return output 2D array
+        Dim strOutput As New Generic.List(Of String)                'Create a new list that will be our output
+
+        Dim cols As Integer = strTable.GetUpperBound(0)             'get the cols of the 2D string
+        Dim rows As Integer = strTable.GetUpperBound(1)             'get the rows of the 2D string
+
+        For x As Integer = 0 To cols - 1                            'for each col
+            For y As Integer = 0 To rows - 1                        'for each row
+                If strTable(x, y) = "" Then Continue For 'if there's blanks in the array (because sometimes there is), skip them
+                If y = 1 Then                                       'if the row is the true/false one
+                    If strTable(x, y) = False Then Continue For     'if it is false, we don't want it. Skip
+                    strOutput.Add(strTable(x, 0))                   'otherwise, add it's corresponding class ID to the output list
+                End If
+            Next
+        Next
+
+        Return strOutput.ToArray                                    'return the output list (as an array)
     End Function
 End Class

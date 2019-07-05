@@ -40,8 +40,12 @@ Partial Class _Default
 
     Sub debug(ByVal strOutput As String)
         'write to javascript console for immediate output
-        Dim strEscaped As String = strOutput.Replace("'", "\'")
-        Response.Write("<script>console.log('" & strEscaped & "')</script>")
+        Try
+            Dim strEscaped As String = strOutput.Replace("'", "\'")                 'Javascript escape quotes
+            Response.Write("<script>console.log('" & strEscaped & "')</script>")    'write javascript to DOM
+        Catch ex As Exception
+            debug("Failed to write to console: " & ex.Message)                      'Write fail to console
+        End Try
     End Sub
 
     'define role names and database codes for use when sending & recieving alerts.
@@ -221,10 +225,13 @@ Partial Class _Default
         If intRole > 0 Then
             'TODO: load classes & streams that i'm a member of
             'query the database for the names of classes that I'm part of
-            For Each item In DatabaseFunctions.getClasses(User.Identity.Name)
-                debug(item)
+            Dim strClassesArr() = DatabaseFunctions.getClasses(User.Identity.Name)
+            For Each item In strClassesArr
+                debug(item) 'test to make sure all our classes are here
+                'TODO: This works, make it do stuff.
             Next
         End If
+
 
         LoadContent(intRole)
     End Sub
