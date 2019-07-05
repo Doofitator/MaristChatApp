@@ -209,29 +209,37 @@ Partial Class _Default
             Case 2 'user is an educator
                 'load alerts and class streams (including add class buttons)
                 addSidebarLbl("lblAlerts", "Alerts")
-                addSidebarDivider()
-                addSidebarDivider()
-                addSidebarClientBtn("HideShow('BodyContent_divNewClass'); hamburger(document.getElementsByClassName('container')[0])", "NEW CLASS")
             Case 3 'user is an administrator
                 'load alerts (including new alert buttons), class streams (including add class buttons)
                 'client buttons show divs, close mobile hamburger menus onclick
                 addSidebarLbl("lblAlerts", "Alerts")
                 addSidebarClientBtn("HideShow('BodyContent_divNewAlert'); hamburger(document.getElementsByClassName('container')[0])", "NEW ALERT")
-                addSidebarDivider()
-                addSidebarDivider()
-                addSidebarClientBtn("HideShow('BodyContent_divNewClass'); hamburger(document.getElementsByClassName('container')[0])", "NEW CLASS")
         End Select
 
         If intRole > 0 Then
             'TODO: load classes & streams that i'm a member of
             'query the database for the names of classes that I'm part of
-            Dim strClassesArr() = DatabaseFunctions.getClasses(User.Identity.Name)
+            Dim strClassesArr() = DatabaseFunctions.getClasses(User.Identity.Name) 'get array of classes
             For Each item In strClassesArr
                 debug(item) 'test to make sure all our classes are here
                 'TODO: This works, make it do stuff.
+
+                'get array of streams
+                Dim strStreamsArr() = DatabaseFunctions.getStreams(item, User.Identity.Name)
+                'add class header to sidebar
+                addSidebarLbl("lbl" & item, item)
+                'add streams to sidebar
+                For Each stream In strStreamsArr
+                    addSidebarBtn("btn" & stream, stream)
+                Next
+                'next class
             Next
         End If
 
+        If intRole >= 2 Then
+            addSidebarDivider()
+            addSidebarClientBtn("HideShow('BodyContent_divNewClass'); hamburger(document.getElementsByClassName('container')[0])", "NEW CLASS")
+        End If
 
         LoadContent(intRole)
     End Sub
@@ -297,10 +305,8 @@ QueryComplete:
             addSidebarClientBtn("NewStream('BodyContent_divNewStream', this); hamburger(document.getElementsByClassName('container')[0])", "NEW STREAM IN " & txtClassID.Text)
             'TODO: make that client button work
             addSidebarDivider()
-        End If
 
-        'if button is a new alert button
-        If btn.ID = "btnWriteAlert" Then
+        ElseIf btn.ID = "btnWriteAlert" Then 'if button is a new alert button
             'run script to update tbl_alerts with new message
             Dim strAccessBoolFixer As String = ""
             Dim cbxUrgent As CheckBox = CType(findDynamicBodyControl("divNewAlert,cbxUrgent"), CheckBox)
@@ -311,10 +317,12 @@ QueryComplete:
             intUserCode = intRoleArray(ddlRoles.SelectedIndex)
             debug(DatabaseFunctions.runSQL("INSERT INTO tbl_notifications ( str_message, int_userGroup, bool_urgent, dt_timeStamp ) VALUES (""" & DatabaseFunctions.MakeSQLSafe(txtMessage.Text) & """, " & intUserCode & ", " & strAccessBoolFixer & ", """ & DateTime.Now & """)"))
             'TODO: The above script writes user groups that are not bound as they are in the database. This is instead a job for the client end to decipher if they are part of the alert's user group.
-        End If
-        'if button is a new stream button
 
-        'if button is a regular, existing stream button
+        ElseIf btn.ID = "btnNewStream" Then 'if button is a new stream button
+
+        Else 'if button is a regular, existing stream button
+            debug("You pressed the """ & btn.ID.Replace("btn", "") & """ stream!")
+        End If
     End Sub
 
     Function findDynamicBodyControl(ByVal path As String) As Control 'a real dirty way of doing something that should be a lot easier

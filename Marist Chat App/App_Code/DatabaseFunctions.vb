@@ -206,4 +206,53 @@ Public Class DatabaseFunctions
 
         Return strOutput.ToArray                                    'return the output list (as an array)
     End Function
+
+    Public Shared Function getStreams(ByVal ClassID As String, ByVal eml As String) As String() 'returns string array of class names that the user is a member of
+        Dim strCommand As String = "SELECT bool_isClassWide, str_streamName FROM tbl_streams WHERE str_classID = """ & ClassID & """"
+        Dim strUserName As String = eml.ToLower.Replace("@marist.vic.edu.au", "") 'get first part of email (username)
+
+        'create connection object
+        Dim oleConn = New OleDb.OleDbConnection
+        oleConn.ConnectionString = strConn
+
+        'Create a Command object.
+        Dim oleCmd = oleConn.CreateCommand
+        oleCmd.CommandText = strCommand
+
+        'Open the connection.
+
+        Try
+            oleConn.Open()
+        Catch ex As Exception
+            ' "FailConnOpen " & ex.Message
+        End Try
+
+        Dim strStreamName As New Generic.List(Of String)   'this will be our output
+
+        Try
+            Dim reader As OleDb.OleDbDataReader = oleCmd.ExecuteReader() 'run sql script
+            While reader.Read
+                For i As Integer = 0 To reader.FieldCount - 1   'for each column
+                    If i = 1 Then 'if the column is the second one (stream name column)
+                        If (reader.GetString(i).ToLower.Contains(strUserName.ToLower)) Then 'if my name is in the stream
+                            strStreamName.Add(reader.GetString(i)) 'add to output list
+                        End If
+                    End If
+
+                    If i = 0 Then 'if the column is the first one (classwide column)
+                        If reader.GetBoolean(i) Then 'if the boolean is true
+                            strStreamName.Add(reader.GetString(i + 1)) 'add it's corresponding string name to the list
+                        End If
+                    End If
+                Next
+            End While
+            oleConn.Close() 'close connection
+        Catch ex As Exception 'if a catastrophic error occurs
+            'console.writeline(ex.ToString)
+            oleConn.Close() 'close the connection
+            'Console.WriteLine("Fail due to " & ex.Message & ex.StackTrace)
+        End Try
+
+        Return strStreamName.ToArray()
+    End Function
 End Class
