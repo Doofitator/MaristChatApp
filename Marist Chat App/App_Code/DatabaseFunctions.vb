@@ -47,7 +47,7 @@ Public Class DatabaseFunctions
         Return result
     End Function
 
-    Public Shared Function readUserInfo(ByVal email As String, ByVal column As String) As String 'function to read passwords from database.
+    Public Shared Function readUserInfo(ByVal email As String, ByVal column As String) As String 'function to read user IDs and Roles from database.
         'Create a Connection object.
         Dim oleConn = New OleDb.OleDbConnection
         oleConn.ConnectionString = strConn
@@ -76,6 +76,40 @@ Public Class DatabaseFunctions
             'console.writeline(ex.ToString)
             oleConn.Close() 'close the connection
             Return "Fail due to " & ex.Message & ex.StackTrace
+        End Try
+
+        Return result
+    End Function
+
+    Public Shared Function readStreamID(ByVal classID As String) As String 'function to read passwords from database.
+        'Create a Connection object.
+        Dim oleConn = New OleDb.OleDbConnection
+        oleConn.ConnectionString = strConn
+
+        'Create a Command object.
+        Dim oleCmd = oleConn.CreateCommand
+        oleCmd.CommandText = "select int_streamID from tbl_streams where str_streamName = '" & MakeSQLSafe(classID) & "'"
+
+        'Open the connection.
+
+        Try
+            oleConn.Open()
+        Catch ex As Exception
+            Return "FailConnOpen " & ex.Message
+        End Try
+
+        Dim result As String = "False" 'this is what the function will return
+
+        Try
+            Dim reader As OleDb.OleDbDataReader = oleCmd.ExecuteReader() 'run sql script
+            While reader.Read
+                result = reader.GetInt32(0) 'get first value of field (because there should only be one record returned as there shouldn't be stream doubleups).
+            End While
+            oleConn.Close() 'close connection
+        Catch ex As Exception 'if a catastrophic error occurs
+            'console.writeline(ex.ToString)
+            oleConn.Close() 'close the connection
+            result = "Fail due to " & ex.Message & ex.StackTrace
         End Try
 
         Return result

@@ -1,4 +1,4 @@
-﻿
+﻿Imports DatabaseFunctions
 Partial Class _Default
     Inherits System.Web.UI.Page
 
@@ -10,7 +10,7 @@ Partial Class _Default
             Response.Redirect("/Default.aspx")
         End If
 
-        Dim intRole As Integer = CInt(DatabaseFunctions.readUserInfo(User.Identity.Name, "int_role"))
+        Dim intRole As Integer = CInt(readUserInfo(User.Identity.Name, "int_role"))
         LoadSidebar(intRole)
     End Sub
 
@@ -204,8 +204,8 @@ Partial Class _Default
             'load just alerts
 
             Case 1 'user is a student
-            'load alerts and class streams
-
+                'load alerts and class streams
+                addSidebarLbl("lblAlerts", "Alerts")
             Case 2 'user is an educator
                 'load alerts and class streams (including add class buttons)
                 addSidebarLbl("lblAlerts", "Alerts")
@@ -216,16 +216,15 @@ Partial Class _Default
                 addSidebarClientBtn("HideShow('BodyContent_divNewAlert'); hamburger(document.getElementsByClassName('container')[0])", "NEW ALERT")
         End Select
 
-        If intRole > 0 Then
-            'TODO: load classes & streams that i'm a member of
+        If intRole > 0 Then 'load class streams if you're not a parent / friend
             'query the database for the names of classes that I'm part of
-            Dim strClassesArr() = DatabaseFunctions.getClasses(User.Identity.Name) 'get array of classes
+            Dim strClassesArr() = getClasses(User.Identity.Name) 'get array of classes
             For Each item In strClassesArr
                 debug(item) 'test to make sure all our classes are here
                 'TODO: This works, make it do stuff.
 
                 'get array of streams
-                Dim strStreamsArr() = DatabaseFunctions.getStreams(item, User.Identity.Name)
+                Dim strStreamsArr() = getStreams(item, User.Identity.Name)
                 'add class header to sidebar
                 addSidebarLbl("lbl" & item, item)
                 'add streams to sidebar
@@ -258,17 +257,53 @@ Partial Class _Default
                 'do nothing
         End Select
         Response.Write("<script src=""/Scripts/scripts.js""></script>")
+
+        If intRole > 0 Then
+            Dim divMessageControls As New HtmlGenericControl("div")                 'New div
+            divMessageControls.ID = "divMessageControls"                            'Set ID
+            divMessageControls.Attributes.Add("class", "messageControls")           'Set class
+            Me.Master.FindControl("BodyContent").Controls.Add(divMessageControls)   'Add to page
+
+            Dim txtBody As New TextBox                          'New Textbox
+            Dim btnSend As New Button                           'New button
+
+            btnSend.ID = "btnSend"                              'Set button ID
+            txtBody.ID = "txtBody"                              'Set textbox ID
+
+            txtBody.Attributes.Add("placeholder", "Message...") 'Set textbox placeholder
+            btnSend.Text = "Send"                               'Set button text
+
+            AddHandler btnSend.Click, AddressOf Me.btn_Click    'Assign button click function
+            txtBody.Attributes.Add("onkeypress", "button_click(this,'BodyContent_btnSend')")
+
+            divMessageControls.Controls.Add(txtBody)            'Add textbox to page
+            divMessageControls.Controls.Add(btnSend)            'Add button to page
+
+            '--------------------------------------------------------------------------------------
+
+            Dim divStreamHeading As New HtmlGenericControl("div")                 'New div
+            divStreamHeading.ID = "divStreamHeading"                            'Set ID
+            divStreamHeading.Attributes.Add("class", "streamHeading")           'Set class
+            Me.Master.FindControl("BodyContent").Controls.Add(divStreamHeading)   'Add to page
+
+            Dim lblStreamName As New Label                            'New Textbox
+
+            lblStreamName.ID = "lblStreamName"                        'Set textbox ID
+
+            divStreamHeading.Controls.Add(lblStreamName)            'Add textbox to page
+        End If
     End Sub
 
     Sub btn_Click(sender As Object, e As EventArgs)
         Dim btn As Button = CType(sender, Button)  'get button that called the event
+        debug("BUTTON CLICKED: " & btn.ID)
         '
         'if button is a new class button
         If btn.ID = "btnWriteClass" Then
             ' make a New field in tbl_classes called classIdentifier
 
             Dim txtClassID As TextBox = CType(findDynamicBodyControl("divNewClass,txtClassID"), TextBox) 'find the class identifier textbox
-            debug(DatabaseFunctions.runSQL("ALTER TABLE tbl_classes ADD COLUMN " & DatabaseFunctions.MakeSQLSafe(txtClassID.Text) & " YESNO NOT NULL")) 'debugging
+            debug(runSQL("ALTER TABLE tbl_classes ADD COLUMN " & MakeSQLSafe(txtClassID.Text) & " YESNO NOT NULL")) 'debugging
 
             Dim txtUserList As TextBox = CType(findDynamicBodyControl("divNewClass,txtUserList"), TextBox) 'find the user list textbox
             Dim strUsers As String = txtUserList.Text.Replace(",", "@marist.vic.edu.au,")   'add email domains to each username
@@ -276,16 +311,16 @@ Partial Class _Default
             Dim listUserIDs As New Generic.List(Of Integer)                                 'new list
             For Each strEmail In arrEmls                                                    'for each email in our array
                 Try
-                    listUserIDs.Add(DatabaseFunctions.readUserInfo(strEmail, "int_ID"))     'add the userID from tbl_users to our list
+                    listUserIDs.Add(readUserInfo(strEmail, "int_ID"))     'add the userID from tbl_users to our list
                 Catch
                     debug("Invalid username: " & strEmail)                                  'invalid u/n error
                 End Try
             Next
-            listUserIDs.Add(DatabaseFunctions.readUserInfo(User.Identity.Name, "int_ID"))   'Add me to the class
+            listUserIDs.Add(readUserInfo(User.Identity.Name, "int_ID"))   'Add me to the class
             Dim strSql As String = "update tbl_classes set "                                'begin writing sql
             For Each intID In listUserIDs                                                   'for each id in the list
                 '                                                                            attempt to update the row
-                Dim strUpdateCmd As String = DatabaseFunctions.runSQL("update tbl_classes set " & DatabaseFunctions.MakeSQLSafe(txtClassID.Text) & " = 1 where int_UserID = " & intID)
+                Dim strUpdateCmd As String = runSQL("update tbl_classes set " & MakeSQLSafe(txtClassID.Text) & " = 1 where int_UserID = " & intID)
                 If strUpdateCmd.StartsWith("Success") Then                                  'if the command was successful
                     Dim intAffectedRows As Integer                                          '|
                     intAffectedRows = CInt(strUpdateCmd.Replace("Success: ", ""))           '|New integer, get amount of affected rows
@@ -296,7 +331,7 @@ Partial Class _Default
                 End If
 
                 'updating the row didn't work, so we will insert (as it obviously wasn't there).
-                DatabaseFunctions.runSQL("insert into tbl_classes (int_userID, " & DatabaseFunctions.MakeSQLSafe(txtClassID.Text) & ") values (" & intID & ", YES)")
+                runSQL("insert into tbl_classes (int_userID, " & MakeSQLSafe(txtClassID.Text) & ") values (" & intID & ", YES)")
 
 QueryComplete:
             Next
@@ -315,34 +350,26 @@ QueryComplete:
             If cbxUrgent.Checked Then strAccessBoolFixer = "YES" Else strAccessBoolFixer = "NO"
             Dim intUserCode As Integer
             intUserCode = intRoleArray(ddlRoles.SelectedIndex)
-            debug(DatabaseFunctions.runSQL("INSERT INTO tbl_notifications ( str_message, int_userGroup, bool_urgent, dt_timeStamp ) VALUES (""" & DatabaseFunctions.MakeSQLSafe(txtMessage.Text) & """, " & intUserCode & ", " & strAccessBoolFixer & ", """ & DateTime.Now & """)"))
+            debug(runSQL("INSERT INTO tbl_notifications (str_message, int_userGroup, bool_urgent, dt_timeStamp) VALUES (""" & MakeSQLSafe(txtMessage.Text) & """, " & intUserCode & ", " & strAccessBoolFixer & ", """ & DateTime.Now & """)"))
             'TODO: The above script writes user groups that are not bound as they are in the database. This is instead a job for the client end to decipher if they are part of the alert's user group.
 
         ElseIf btn.ID = "btnNewStream" Then 'if button is a new stream button
 
         ElseIf btn.ID = "btnSend" Then 'if button is the send message button
+            Dim txtBody As TextBox = findDynamicBodyControl("divMessageControls,txtBody")
+            Dim strMessage As String = txtBody.Text
+            Dim lblStreamName As Label = findDynamicBodyControl("divStreamHeading,lblStreamName") 'get heading label
+            runSQL("insert into tbl_messages (int_streamID, int_fromID, dt_timeStamp, str_message, bool_active, bool_read) VALUES (" & readStreamID(lblStreamName.Text) & ", " & readUserInfo(User.Identity.Name, "int_ID") & ", """ & DateTime.Now & """, """ & MakeSQLSafe(strMessage) & """, True, False)")
+            txtBody.Text = ""
+            'todo: what happens when we hit this without first hitting a stream in the sidebar?
 
         Else 'if button is a regular, existing stream button
-            Dim strStreamName As String = btn.ID.Replace("btn", "") 'get stream name
-            debug("You pressed the """ & strStreamName & """ stream!") 'debug to make sure that worked
+            Dim strStreamName As String = btn.ID.Replace("btn", "")     'get stream name
+            Dim lblStreamName As Label = findDynamicBodyControl("divStreamHeading,lblStreamName") 'get heading label
+            debug("You pressed the """ & strStreamName & """ stream!")  'debug to make sure that worked
+            lblStreamName.Text = strStreamName                            'set heading label text
 
-            Dim divMessageControls As New HtmlGenericControl("div")
-            divMessageControls.ID = "divMessageControls"
-            divMessageControls.Attributes.Add("class", "messageControls")
-            Me.Master.FindControl("BodyContent").Controls.Add(divMessageControls)
-
-            Dim txtBody As New TextBox
-            Dim btnSend As New Button
-
-            btnSend.ID = "btnSend"
-            txtBody.ID = "txtBody"
-
-            txtBody.Attributes.Add("placeholder", "Message...")
-            btnSend.Text = "Send"
-            AddHandler btnSend.Click, AddressOf Me.btn_Click
-
-            divMessageControls.Controls.Add(txtBody)
-            divMessageControls.Controls.Add(btnSend)
+            'Load stream messages
         End If
     End Sub
 

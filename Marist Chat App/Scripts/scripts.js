@@ -4,6 +4,13 @@
     document.getElementById('BodyContent_txtStreamID').value = usrClass;
 }
 
+function button_click(objTextBox, objBtnID) {
+    if (window.event.keyCode == 13) {
+        document.getElementById(objBtnID).focus();
+        document.getElementById(objBtnID).click();
+    }
+}
+
 
 function HideShow(div) {
     var element = document.getElementById(div);

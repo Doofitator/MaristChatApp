@@ -139,3 +139,9 @@ body {
         .messageControls > input[type="text"]:focus {
             outline-width: 0;
         }
+
+.streamHeading {
+    margin: auto;
+    display: table;
+    border-bottom: 1px solid black;
+}
