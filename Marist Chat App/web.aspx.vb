@@ -220,7 +220,6 @@ Partial Class _Default
             'query the database for the names of classes that I'm part of
             Dim strClassesArr() = getClasses(User.Identity.Name) 'get array of classes
             For Each item In strClassesArr
-                debug(item) 'test to make sure all our classes are here
                 'TODO: This works, make it do stuff.
 
                 'get array of streams
@@ -274,7 +273,7 @@ Partial Class _Default
             btnSend.Text = "Send"                               'Set button text
 
             AddHandler btnSend.Click, AddressOf Me.btn_Click    'Assign button click function
-            txtBody.Attributes.Add("onkeypress", "button_click(this,'BodyContent_btnSend')")
+            txtBody.Attributes.Add("onkeypress", "button_click(this,'BodyContent_btnSend')") 'get it to run some javascript on click
 
             divMessageControls.Controls.Add(txtBody)            'Add textbox to page
             divMessageControls.Controls.Add(btnSend)            'Add button to page
@@ -296,7 +295,7 @@ Partial Class _Default
 
     Sub btn_Click(sender As Object, e As EventArgs)
         Dim btn As Button = CType(sender, Button)  'get button that called the event
-        debug("BUTTON CLICKED: " & btn.ID)
+        'debug("BUTTON CLICKED: " & btn.ID)
         '
         'if button is a new class button
         If btn.ID = "btnWriteClass" Then
@@ -361,15 +360,57 @@ QueryComplete:
             Dim lblStreamName As Label = findDynamicBodyControl("divStreamHeading,lblStreamName") 'get heading label
             runSQL("insert into tbl_messages (int_streamID, int_fromID, dt_timeStamp, str_message, bool_active, bool_read) VALUES (" & readStreamID(lblStreamName.Text) & ", " & readUserInfo(User.Identity.Name, "int_ID") & ", """ & DateTime.Now & """, """ & MakeSQLSafe(strMessage) & """, True, False)")
             txtBody.Text = ""
+            Dim streamButton As Button = findDynamicSidebarControl("btn" & lblStreamName.Text)
+            btn_Click(streamButton, EventArgs.Empty)
             'todo: what happens when we hit this without first hitting a stream in the sidebar?
 
         Else 'if button is a regular, existing stream button
-            Dim strStreamName As String = btn.ID.Replace("btn", "")     'get stream name
+            Dim strStreamName As String = btn.ID.Replace("btn", "")         'get stream name
             Dim lblStreamName As Label = findDynamicBodyControl("divStreamHeading,lblStreamName") 'get heading label
-            debug("You pressed the """ & strStreamName & """ stream!")  'debug to make sure that worked
-            lblStreamName.Text = strStreamName                            'set heading label text
+            'debug("You pressed the """ & strStreamName & """ stream!")      'debug to make sure that worked
+            lblStreamName.Text = strStreamName                              'set heading label text
 
             'Load stream messages
+            Dim strMessages(,) = getMessages(readStreamID(strStreamName))   'get the messages
+
+            Dim intMessageCount = 0
+
+            For Each message In strMessages                                 'for every message
+                If (Not message = Nothing) And (Not IsNumeric(message)) Then                               'if the message isn't blank
+
+                    'todo: documentation
+
+                    intMessageCount += 1
+
+                    Dim cols As Integer = strMessages.GetUpperBound(0)
+                    Dim rows As Integer = strMessages.GetUpperBound(1)
+
+                    Dim toFind As String = message
+                    Dim xIndex As Integer
+                    Dim yIndex As Integer
+
+                    For x As Integer = 0 To cols - 1
+                        For y As Integer = 0 To rows - 1
+                            If strMessages(x, y) = toFind Then
+                                xIndex = x
+                                yIndex = y
+                                'debug(toFind & " [(" & x & "," & y & ")] has the fromID " & strMessages(x, y - 1))
+
+                                Dim lblMessage As New Label
+                                lblMessage.ID = "lblMessage" & intMessageCount
+                                If readUserInfo(User.Identity.Name, "int_ID") = strMessages(x, y - 1) Then
+                                    lblMessage.CssClass = "yourMessage"
+                                Else
+                                    lblMessage.CssClass = "theirMessage"
+                                End If
+                                lblMessage.Text = toFind
+                                Me.Master.FindControl("BodyContent").Controls.Add(lblMessage)
+                            End If
+                        Next
+                    Next
+
+                End If
+            Next
         End If
     End Sub
 
@@ -379,4 +420,12 @@ QueryComplete:
         'output the control defined in the path
         Return Me.Master.FindControl("frmPage").FindControl("BodyContent").FindControl(strIDArray(0)).FindControl(strIDArray(1))
     End Function
+
+    Function findDynamicSidebarControl(ByVal id As String) As Control 'a real dirty way of doing something that should be a lot easier
+
+        'output the control defined in the path
+        Return Me.Master.FindControl("frmPage").FindControl("Sidebar").FindControl(id)
+    End Function
+
+    'TODO: Make a timer work! Messages need to come through without reloads!
 End Class

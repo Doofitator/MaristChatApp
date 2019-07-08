@@ -145,3 +145,18 @@ body {
     display: table;
     border-bottom: 1px solid black;
 }
+
+.yourMessage, .theirMessage {
+    display: block;
+    width: 100%;
+    padding: 2px;
+}
+
+.yourMessage {
+    border-right: 5px solid blue;
+    text-align: right;
+}
+
+.theirMessage {
+    border-left: 5px solid red;
+}

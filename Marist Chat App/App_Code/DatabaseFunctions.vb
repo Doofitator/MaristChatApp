@@ -81,14 +81,14 @@ Public Class DatabaseFunctions
         Return result
     End Function
 
-    Public Shared Function readStreamID(ByVal classID As String) As String 'function to read passwords from database.
+    Public Shared Function readStreamID(ByVal streamName As String) As String 'function to read stream IDs from database.
         'Create a Connection object.
         Dim oleConn = New OleDb.OleDbConnection
         oleConn.ConnectionString = strConn
 
         'Create a Command object.
         Dim oleCmd = oleConn.CreateCommand
-        oleCmd.CommandText = "select int_streamID from tbl_streams where str_streamName = '" & MakeSQLSafe(classID) & "'"
+        oleCmd.CommandText = "select int_streamID from tbl_streams where str_streamName = '" & MakeSQLSafe(streamName) & "'"
 
         'Open the connection.
 
@@ -288,5 +288,57 @@ Public Class DatabaseFunctions
         End Try
 
         Return strStreamName.ToArray()
+    End Function
+
+    Public Shared Function getMessages(ByVal streamID As Integer) As String(,) 'returns 2D array. (0,0) = message body, (0,1) = message sender ID
+        Dim strCommand As String = "select str_message, int_fromID from tbl_messages where int_streamID = " & streamID
+        'command to select the record in the class table
+
+        'create connection object
+        Dim oleConn = New OleDb.OleDbConnection
+        oleConn.ConnectionString = strConn
+
+        'Create a Command object.
+        Dim oleCmd = oleConn.CreateCommand
+        oleCmd.CommandText = strCommand
+
+        'Open the connection.
+
+        Try
+            oleConn.Open()
+        Catch ex As Exception
+            ' "FailConnOpen " & ex.Message
+        End Try
+
+        Dim strMessages As New Generic.List(Of String)   'this will be the first dimension of our eventual array
+        Dim intSenders As New Generic.List(Of Integer)   'this will be the second dimension of our eventual array
+
+        Try
+            Dim reader As OleDb.OleDbDataReader = oleCmd.ExecuteReader() 'run sql script
+            While reader.Read
+                For i As Integer = 0 To reader.FieldCount - 1   'for each column
+                    Try
+                        strMessages.Add(reader.GetString(i))   'add the column name to our first dimension
+                    Catch
+                        intSenders.Add(reader.GetInt32(i)) 'add it's boolean value to our second
+                    End Try
+                Next
+            End While
+            oleConn.Close() 'close connection
+        Catch ex As Exception 'if a catastrophic error occurs
+            'console.writeline(ex.ToString)
+            oleConn.Close() 'close the connection
+            'Console.WriteLine("Fail due to " & ex.Message & ex.StackTrace)
+        End Try
+
+        Dim strOutput(strMessages.Count, strMessages.Count) As String   'New 2D string (output)
+        Dim intIndex As Integer = 0                                     'new integer
+        For Each itm In strMessages                                      'for each message
+            intIndex = strMessages.IndexOf(itm)                          'get the index of the sender item
+            strOutput(intIndex, 0) = intSenders(intIndex)              'add the corresponding message value to the second dimension
+                strOutput(intIndex, 1) = itm                                'add the sender ID to the first dimension
+        Next
+
+        Return strOutput 'return output 2D array
     End Function
 End Class
