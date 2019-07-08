@@ -11,7 +11,7 @@
     <title>Marist Chat App</title>
 </head>
 <body>
-    <form id="frmPage" runat="server">
+    <form id="frmPage" runat="server" autocomplete="off">
     <div class="sidebar">
         <ul>
              <asp:ContentPlaceHolder id="Sidebar" runat="server">
