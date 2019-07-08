@@ -4,7 +4,7 @@
      
 </asp:Content>
 <asp:Content ID="Content3" ContentPlaceHolderID="topBar" runat="Server">
-    Log In
+    <span class="title">Please Log In</span>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="BodyContent" Runat="Server">
 

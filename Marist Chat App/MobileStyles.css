@@ -81,6 +81,12 @@ body {
     padding-left: 6px;
 }
 
+.title {
+    display: block;
+    float: right;
+    padding: 10px;
+}
+
 .bar1, .bar2, .bar3 {
     width: 35px;
     height: 5px;
@@ -145,3 +151,62 @@ body {
         color: #fff;
         cursor: pointer;
     }
+
+/* ------------ */
+
+.messageControls {
+    width: calc(100% - 10vw);
+    position: fixed;
+    bottom: 3vh;
+    z-index: -1;
+}
+
+    .messageControls > input[type="button"], .messageControls > input[type="submit"] {
+        background: var(--main-colour);
+        border: 0px;
+        color: var(--text-colour);
+        height: 30px;
+        text-align: left;
+        border-top-right-radius: 10px;
+        border-bottom-right-radius: 10px;
+        width: 50px;
+    }
+
+        .messageControls > input[type="button"]:hover, .messageControls > input[type="submit"]:hover {
+            background: var(--light-colour);
+            cursor: pointer;
+        }
+
+    .messageControls > input[type="text"] {
+        height: 30px;
+        border-bottom-left-radius: 10px;
+        border-top-left-radius: 10px;
+        border-style: none;
+        width: calc(100% - 50px);
+    }
+
+        .messageControls > input[type="text"]:focus {
+            outline-width: 0;
+        }
+
+.streamHeading {
+    margin: auto;
+    display: table;
+    border-bottom: 1px solid black;
+}
+
+.yourMessage, .theirMessage {
+    display: block;
+    width: calc(100% - 4vw);
+    padding: 2px;
+}
+
+.yourMessage {
+    border-right: 5px solid blue;
+    text-align: right;
+    margin-right: 5vw;
+}
+
+.theirMessage {
+    border-left: 5px solid red;
+}
