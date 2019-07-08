@@ -4,13 +4,19 @@
     document.getElementById('BodyContent_txtStreamID').value = usrClass;
 }
 
-function button_click(objTextBox, objBtnID) {
-    if (window.event.keyCode == 13) {
-        document.getElementById(objBtnID).focus();
-        document.getElementById(objBtnID).click();
+function button_click(e) {
+    var keyCode = e.keyCode ? e.keyCode : e.which;
+    console.log("WINDOW EVENT KEYCODE: " + keyCode);
+    if (window.event.keycode == 13) {
+        document.getElementById('BodyContent_btnSend').focus();
+        document.getElementById('BodyContent_btnSend').click();
     }
 }
 
+function ScrollDown() {
+    var objDiv = document.getElementById("BodyContent_pnlMessages");
+    objDiv.scrollTop = objDiv.scrollHeight;
+}
 
 function HideShow(div) {
     var element = document.getElementById(div);

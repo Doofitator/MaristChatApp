@@ -336,7 +336,7 @@ Public Class DatabaseFunctions
         For Each itm In strMessages                                      'for each message
             intIndex = strMessages.IndexOf(itm)                          'get the index of the sender item
             strOutput(intIndex, 0) = intSenders(intIndex)              'add the corresponding message value to the second dimension
-                strOutput(intIndex, 1) = itm                                'add the sender ID to the first dimension
+            strOutput(intIndex, 1) = itm                                'add the sender ID to the first dimension
         Next
 
         Return strOutput 'return output 2D array

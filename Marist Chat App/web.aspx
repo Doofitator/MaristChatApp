@@ -4,7 +4,6 @@
 
 <%-- Add content controls here --%>
 
-
 <asp:Content ID="Content1" ContentPlaceHolderID="Sidebar" Runat="Server">
     <input type="text" placeholder="Search" id="sbox" />
 </asp:Content>
@@ -14,5 +13,16 @@
 </asp:Content>
 
 <asp:Content ID="Content3" ContentPlaceHolderID="BodyContent" Runat="Server">
-
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script>
+        setTimeout(function () {
+            ScrollDown();
+        }, 500);
+    </script>
+    <script>
+        $(document).ready(function () {
+            if ($(window).width() < 388)
+                $('#topBar_lblStreamName').css('display', 'none');
+        });
+    </script>
 </asp:Content>
