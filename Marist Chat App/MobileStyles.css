@@ -137,7 +137,7 @@ body {
     border-bottom: 1px solid var(--text-colour);
 }
 
-.hamburger > ul > input[type=submit], .hamburger > ul > input[type=button] {
+.hamburger > ul > input[type=submit], .hamburger > ul > input[type=button], .hamburger > ul > div > input[type=submit] {
     background: var(--main-colour);
     border: 0px;
     color: var(--text-colour);
@@ -147,7 +147,7 @@ body {
     border-bottom: 1px solid var(--text-colour);
 }
 
-    .hamburger > ul > input[type=submit]:hover, .hamburger > ul > input[type=button]:hover {
+    .hamburger > ul > input[type=submit]:hover, .hamburger > ul > input[type=button]:hover, .hamburger > ul > div > input[type=submit]:hover {
         background: var(--light-colour);
         color: #fff;
         cursor: pointer;
@@ -226,3 +226,22 @@ span#topBar_lblStreamName {
     overflow-x: hidden;
     height: 78vh;
 }
+
+.urgent {
+    color: red !important;
+    position: relative;
+}
+
+    .urgent::after {
+        content: "";
+        background-image: url('https://cdn3.iconfinder.com/data/icons/tango-icon-library/48/software-update-urgent-512.png');
+        background-size: 33px 33px;
+        background-repeat: no-repeat;
+        min-height: 33px;
+        min-width: 33px;
+        display: block;
+        float: right;
+        position: absolute;
+        right: 0px;
+        margin-top: -33px;
+    }

@@ -30,21 +30,6 @@ function HideShow(div) {
     dragElement(element);
 }
 
-function collapse(label) {
-    var ancestor = document.getElementsByClassName('sidebar')[0],
-        descendents = ancestor.getElementsByTagName('*');
-    for (i = 0; i < descendents.length; i++) {
-        if (descendents[i] = label) {
-            console.log("label at " + i);
-            //todo: finish this when the website comes back online
-
-            //get all elements in DOM until next <li>
-
-            //set their styles to display:none or display:block respectively
-        }
-    }
-}
-
 // from https://www.w3schools.com/howto/howto_js_draggable.asp:
 
 function dragElement(elmnt) {

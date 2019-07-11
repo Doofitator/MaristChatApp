@@ -24,5 +24,17 @@
             if ($(window).width() < 388)
                 $('#topBar_lblStreamName').css('display', 'none');
         });
+        function collapse(label) {
+            
+            var elems = $(label).nextUntil('li, hr');
+            var i;
+            for (i = 0; i < elems.length; i++) {
+                if (elems[i].style.display == "none") {
+                    elems[i].style.display = "block";
+                } else {
+                    elems[i].style.display = "none";
+                }
+            }
+        }
     </script>
 </asp:Content>
