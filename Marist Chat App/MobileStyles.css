@@ -260,3 +260,26 @@ span#topBar_lblStreamName {
         right: 0px;
         margin-top: -33px;
     }
+
+.messagesContainer > div > input[type=submit] {
+    background: var(--main-colour);
+    border: 0px;
+    color: var(--text-colour);
+    padding: 10px;
+    width: 100%;
+    text-align: left;
+}
+
+    .messagesContainer > div > input[type=submit]:hover {
+        background: var(--light-colour);
+        color: #fff;
+        cursor: pointer;
+    }
+
+    .messagesContainer > div {
+        padding-bottom: 2.5px;
+    }
+
+.urgent > input[type=submit] {
+    color: red !important;
+}

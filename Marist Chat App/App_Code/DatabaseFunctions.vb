@@ -448,6 +448,9 @@ Public Class DatabaseFunctions
         'todo: As in the previous function, I have realised that the following line should probably be 'strOutput(strNotifcationContent.Count, 1)', however I don't
         'want to waste time debugging that change as it works atm
 
+        strNotificationContent.Reverse()
+        intIDs.Reverse()
+
         Dim strOutput(strNotificationContent.Count, strNotificationContent.Count) As String   'New 2D string (output)
         Dim intIndex As Integer = 0                                     'new integer
         For Each itm In strNotificationContent                          'for each message

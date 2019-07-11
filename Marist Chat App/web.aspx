@@ -36,4 +36,8 @@
             }
         }
     </script>
+
+    <asp:Panel runat="server" ID="pnlMessages" CssClass="messagesContainer">
+
+    </asp:Panel>
 </asp:Content>

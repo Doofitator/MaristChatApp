@@ -183,13 +183,37 @@ body {
 .messagesContainer {
     overflow: scroll;
     overflow-x: hidden;
-    height: 88vh;
+    height: 83vh;
 }
+
+    .messagesContainer > div > input[type=submit] {
+        background: var(--main-colour);
+        border: 0px;
+        color: var(--text-colour);
+        padding: 10px;
+        width: 200px;
+        text-align: left;
+    }
+
+    .messagesContainer > div > input[type=submit]:hover {
+        background: var(--light-colour);
+        color: #fff;
+        cursor: pointer;
+    }
+
+    .messagesContainer > div {
+        padding-bottom: 2.5px;
+    }
 
 .urgent {
     color: red !important;
     position: relative;
 }
+
+    .urgent > input[type=submit] {
+        color: red !important;
+    }
+
     .urgent::after {
         content: "";
         background-image: url('https://cdn3.iconfinder.com/data/icons/tango-icon-library/48/software-update-urgent-512.png');
