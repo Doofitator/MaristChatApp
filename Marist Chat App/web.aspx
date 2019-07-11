@@ -13,7 +13,6 @@
 </asp:Content>
 
 <asp:Content ID="Content3" ContentPlaceHolderID="BodyContent" Runat="Server">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script>
         setTimeout(function () {
             ScrollDown();

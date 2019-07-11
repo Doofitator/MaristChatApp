@@ -1,4 +1,5 @@
-﻿Imports DatabaseFunctions
+﻿Imports System.Data
+Imports DatabaseFunctions
 Partial Class _Default
     Inherits System.Web.UI.Page
 
@@ -194,14 +195,14 @@ Partial Class _Default
         'add newline to div
         divNewStream.Controls.Add(New LiteralControl("<br>"))
 
-        Dim lblUserList As New Label                                    '|
-        lblUserList.Text = "CSV user list:"                             '| New label, add to div
-        divNewStream.Controls.Add(lblUserList)                          '|
+        Dim lblUserList As New Label                                     '|
+        lblUserList.Text = "CSV user list:"                              '| New label, add to div
+        divNewStream.Controls.Add(lblUserList)                           '|
 
-        Dim txtUserList As New TextBox                                  '|
-        txtUserList.TextMode = TextBoxMode.MultiLine                    '| New textbox,
-        txtUserList.ID = "txtUserList"                                  '| Add to div
-        divNewStream.Controls.Add(txtUserList)                          '|
+        Dim txtUserList As New TextBox                                   '|
+        txtUserList.TextMode = TextBoxMode.MultiLine                     '| New textbox,
+        txtUserList.ID = "txtUserList"                                   '| Add to div
+        divNewStream.Controls.Add(txtUserList)                           '|
 
         'add newlines to div
         divNewStream.Controls.Add(New LiteralControl("<br>"))
@@ -216,6 +217,7 @@ Partial Class _Default
     End Sub
 
     Sub addReaderDiv()
+        'todo: document
         Dim divReader As New HtmlGenericControl("div")                'New div
         divReader.ID = "divReader"                                 'Set ID
         divReader.Attributes.Add("class", "wizard")                   'Set CSS Class
@@ -236,33 +238,26 @@ Partial Class _Default
         'add newline to div
         divReader.Controls.Add(New LiteralControl("<br>"))
 
-        Dim pnlRadioList As New Panel
+        Dim rbtnList As New RadioButtonList
+        rbtnList.ID = "rbtnList"
 
-        Dim rbtnUser As New RadioButton
-        rbtnUser.Text = "User"
-        rbtnUser.ID = "rbtnUser"
+        Dim rbtnUser As New ListItem
+        rbtnUser.Text = "User (eg. 'asharkey268')"
 
-        Dim rbtnStream As New RadioButton
-        rbtnStream.Text = "Stream"
-        rbtnStream.ID = "rbtnStream"
+        Dim rbtnStream As New ListItem
+        rbtnStream.Text = "Stream (eg. 'Mr V's SoftDev Class')"
 
-        Dim rbtnClass As New RadioButton
-        rbtnClass.Text = "Class"
-        rbtnClass.ID = "rbtnClass"
+        Dim rbtnClass As New ListItem
+        rbtnClass.Text = "Class (eg. 'IT0331A')"
 
-        Dim rbtnYearLevel As New RadioButton
-        rbtnYearLevel.Text = "Year Level"
-        rbtnYearLevel.ID = "rbtnYearLevel"
+        Dim rbtnYearLevel As New ListItem
+        rbtnYearLevel.Text = "Year Level (eg. '11')"
 
-        pnlRadioList.Controls.Add(rbtnUser)
-        pnlRadioList.Controls.Add(New LiteralControl("<br>"))
-        pnlRadioList.Controls.Add(rbtnStream)
-        pnlRadioList.Controls.Add(New LiteralControl("<br>"))
-        pnlRadioList.Controls.Add(rbtnClass)
-        pnlRadioList.Controls.Add(New LiteralControl("<br>"))
-        pnlRadioList.Controls.Add(rbtnYearLevel)
-        pnlRadioList.Controls.Add(New LiteralControl("<br>"))
-        divReader.Controls.Add(pnlRadioList)
+        rbtnList.Items.Add(rbtnUser)
+        rbtnList.Items.Add(rbtnStream)
+        rbtnList.Items.Add(rbtnClass)
+        rbtnList.Items.Add(rbtnYearLevel)
+        divReader.Controls.Add(rbtnList)
 
         divReader.Controls.Add(New LiteralControl("<br>"))
 
@@ -288,6 +283,16 @@ Partial Class _Default
         divReader.Controls.Add(txtAdvanced)
 
         divReader.Controls.Add(New LiteralControl("<br>"))
+
+        Dim lblAdvancedTable As New Label
+        lblAdvancedTable.Text = "And please reiterate the name of the table you wish to query: "
+        divReader.Controls.Add(lblAdvancedTable)
+
+        Dim txtAdvancedTable As New TextBox
+        txtAdvancedTable.ID = "txtAdvancedTable"
+        divReader.Controls.Add(txtAdvancedTable)
+
+        divReader.Controls.Add(New LiteralControl("<br>"))
         divReader.Controls.Add(New LiteralControl("<br>"))
 
         Dim btnQueryDB As New Button                                 '|
@@ -296,6 +301,25 @@ Partial Class _Default
         btnQueryDB.UseSubmitBehavior = False                         '|
         AddHandler btnQueryDB.Click, AddressOf Me.btn_Click          '|
         divReader.Controls.Add(btnQueryDB)                        '|
+    End Sub
+
+    Sub addDataTableDiv()
+        Dim divDataTable As New HtmlGenericControl("div")                'New div
+        divDataTable.ID = "divDataTable"                                 'Set ID
+        divDataTable.Attributes.Add("class", "wizard")                   'Set CSS Class
+
+        Me.Master.FindControl("BodyContent").Controls.Add(divDataTable)  'Add the div to the page
+
+        Dim divDataTableTitleBar = New HtmlGenericControl("div")         'New 'titlebar' div
+        divDataTableTitleBar.ID = "divDataTableTitleBar"                 'Set ID
+        divDataTableTitleBar.Attributes.Add("class", "titleBar")         'Set CSS Class
+        '                                                                'Add innerHTML incl. 'close' button
+        divDataTableTitleBar.InnerHtml = "<h3>Results DataTable<input style=""float: right;"" type=""button"" onclick=""HideShow('BodyContent_divDataTable')"" value=""X"" /></h3>"
+        divDataTable.Controls.Add(divDataTableTitleBar)                  'Add titlebar to div
+
+        Dim dvResults As New GridView                                   '|
+        dvResults.ID = "dvResults"                                      '| new gridview, add to div
+        divDataTable.Controls.Add(dvResults)                            '|
     End Sub
 
     Sub LoadSidebar(ByVal intRole As Integer)
@@ -360,7 +384,7 @@ Partial Class _Default
 
         If intRole = 3 Then 'if user is an admin
             addSidebarClientBtn("HideShow('BodyContent_divNewAlert'); hamburger(document.getElementsByClassName('container')[0])", "NEW ALERT") 'add new alert button
-            addSidebarClientBtn("HideShow('BodyContent_divReader'); hamburger(document.getElementsByClassName('container')[0])", "READER") 'add reader button
+            addSidebarClientBtn("HideShow('BodyContent_divReader'); hamburger(document.getElementsByClassName('container')[0])", "SQL READER") 'add reader button
         End If
 
         LoadContent(intRole) 'load other required DOM elements
@@ -376,7 +400,7 @@ Partial Class _Default
                 addNewAlertsDiv()
                 addNewClassDiv()
                 addReaderDiv()
-
+                addDataTableDiv()
             Case Else
                 'do nothing
         End Select
@@ -517,7 +541,42 @@ QueryComplete:
             'addNewQueryWizard()
             'find dynamic datagrid control
             'populate datagrid control with query results
-            'TODO: Write admin query code
+            'TODO: docuement properly
+            Dim rbtnList As RadioButtonList = CType(findDynamicBodyControl("divReader,rbtnList"), RadioButtonList)
+            Dim txtTerm As TextBox = CType(findDynamicBodyControl("divReader,txtTerm"), TextBox)
+            Dim txtAdvanced As TextBox = CType(findDynamicBodyControl("divReader,txtAdvanced"), TextBox)
+            Dim txtAdvancedTable As TextBox = CType(findDynamicBodyControl("divReader,txtAdvancedTable"), TextBox)
+
+            Dim dsResult As New DataSet
+
+            If txtAdvanced.Text = "" Then
+                Dim intToQuery As String = rbtnList.SelectedIndex
+                Dim strQueryData As String = MakeSQLSafe(txtTerm.Text)
+                Dim strSql As String
+                Select Case intToQuery
+                    Case 0
+                        strSql = "select * from tbl_messages where int_fromID = " & readUserInfo(strQueryData & "@marist.vic.edu.au", "int_ID")
+                    Case 1
+                        strSql = "select * from tbl_messages where int_streamID = " & readStreamID(strQueryData)
+                    Case 2
+                        strSql = "select * from tbl_messages where int_streamID in (select int_streamID from tbl_streams where str_classID = '" & strQueryData & "')"
+                    Case 3
+                        Dim dtCurrentYear As Date = Date.Now
+                        Dim intGradYear As Integer = 12 - (CInt(strQueryData) - dtCurrentYear.Date.Year)
+                        strSql = "select * from tbl_messages where int_fromID in (select int_ID from tbl_users where dt_graduationYear = #" & New Date(intGradYear, "1", "1") & "#)"
+                    Case Else
+                        strSql = "select str_message from tbl_messages"
+                End Select
+                dsResult = readSql(strSql)
+            Else
+                dsResult = readSql(txtAdvanced.Text, txtAdvancedTable.Text)
+            End If
+
+            Dim dvResults As GridView = CType(findDynamicBodyControl("divDataTable,dvResults"), GridView)
+            dvResults.DataSource = dsResult
+            dvResults.DataBind()
+
+            Response.Write("<script>document.addEventListener(""DOMContentLoaded"", function(event) { HideShow('BodyContent_divDataTable'); });</script>")
 
         Else 'if button is a regular, existing stream button
 

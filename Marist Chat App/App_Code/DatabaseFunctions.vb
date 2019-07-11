@@ -493,6 +493,29 @@ Public Class DatabaseFunctions
         Return result
     End Function
 
+    Public Shared Function readSql(ByVal sql As String, Optional table As String = "tbl_messages") As DataSet
+        Dim dsResults As New DataSet(table)
+
+        'Create a Connection object.
+        Dim oleConn = New OleDb.OleDbConnection
+        oleConn.ConnectionString = strConn
+
+        'Create a Command object.
+        Dim oleAdp As OleDb.OleDbDataAdapter = New OleDb.OleDbDataAdapter(sql, oleConn)
+
+        'Open the connection.
+
+        Try
+            oleConn.Open()
+        Catch ex As Exception
+            'Return "FailConnOpen " & ex.Message
+        End Try
+
+        oleAdp.Fill(dsResults, table)
+
+        Return dsResults
+    End Function
+
     'define role names and database codes for use when sending & recieving alerts.
     Public Shared strRoleArray As String() = {"All", "Parents", "Students", "Educators", "Admins", "Parents & Students", "Parents & Educators", "Parents, Students & Educators", "Students & Educators", "Students, Educators & Admins"}
     Public Shared intRoleArray As Integer() = {4, 0, 1, 2, 3, 5, 6, 7, 8, 9}
