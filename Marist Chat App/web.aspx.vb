@@ -50,9 +50,7 @@ Partial Class _Default
         End Try
     End Sub
 
-    'define role names and database codes for use when sending & recieving alerts.
-    Dim strRoleArray As String() = {"All", "Parents", "Students", "Educators", "Admins", "Parents & Students", "Parents & Educators", "Parents, Students & Educators", "Students & Educators", "Students, Educators & Admins"}
-    Dim intRoleArray As Integer() = {4, 0, 1, 2, 3, 5, 6, 7, 8, 9}
+
 
     Sub addNewAlertsDiv()
         Dim divNewAlert As New HtmlGenericControl("div")                'New div
@@ -204,22 +202,46 @@ Partial Class _Default
     End Sub
 
     Sub LoadSidebar(ByVal intRole As Integer)
-        Select Case intRole
-            Case 0 'user is a parent
-            'load just alerts
 
-            Case 1 'user is a student
-                'load alerts and class streams
-                addSidebarLbl("lblAlerts", "Alerts")
-            Case 2 'user is an educator
-                'load alerts and class streams (including add class buttons)
-                addSidebarLbl("lblAlerts", "Alerts")
-            Case 3 'user is an administrator
-                'load alerts (including new alert buttons), class streams (including add class buttons)
-                'client buttons show divs, close mobile hamburger menus onclick
-                addSidebarLbl("lblAlerts", "Alerts")
-                addSidebarClientBtn("HideShow('BodyContent_divNewAlert'); hamburger(document.getElementsByClassName('container')[0])", "NEW ALERT")
-        End Select
+        '--------------------Load alerts---------------------
+
+        addSidebarLbl("lblAlerts", "Alerts")
+        Dim strNotificationsArr(,) = getAlerts(User.Identity.Name)
+
+        For Each notification In strNotificationsArr                                 'for every message
+            If (Not notification = Nothing) And (Not IsNumeric(notification)) Then                               'if the message isn't blank
+
+                'todo: documentation
+
+
+                Dim cols As Integer = strNotificationsArr.GetUpperBound(0)
+                Dim rows As Integer = strNotificationsArr.GetUpperBound(1)
+
+                Dim toFind As String = notification
+                Dim xIndex As Integer
+                Dim yIndex As Integer
+
+                For x As Integer = 0 To cols - 1
+                    For y As Integer = 0 To rows - 1
+                        If strNotificationsArr(x, y) = toFind Then
+                            xIndex = x
+                            yIndex = y
+                            'debug("""" & toFind & """ [(" & x & "," & y & ")] has the ID " & strNotificationsArr(x, y - 1))
+                            Dim strShortText As String
+                            Try
+                                strShortText = Regex.Replace(toFind.Replace("''", "'").Substring(0, 30) & "…", "<.*?>", "")
+                            Catch
+                                strShortText = Regex.Replace(toFind.Replace("''", "'"), "<.*?>", "")
+                            End Try
+                            addSidebarBtn("btnAlert" & strNotificationsArr(x, y - 1), strShortText)
+                        End If
+                    Next
+                Next
+
+            End If
+        Next
+
+        '-------------------Finish alerts--------------------
 
         If intRole > 0 Then 'load class streams if you're not a parent / friend
             'query the database for the names of classes that I'm part of
@@ -233,18 +255,21 @@ Partial Class _Default
                 'add streams to sidebar
                 For Each stream In strStreamsArr
                     addSidebarBtn("btn" & stream, stream)
-
                 Next
                 'next class
             Next
         End If
 
-        If intRole >= 2 Then
-            addSidebarDivider()
-            addSidebarClientBtn("HideShow('BodyContent_divNewClass'); hamburger(document.getElementsByClassName('container')[0])", "NEW CLASS")
+        If intRole >= 2 Then 'if user is an educator or admin
+            addSidebarDivider() 'add <hr>
+            addSidebarClientBtn("HideShow('BodyContent_divNewClass'); hamburger(document.getElementsByClassName('container')[0])", "NEW CLASS") 'add new class button
         End If
 
-        LoadContent(intRole)
+        If intRole = 3 Then 'if user is an admin
+            addSidebarClientBtn("HideShow('BodyContent_divNewAlert'); hamburger(document.getElementsByClassName('container')[0])", "NEW ALERT") 'add new alert button
+        End If
+
+        LoadContent(intRole) 'load other required DOM elements
     End Sub
 
     Sub LoadContent(ByVal intRole As Integer)
@@ -301,7 +326,7 @@ Partial Class _Default
 
     Sub btn_Click(sender As Object, e As EventArgs)
         Dim btn As Button = CType(sender, Button)  'get button that called the event
-        'debug("BUTTON CLICKED: " & btn.ID)
+        debug("BUTTON CLICKED: " & btn.ID)
         '
         'if button is a new class button
         If btn.ID = "btnWriteClass" Then
@@ -348,6 +373,10 @@ QueryComplete:
 
         ElseIf btn.ID = "btnWriteAlert" Then 'if button is a new alert button
             'run script to update tbl_alerts with new message
+
+            'todo: document
+            'todo: this doesn't allow HTML. We get the request blocked before we even reach this point where we can make the HTML safe.
+
             Dim strAccessBoolFixer As String = ""
             Dim cbxUrgent As CheckBox = CType(findDynamicBodyControl("divNewAlert,cbxUrgent"), CheckBox)
             Dim txtMessage As TextBox = CType(findDynamicBodyControl("divNewAlert,txtMessage"), TextBox)
@@ -370,7 +399,23 @@ QueryComplete:
             btn_Click(streamButton, EventArgs.Empty)
             'todo: what happens when we hit this without first hitting a stream in the sidebar?
 
+        ElseIf btn.ID.StartsWith("btnAlert") Then
+            'todo: document!
+
+            debug("alert: " & btn.ID.Replace("btnAlert", "") & " pressed.")
+            Dim pnlMessages As New Panel
+            pnlMessages.CssClass = "messagesContainer"
+            pnlMessages.ID = "pnlMessages"
+            Me.Master.FindControl("BodyContent").Controls.Add(pnlMessages)
+
+            Dim litNotificationHTML As New LiteralControl()
+            litNotificationHTML.Text = Server.HtmlDecode(readNotification(btn.ID.Replace("btnAlert", "")).Replace("''", "'"))
+            pnlMessages.Controls.Add(litNotificationHTML)
+
         Else 'if button is a regular, existing stream button
+
+            'todo: document!
+
             Dim strStreamName As String = btn.ID.Replace("btn", "")         'get stream name
             Dim lblStreamName As Label = findDynamicTopBarControl("divStreamHeading,lblStreamName") 'get heading label
             'debug("You pressed the """ & strStreamName & """ stream!")      'debug to make sure that worked

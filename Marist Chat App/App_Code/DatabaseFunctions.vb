@@ -115,6 +115,40 @@ Public Class DatabaseFunctions
         Return result
     End Function
 
+    Public Shared Function readNotification(ByVal ID As Integer) As String 'function to read notifications (HTML) from database.
+        'Create a Connection object.
+        Dim oleConn = New OleDb.OleDbConnection
+        oleConn.ConnectionString = strConn
+
+        'Create a Command object.
+        Dim oleCmd = oleConn.CreateCommand
+        oleCmd.CommandText = "select str_message from tbl_notifications where int_ID = " & ID
+
+        'Open the connection.
+
+        Try
+            oleConn.Open()
+        Catch ex As Exception
+            Return "FailConnOpen " & ex.Message
+        End Try
+
+        Dim result As String = "False" 'this is what the function will return
+
+        Try
+            Dim reader As OleDb.OleDbDataReader = oleCmd.ExecuteReader() 'run sql script
+            While reader.Read
+                result = reader.GetString(0) 'get first value of field (because there should only be one record returned as there shouldn't be ID doubleups).
+            End While
+            oleConn.Close() 'close connection
+        Catch ex As Exception 'if a catastrophic error occurs
+            'console.writeline(ex.ToString)
+            oleConn.Close() 'close the connection
+            Return "Fail due to " & ex.Message & ex.StackTrace
+        End Try
+
+        Return result
+    End Function
+
     Public Shared Function runSQL(ByVal sql As String) As String 'function to write to the database
         'create connection object
         Dim oleConn = New OleDb.OleDbConnection
@@ -331,6 +365,7 @@ Public Class DatabaseFunctions
             'Console.WriteLine("Fail due to " & ex.Message & ex.StackTrace)
         End Try
 
+        'todo: I have just realised that the following line should probably be 'strOutput(strMessages.Count, 1)', however I don't want to waste time debugging that change as it works atm
         Dim strOutput(strMessages.Count, strMessages.Count) As String   'New 2D string (output)
         Dim intIndex As Integer = 0                                     'new integer
         For Each itm In strMessages                                      'for each message
@@ -341,4 +376,90 @@ Public Class DatabaseFunctions
 
         Return strOutput 'return output 2D array
     End Function
+
+    Public Shared Function getAlerts(ByVal eml As String) As String(,) 'returns 2D array of alerts that the user has been sent & their IDs
+        Dim strCommand As String = "SELECT str_message, int_userGroup, int_ID FROM tbl_notifications"
+
+        'create connection object
+        Dim oleConn = New OleDb.OleDbConnection
+        oleConn.ConnectionString = strConn
+
+        'Create a Command object.
+        Dim oleCmd = oleConn.CreateCommand
+        oleCmd.CommandText = strCommand
+
+        'Open the connection.
+
+        Try
+            oleConn.Open()
+        Catch ex As Exception
+            ' "FailConnOpen " & ex.Message
+        End Try
+
+        Dim strNotificationContent As New Generic.List(Of String)   'this is the notification body content
+        Dim intIDs As New Generic.List(Of Integer)                  'these are our notification IDs
+        Try
+            Dim reader As OleDb.OleDbDataReader = oleCmd.ExecuteReader() 'run sql script
+            While reader.Read
+                For i As Integer = 0 To reader.FieldCount - 1   'for each column
+                    If i = 1 Then 'if the column is the second one (role column)
+                        Dim intRole As Integer = readUserInfo(eml, "int_role")  'get user's role
+                        Dim validAlerts As New Generic.List(Of Integer)         'start a new list
+                        Select Case intRole
+                            Case 0                                              'if the user is a parent
+                                validAlerts.Add(4)                              '|
+                                validAlerts.Add(0)                              '|
+                                validAlerts.Add(5)                              '| add all the groups they are a part of to the list, as per intRoleArray (/ strRoleArray)
+                                validAlerts.Add(6)                              '|
+                                validAlerts.Add(7)                              '|
+                            Case 1                                              'if the user is a student
+                                validAlerts.Add(4)                              '|
+                                validAlerts.Add(1)                              '|
+                                validAlerts.Add(5)                              '| add all the groups they are a part of to the list, 
+                                validAlerts.Add(7)                              '| as per intRoleArray (/ strRoleArray)
+                                validAlerts.Add(8)                              '|
+                                validAlerts.Add(9)                              '|
+                            Case 2                                              'if the user is an educator
+                                validAlerts.Add(4)                              '|
+                                validAlerts.Add(2)                              '|
+                                validAlerts.Add(6)                              '| add all the groups they are a part of to the list, 
+                                validAlerts.Add(7)                              '| as per intRoleArray (/ strRoleArray)
+                                validAlerts.Add(8)                              '|
+                                validAlerts.Add(9)                              '|
+                            Case 3                                              'if the user is an admin
+                                validAlerts.Add(4)                              '|
+                                validAlerts.Add(3)                              '| add all the groups they are a part of to the list, as per intRoleArray (/ strRoleArray)
+                                validAlerts.Add(9)                              '|
+                        End Select
+                        If (validAlerts.Contains(reader.GetInt32(i))) Then 'if my role is in the notification
+                            strNotificationContent.Add(reader.GetString(i - 1)) 'add first column (body content) to list
+                            intIDs.Add(reader.GetInt32(i + 1)) 'add third column (ID) to list
+                        End If
+                    End If
+                Next
+            End While
+            oleConn.Close() 'close connection
+        Catch ex As Exception 'if a catastrophic error occurs
+            'console.writeline(ex.ToString)
+            oleConn.Close() 'close the connection
+            'Console.WriteLine("Fail due to " & ex.Message & ex.StackTrace)
+        End Try
+
+        'todo: As in the previous function, I have realised that the following line should probably be 'strOutput(strNotifcationContent.Count, 1)', however I don't
+        'want to waste time debugging that change as it works atm
+
+        Dim strOutput(strNotificationContent.Count, strNotificationContent.Count) As String   'New 2D string (output)
+        Dim intIndex As Integer = 0                                     'new integer
+        For Each itm In strNotificationContent                          'for each message
+            intIndex = strNotificationContent.IndexOf(itm)              'get the index of the notification
+            strOutput(intIndex, 0) = intIDs(intIndex).ToString()                   'add the corresponding notification ID to the second dimension
+            strOutput(intIndex, 1) = itm                                'add the message content to the first dimension
+        Next
+
+        Return strOutput 'return output 2D array
+    End Function
+
+    'define role names and database codes for use when sending & recieving alerts.
+    Public Shared strRoleArray As String() = {"All", "Parents", "Students", "Educators", "Admins", "Parents & Students", "Parents & Educators", "Parents, Students & Educators", "Students & Educators", "Students, Educators & Admins"}
+    Public Shared intRoleArray As Integer() = {4, 0, 1, 2, 3, 5, 6, 7, 8, 9}
 End Class

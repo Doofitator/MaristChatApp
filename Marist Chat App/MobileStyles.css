@@ -193,14 +193,16 @@ body {
 span#topBar_lblStreamName {
     float: right;
     position: relative;
-    left: 70%;
+    left: -78%;
     margin-top: 8px;
+    top: -30;
 }
 
 .streamHeading {
     float: right;
     position: relative;
-    left: -50%;
+    left: 50%;
+    top: 30;
 }
 
 .yourMessage, .theirMessage {
@@ -222,5 +224,5 @@ span#topBar_lblStreamName {
 .messagesContainer {
     overflow: scroll;
     overflow-x: hidden;
-    height: 80vh;
+    height: 78vh;
 }
