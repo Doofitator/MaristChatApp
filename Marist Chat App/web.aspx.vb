@@ -90,7 +90,7 @@ Partial Class _Default
         divNewAlert.Controls.Add(txtMessage)                            '|
 
         'Add newline to div
-        Dim newLine1 As New LiteralControl("<br>") : divNewAlert.Controls.Add(newLine1)
+        divNewAlert.Controls.Add(New LiteralControl("<br>"))
 
         Dim cbxUrgent As New CheckBox                                   '|
         cbxUrgent.ID = "cbxUrgent"                                      '|
@@ -99,7 +99,7 @@ Partial Class _Default
         divNewAlert.Controls.Add(cbxUrgent)                             '|
 
         'add newline to div
-        Dim newLine2 As New LiteralControl("<br>") : divNewAlert.Controls.Add(newLine2)
+        divNewAlert.Controls.Add(New LiteralControl("<br>"))
 
         Dim lblRoles As New Label                                       '|
         lblRoles.Text = "User groups:"                                  '| New label, add to div
@@ -112,8 +112,8 @@ Partial Class _Default
         divNewAlert.Controls.Add(ddlRoles)                              '|
 
         'add newlines to div
-        Dim newLine3 As New LiteralControl("<br>") : divNewAlert.Controls.Add(newLine3)
-        Dim newLine4 As New LiteralControl("<br>") : divNewAlert.Controls.Add(newLine4)
+        divNewAlert.Controls.Add(New LiteralControl("<br>"))
+        divNewAlert.Controls.Add(New LiteralControl("<br>"))
 
         Dim btnWriteAlert As New Button                                 '|
         btnWriteAlert.Text = "Write Alert"                              '|
@@ -146,7 +146,7 @@ Partial Class _Default
         divNewClass.Controls.Add(txtClassID)                            '|
 
         'add newline to div
-        Dim newLine1 As New LiteralControl("<br>") : divNewClass.Controls.Add(newLine1)
+        divNewClass.Controls.Add(New LiteralControl("<br>"))
 
         Dim lblUserList As New Label                                    '|
         lblUserList.Text = "CSV user list:"                             '| New label, add to div
@@ -158,8 +158,8 @@ Partial Class _Default
         divNewClass.Controls.Add(txtUserList)                           '|
 
         'add newlines to div
-        Dim newLine3 As New LiteralControl("<br>") : divNewClass.Controls.Add(newLine3)
-        Dim newLine4 As New LiteralControl("<br>") : divNewClass.Controls.Add(newLine4)
+        divNewClass.Controls.Add(New LiteralControl("<br>"))
+        divNewClass.Controls.Add(New LiteralControl("<br>"))
 
         Dim btnWriteClass As New Button                                 '|
         btnWriteClass.Text = "Write Class"                              '|
@@ -177,7 +177,7 @@ Partial Class _Default
 
         Dim divNewStreamTitleBar = New HtmlGenericControl("div")         'New 'titlebar' div
         divNewStreamTitleBar.ID = "divNewStreamTitleBar"                 'Set ID
-        divNewStreamTitleBar.Attributes.Add("Stream", "titleBar")        'Set CSS Class
+        divNewStreamTitleBar.Attributes.Add("class", "titleBar")         'Set CSS Class
         '                                                                'Add innerHTML incl. 'close' button
         divNewStreamTitleBar.InnerHtml = "<h3>New Stream Wizard<input style=""float: right;"" type=""button"" onclick=""HideShow('BodyContent_divNewStream')"" value=""X"" /></h3>"
         divNewStream.Controls.Add(divNewStreamTitleBar)                  'Add titlebar to div
@@ -192,7 +192,7 @@ Partial Class _Default
         divNewStream.Controls.Add(txtStreamID)                           '|
 
         'add newline to div
-        Dim newLine1 As New LiteralControl("<br>") : divNewStream.Controls.Add(newLine1)
+        divNewStream.Controls.Add(New LiteralControl("<br>"))
 
         Dim lblUserList As New Label                                    '|
         lblUserList.Text = "CSV user list:"                             '| New label, add to div
@@ -204,8 +204,8 @@ Partial Class _Default
         divNewStream.Controls.Add(txtUserList)                          '|
 
         'add newlines to div
-        Dim newLine3 As New LiteralControl("<br>") : divNewStream.Controls.Add(newLine3)
-        Dim newLine4 As New LiteralControl("<br>") : divNewStream.Controls.Add(newLine4)
+        divNewStream.Controls.Add(New LiteralControl("<br>"))
+        divNewStream.Controls.Add(New LiteralControl("<br>"))
 
         Dim btnWriteStream As New Button                                 '|
         btnWriteStream.Text = "Write Stream"                             '|
@@ -213,6 +213,89 @@ Partial Class _Default
         btnWriteStream.UseSubmitBehavior = False                         '|
         AddHandler btnWriteStream.Click, AddressOf Me.btn_Click          '|
         divNewStream.Controls.Add(btnWriteStream)                        '|
+    End Sub
+
+    Sub addReaderDiv()
+        Dim divReader As New HtmlGenericControl("div")                'New div
+        divReader.ID = "divReader"                                 'Set ID
+        divReader.Attributes.Add("class", "wizard")                   'Set CSS Class
+
+        Me.Master.FindControl("BodyContent").Controls.Add(divReader)  'Add the div to the page
+
+        Dim divReaderTitleBar = New HtmlGenericControl("div")         'New 'titlebar' div
+        divReaderTitleBar.ID = "divReaderTitleBar"                 'Set ID
+        divReaderTitleBar.Attributes.Add("class", "titleBar")        'Set CSS Class
+        '                                                                'Add innerHTML incl. 'close' button
+        divReaderTitleBar.InnerHtml = "<h3>Administrator Data Reader<input style=""float: right;"" type=""button"" onclick=""HideShow('BodyContent_divReader')"" value=""X"" /></h3>"
+        divReader.Controls.Add(divReaderTitleBar)                  'Add titlebar to div
+
+        Dim lblSearch As New Label                                     '|
+        lblSearch.Text = "Search for messages by:"                                '| New label, add to div
+        divReader.Controls.Add(lblSearch)                           '|
+
+        'add newline to div
+        divReader.Controls.Add(New LiteralControl("<br>"))
+
+        Dim pnlRadioList As New Panel
+
+        Dim rbtnUser As New RadioButton
+        rbtnUser.Text = "User"
+        rbtnUser.ID = "rbtnUser"
+
+        Dim rbtnStream As New RadioButton
+        rbtnStream.Text = "Stream"
+        rbtnStream.ID = "rbtnStream"
+
+        Dim rbtnClass As New RadioButton
+        rbtnClass.Text = "Class"
+        rbtnClass.ID = "rbtnClass"
+
+        Dim rbtnYearLevel As New RadioButton
+        rbtnYearLevel.Text = "Year Level"
+        rbtnYearLevel.ID = "rbtnYearLevel"
+
+        pnlRadioList.Controls.Add(rbtnUser)
+        pnlRadioList.Controls.Add(New LiteralControl("<br>"))
+        pnlRadioList.Controls.Add(rbtnStream)
+        pnlRadioList.Controls.Add(New LiteralControl("<br>"))
+        pnlRadioList.Controls.Add(rbtnClass)
+        pnlRadioList.Controls.Add(New LiteralControl("<br>"))
+        pnlRadioList.Controls.Add(rbtnYearLevel)
+        pnlRadioList.Controls.Add(New LiteralControl("<br>"))
+        divReader.Controls.Add(pnlRadioList)
+
+        divReader.Controls.Add(New LiteralControl("<br>"))
+
+        Dim lblTerm As New Label
+        lblTerm.Text = "Search Query: "
+        divReader.Controls.Add(lblTerm)
+
+        Dim txtTerm As New TextBox
+        txtTerm.ID = "txtTerm"
+        divReader.Controls.Add(txtTerm)
+
+        divReader.Controls.Add(New LiteralControl("<br>"))
+        divReader.Controls.Add(New LiteralControl("<br>"))
+        divReader.Controls.Add(New LiteralControl("<hr>"))
+        divReader.Controls.Add(New LiteralControl("<br>"))
+
+        Dim lblAdvanced As New Label
+        lblAdvanced.Text = "Or type an Access SQL query: "
+        divReader.Controls.Add(lblAdvanced)
+
+        Dim txtAdvanced As New TextBox
+        txtAdvanced.ID = "txtAdvanced"
+        divReader.Controls.Add(txtAdvanced)
+
+        divReader.Controls.Add(New LiteralControl("<br>"))
+        divReader.Controls.Add(New LiteralControl("<br>"))
+
+        Dim btnQueryDB As New Button                                 '|
+        btnQueryDB.Text = "Query Database"                             '|
+        btnQueryDB.ID = "btnQueryDB"                             '| New button, link to btn_Click & Add to div.
+        btnQueryDB.UseSubmitBehavior = False                         '|
+        AddHandler btnQueryDB.Click, AddressOf Me.btn_Click          '|
+        divReader.Controls.Add(btnQueryDB)                        '|
     End Sub
 
     Sub LoadSidebar(ByVal intRole As Integer)
@@ -277,6 +360,7 @@ Partial Class _Default
 
         If intRole = 3 Then 'if user is an admin
             addSidebarClientBtn("HideShow('BodyContent_divNewAlert'); hamburger(document.getElementsByClassName('container')[0])", "NEW ALERT") 'add new alert button
+            addSidebarClientBtn("HideShow('BodyContent_divReader'); hamburger(document.getElementsByClassName('container')[0])", "READER") 'add reader button
         End If
 
         LoadContent(intRole) 'load other required DOM elements
@@ -291,6 +375,7 @@ Partial Class _Default
                 'load new alert and new class divs
                 addNewAlertsDiv()
                 addNewClassDiv()
+                addReaderDiv()
 
             Case Else
                 'do nothing
@@ -425,6 +510,14 @@ QueryComplete:
             '                                                               '| Set literal HTML to the message body (which is HTML formatted)
             litNotificationHTML.Text = Server.HtmlDecode(readNotification(btn.ID.Replace("btnAlert", "")).Replace("''", "'"))
             pnlMessages.Controls.Add(litNotificationHTML)                   '| Add literal control to message div
+
+        ElseIf btn.ID = "btnQueryDB" Then
+            'get controls, find what is queried
+            'determine sql query
+            'addNewQueryWizard()
+            'find dynamic datagrid control
+            'populate datagrid control with query results
+            'TODO: Write admin query code
 
         Else 'if button is a regular, existing stream button
 

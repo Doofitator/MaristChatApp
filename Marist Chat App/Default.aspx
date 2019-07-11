@@ -8,8 +8,12 @@
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="BodyContent" Runat="Server">
 
-    <asp:Login ID="frmLogin" runat="server" CreateUserText="Register" CreateUserUrl="~/Register.aspx" DestinationPageUrl="~/web.aspx" UserNameLabelText="Email:" UserNameRequiredErrorMessage="Email is required." TitleText="" >
-    </asp:Login>
+<asp:Image ID="imgBanner" runat="server" ImageUrl="~/banner.png" CssClass="banner" />
 
-    </asp:Content>
+    <asp:Panel runat="server" CssClass="loginWrapper">
+        <asp:Login ID="frmLogin" runat="server" CreateUserText="Register" CssClass="loginForm" CreateUserUrl="~/Register.aspx" DestinationPageUrl="~/web.aspx" UserNameLabelText="Email:" UserNameRequiredErrorMessage="Email is required." TitleText="" >
+        </asp:Login>
+    </asp:Panel>
+
+</asp:Content>
 

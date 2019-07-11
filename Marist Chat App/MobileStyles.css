@@ -198,6 +198,21 @@ span#topBar_lblStreamName {
     top: -30;
 }
 
+.banner {
+    width: calc(100vw - 10vw);
+}
+
+.loginWrapper {
+    position: relative;
+    right: 25%;
+    padding-top: 20px;
+}
+
+.loginForm {
+    position: relative;
+    left: 45%;
+}
+
 .streamHeading {
     float: right;
     position: relative;

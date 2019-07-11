@@ -11,6 +11,23 @@ body {
     padding: 10px;
 }
 
+.banner {
+    width: calc(100vw - 200px - 6vw);
+}
+
+.loginWrapper {
+    position: relative;
+    right: 25%;
+    padding-top: 20px;
+}
+
+.loginForm {
+    position: relative;
+    left: 60%;
+    max-width: 400px;
+    margin-bottom: 15px;
+}
+
 /* Sidebar from https://forums.asp.net/t/2117521.aspx?Dash+Board+sidebar+menu */
 .sidebar {
     position: fixed;
