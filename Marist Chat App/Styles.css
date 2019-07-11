@@ -148,8 +148,9 @@ body {
 
 .yourMessage, .theirMessage {
     display: block;
-    width: 100%;
+    width: 98.5%;
     padding: 2px;
+    padding-bottom: 5px;
 }
 
 .yourMessage {
@@ -159,4 +160,10 @@ body {
 
 .theirMessage {
     border-left: 5px solid red;
+}
+
+.messagesContainer {
+    overflow: scroll;
+    overflow-x: hidden;
+    height: 85vh;
 }

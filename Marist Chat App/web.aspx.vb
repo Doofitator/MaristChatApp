@@ -18,6 +18,7 @@ Partial Class _Default
         Dim btn As New Button                               'New button
         btn.ID = controlID                                  'set button ID
         btn.Text = controlContent                           'set button text
+        btn.UseSubmitBehavior = False                       'disable button from submitting form on enter
         AddHandler btn.Click, AddressOf Me.btn_Click        'add button onclick event
         Me.Master.FindControl("sidebar").Controls.Add(btn)  'add button to sidebar
     End Sub
@@ -104,6 +105,7 @@ Partial Class _Default
         Dim btnWriteAlert As New Button                                 '|
         btnWriteAlert.Text = "Write Alert"                              '|
         btnWriteAlert.ID = "btnWriteAlert"                              '| New button, link to btn_Click & Add to div.
+        btnWriteAlert.UseSubmitBehavior = False                         '|
         AddHandler btnWriteAlert.Click, AddressOf Me.btn_Click          '|
         divNewAlert.Controls.Add(btnWriteAlert)                         '|
     End Sub
@@ -149,6 +151,7 @@ Partial Class _Default
         Dim btnWriteClass As New Button                                 '|
         btnWriteClass.Text = "Write Class"                              '|
         btnWriteClass.ID = "btnWriteClass"                              '| New button, link to btn_Click & Add to div.
+        btnWriteClass.UseSubmitBehavior = False                         '|
         AddHandler btnWriteClass.Click, AddressOf Me.btn_Click          '|
         divNewClass.Controls.Add(btnWriteClass)                         '|
     End Sub
@@ -194,6 +197,7 @@ Partial Class _Default
         Dim btnWriteStream As New Button                                 '|
         btnWriteStream.Text = "Write Stream"                             '|
         btnWriteStream.ID = "btnWriteStream"                             '| New button, link to btn_Click & Add to div.
+        btnWriteStream.UseSubmitBehavior = False                         '|
         AddHandler btnWriteStream.Click, AddressOf Me.btn_Click          '|
         divNewStream.Controls.Add(btnWriteStream)                        '|
     End Sub
@@ -271,9 +275,10 @@ Partial Class _Default
 
             txtBody.Attributes.Add("placeholder", "Message...") 'Set textbox placeholder
             btnSend.Text = "Send"                               'Set button text
+            btnSend.UseSubmitBehavior = False                   'Disable button from submitting form on enter
 
             AddHandler btnSend.Click, AddressOf Me.btn_Click    'Assign button click function
-            txtBody.Attributes.Add("onkeypress", "button_click(this,'BodyContent_btnSend')") 'get it to run some javascript on click
+            txtBody.Attributes.Add("onkeypress", "button_click(event)") 'get it to run some javascript on click
 
             divMessageControls.Controls.Add(txtBody)            'Add textbox to page
             divMessageControls.Controls.Add(btnSend)            'Add button to page
@@ -373,6 +378,10 @@ QueryComplete:
             'Load stream messages
             Dim strMessages(,) = getMessages(readStreamID(strStreamName))   'get the messages
 
+            Dim pnlMessages As New Panel
+            pnlMessages.CssClass = "messagesContainer"
+            Me.Master.FindControl("BodyContent").Controls.Add(pnlMessages)
+
             Dim intMessageCount = 0
 
             For Each message In strMessages                                 'for every message
@@ -403,8 +412,8 @@ QueryComplete:
                                 Else
                                     lblMessage.CssClass = "theirMessage"
                                 End If
-                                lblMessage.Text = toFind
-                                Me.Master.FindControl("BodyContent").Controls.Add(lblMessage)
+                                lblMessage.Text = toFind.Replace("''", "'")
+                                pnlMessages.Controls.Add(lblMessage)
                             End If
                         Next
                     Next
