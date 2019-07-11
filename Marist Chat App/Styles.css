@@ -165,5 +165,5 @@ body {
 .messagesContainer {
     overflow: scroll;
     overflow-x: hidden;
-    height: 85vh;
+    height: 83vh;
 }

@@ -189,10 +189,18 @@ body {
             outline-width: 0;
         }
 
+
+span#topBar_lblStreamName {
+    float: right;
+    position: relative;
+    left: 70%;
+    margin-top: 8px;
+}
+
 .streamHeading {
-    margin: auto;
-    display: table;
-    border-bottom: 1px solid black;
+    float: right;
+    position: relative;
+    left: -50%;
 }
 
 .yourMessage, .theirMessage {
@@ -209,4 +217,10 @@ body {
 
 .theirMessage {
     border-left: 5px solid red;
+}
+
+.messagesContainer {
+    overflow: scroll;
+    overflow-x: hidden;
+    height: 80vh;
 }

@@ -18,7 +18,8 @@ Partial Class _Default
         Dim btn As New Button                               'New button
         btn.ID = controlID                                  'set button ID
         btn.Text = controlContent                           'set button text
-        btn.UseSubmitBehavior = False                       'disable button from submitting form on enter
+        'TODO: The following line needs to be uncommented, however it can't because it breaks something in javascript.
+        'btn.UseSubmitBehavior = False                       'disable button from submitting form on enter
         AddHandler btn.Click, AddressOf Me.btn_Click        'add button onclick event
         Me.Master.FindControl("sidebar").Controls.Add(btn)  'add button to sidebar
     End Sub
@@ -225,7 +226,6 @@ Partial Class _Default
             Dim strClassesArr() = getClasses(User.Identity.Name) 'get array of classes
             For Each item In strClassesArr
                 'TODO: This works, make it do stuff.
-
                 'get array of streams
                 Dim strStreamsArr() = getStreams(item, User.Identity.Name)
                 'add class header to sidebar
@@ -233,6 +233,7 @@ Partial Class _Default
                 'add streams to sidebar
                 For Each stream In strStreamsArr
                     addSidebarBtn("btn" & stream, stream)
+
                 Next
                 'next class
             Next
@@ -288,7 +289,7 @@ Partial Class _Default
             Dim divStreamHeading As New HtmlGenericControl("div")                 'New div
             divStreamHeading.ID = "divStreamHeading"                            'Set ID
             divStreamHeading.Attributes.Add("class", "streamHeading")           'Set class
-            Me.Master.FindControl("BodyContent").Controls.Add(divStreamHeading)   'Add to page
+            Me.Master.FindControl("topBar").Controls.Add(divStreamHeading)   'Add to page
 
             Dim lblStreamName As New Label                            'New Textbox
 
@@ -362,7 +363,7 @@ QueryComplete:
         ElseIf btn.ID = "btnSend" Then 'if button is the send message button
             Dim txtBody As TextBox = findDynamicBodyControl("divMessageControls,txtBody")
             Dim strMessage As String = txtBody.Text
-            Dim lblStreamName As Label = findDynamicBodyControl("divStreamHeading,lblStreamName") 'get heading label
+            Dim lblStreamName As Label = findDynamicTopBarControl("divStreamHeading,lblStreamName") 'get heading label
             runSQL("insert into tbl_messages (int_streamID, int_fromID, dt_timeStamp, str_message, bool_active, bool_read) VALUES (" & readStreamID(lblStreamName.Text) & ", " & readUserInfo(User.Identity.Name, "int_ID") & ", """ & DateTime.Now & """, """ & MakeSQLSafe(strMessage) & """, True, False)")
             txtBody.Text = ""
             Dim streamButton As Button = findDynamicSidebarControl("btn" & lblStreamName.Text)
@@ -371,7 +372,7 @@ QueryComplete:
 
         Else 'if button is a regular, existing stream button
             Dim strStreamName As String = btn.ID.Replace("btn", "")         'get stream name
-            Dim lblStreamName As Label = findDynamicBodyControl("divStreamHeading,lblStreamName") 'get heading label
+            Dim lblStreamName As Label = findDynamicTopBarControl("divStreamHeading,lblStreamName") 'get heading label
             'debug("You pressed the """ & strStreamName & """ stream!")      'debug to make sure that worked
             lblStreamName.Text = strStreamName                              'set heading label text
 
@@ -380,6 +381,7 @@ QueryComplete:
 
             Dim pnlMessages As New Panel
             pnlMessages.CssClass = "messagesContainer"
+            pnlMessages.ID = "pnlMessages"
             Me.Master.FindControl("BodyContent").Controls.Add(pnlMessages)
 
             Dim intMessageCount = 0
@@ -428,6 +430,13 @@ QueryComplete:
 
         'output the control defined in the path
         Return Me.Master.FindControl("frmPage").FindControl("BodyContent").FindControl(strIDArray(0)).FindControl(strIDArray(1))
+    End Function
+
+    Function findDynamicTopBarControl(ByVal path As String) As Control 'a real dirty way of doing something that should be a lot easier
+        Dim strIDArray As Array = path.Split(",")   'split the inputted path
+
+        'output the control defined in the path
+        Return Me.Master.FindControl("frmPage").FindControl("topBar").FindControl(strIDArray(0)).FindControl(strIDArray(1))
     End Function
 
     Function findDynamicSidebarControl(ByVal id As String) As Control 'a real dirty way of doing something that should be a lot easier

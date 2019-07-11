@@ -13,6 +13,10 @@ function button_click(e) {
     }
 }
 
+function ScrollDown() {
+    var objDiv = document.getElementById("BodyContent_pnlMessages");
+    objDiv.scrollTop = objDiv.scrollHeight;
+}
 
 function HideShow(div) {
     var element = document.getElementById(div);
