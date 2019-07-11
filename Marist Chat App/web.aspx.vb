@@ -445,7 +445,8 @@ Partial Class _Default
 
     Sub btn_Click(sender As Object, e As EventArgs)
         Dim btn As Button = CType(sender, Button)  'get button that called the event
-
+        Dim lblStreamName As Label = findDynamicTopBarControl("divStreamHeading,lblStreamName") 'get heading label
+        
         Try
             Dim strID As String = btn.ID    '| Try to get the button ID and 
             debug("btn clicked: " & strID)  '| write it to the javascript console
@@ -523,8 +524,10 @@ QueryComplete:
             btn_Click(streamButton, EventArgs.Empty)
 
         ElseIf btn.ID.StartsWith("btnAlert") Then
-
-            debug("alert: " & btn.ID.Replace("btnAlert", "") & " pressed.") 'debugging
+            
+            dim strAlertName as string = btn.ID.Replace("btnAlert", "")     'get alert name
+            debug("alert: " & strAlertName & " pressed.") 'debugging
+            lblStreamName.Text = strAlertName                               'set heading label text
             Dim pnlMessages As New Panel                                    '| make new div to house message content
             pnlMessages.CssClass = "messagesContainer"                      '| with messagesContainer class
             pnlMessages.ID = "pnlMessages"                                  '| and add it to the page
@@ -536,6 +539,7 @@ QueryComplete:
             pnlMessages.Controls.Add(litNotificationHTML)                   '| Add literal control to message div
 
         ElseIf btn.ID = "btnQueryDB" Then
+            lblStreamName.Text = "Database Query"
             'get controls, find what is queried
             'determine sql query
             'addNewQueryWizard()
@@ -583,7 +587,6 @@ QueryComplete:
             'todo: document!
 
             Dim strStreamName As String = btn.ID.Replace("btn", "")         'get stream name
-            Dim lblStreamName As Label = findDynamicTopBarControl("divStreamHeading,lblStreamName") 'get heading label
             'debug("You pressed the """ & strStreamName & """ stream!")      'debug to make sure that worked
             lblStreamName.Text = strStreamName                              'set heading label text
 
