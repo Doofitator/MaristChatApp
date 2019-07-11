@@ -14,8 +14,22 @@ Partial Class _Default
         LoadSidebar(intRole)
     End Sub
 
-    Sub addSidebarBtn(ByVal controlID As String, ByVal controlContent As String)
+    Sub addSidebarBtn(ByVal controlID As String, ByVal controlContent As String, Optional isUrgentAlert As Boolean = False)
         Dim btn As New Button                               'New button
+        If isUrgentAlert Then
+            Dim pnl As New Panel
+            pnl.CssClass = "urgent"
+            Me.Master.FindControl("sidebar").Controls.Add(pnl)
+
+
+            btn.ID = controlID                                  'set button ID
+            btn.Text = controlContent                           'set button text
+            'TODO: The following line needs to be uncommented, however it can't because it breaks something in javascript.
+            'btn.UseSubmitBehavior = False                       'disable button from submitting form on enter
+            AddHandler btn.Click, AddressOf Me.btn_Click        'add button onclick event
+            pnl.Controls.Add(btn)  'add button to sidebar
+            Exit Sub
+        End If
         btn.ID = controlID                                  'set button ID
         btn.Text = controlContent                           'set button text
         'TODO: The following line needs to be uncommented, however it can't because it breaks something in javascript.
@@ -26,7 +40,7 @@ Partial Class _Default
     Sub addSidebarLbl(ByVal controlID As String, ByVal controlContent As String)
         Dim lbl As New Literal                              'New Label
         lbl.ID = controlID                                  'set Label ID
-        lbl.Text = "<li>" & controlContent & "</li>"        'set Label text
+        lbl.Text = "<li onclick=""collapse(this)"">" & controlContent & "</li>"        'set Label text
         Me.Master.FindControl("sidebar").Controls.Add(lbl)  'add Label to sidebar
     End Sub
     Sub addSidebarClientBtn(ByVal controlOnclick As String, ByVal controlText As String) 'basically addSidebarBtn except it runs javascript instead of VB code
@@ -208,32 +222,29 @@ Partial Class _Default
         addSidebarLbl("lblAlerts", "Alerts")
         Dim strNotificationsArr(,) = getAlerts(User.Identity.Name)
 
-        For Each notification In strNotificationsArr                                 'for every message
+        For Each notification In strNotificationsArr                                                             'for every message
             If (Not notification = Nothing) And (Not IsNumeric(notification)) Then                               'if the message isn't blank
 
-                'todo: documentation
+                Dim cols As Integer = strNotificationsArr.GetUpperBound(0)                                       '|Get the array's rows and columns
+                Dim rows As Integer = strNotificationsArr.GetUpperBound(1)                                       '|
 
+                Dim toFind As String = notification     'set the data that we need to locate
+                'Dim xIndex As Integer   '| Define eventual location points
+                'Dim yIndex As Integer   '| for debugging purposes
 
-                Dim cols As Integer = strNotificationsArr.GetUpperBound(0)
-                Dim rows As Integer = strNotificationsArr.GetUpperBound(1)
-
-                Dim toFind As String = notification
-                Dim xIndex As Integer
-                Dim yIndex As Integer
-
-                For x As Integer = 0 To cols - 1
-                    For y As Integer = 0 To rows - 1
-                        If strNotificationsArr(x, y) = toFind Then
-                            xIndex = x
-                            yIndex = y
-                            'debug("""" & toFind & """ [(" & x & "," & y & ")] has the ID " & strNotificationsArr(x, y - 1))
-                            Dim strShortText As String
+                For x As Integer = 0 To cols - 1                                    'For each column
+                    For y As Integer = 0 To rows - 1                                'For each row
+                        If strNotificationsArr(x, y) = toFind Then                  'If the point we are at is the location we want
+                            'xIndex = x                                              '| Set the vars to the location we are at now
+                            'yIndex = y                                              '|
+                            'debug("""" & toFind & """ [(" & x & "," & y & ")] has the ID " & strNotificationsArr(x, y - 1)) 'write point to javascript console
+                            Dim strShortText As String                              'New variable to hold the first few words of the alert
                             Try
-                                strShortText = Regex.Replace(toFind.Replace("''", "'").Substring(0, 30) & "…", "<.*?>", "")
-                            Catch
-                                strShortText = Regex.Replace(toFind.Replace("''", "'"), "<.*?>", "")
+                                strShortText = Regex.Replace(toFind.Replace("''", "'").Substring(0, 30) & "…", "<.*?>", "") 'get the first 30 characters of the text, minus the HTML tags and double quotation marks that make the string SQL-safe
+                            Catch                                                                                           'if that failes because the string isn't 30 characters long
+                                strShortText = Regex.Replace(toFind.Replace("''", "'"), "<.*?>", "")                        'do it all again without stripping down to 30 characters
                             End Try
-                            addSidebarBtn("btnAlert" & strNotificationsArr(x, y - 1), strShortText)
+                            addSidebarBtn("btnAlert" & strNotificationsArr(x, y - 1), strShortText, isAlertUrgent(strNotificationsArr(x, y - 1))) 'add button to sidebar for the alert including urgent class if applicable
                         End If
                     Next
                 Next
@@ -247,7 +258,6 @@ Partial Class _Default
             'query the database for the names of classes that I'm part of
             Dim strClassesArr() = getClasses(User.Identity.Name) 'get array of classes
             For Each item In strClassesArr
-                'TODO: This works, make it do stuff.
                 'get array of streams
                 Dim strStreamsArr() = getStreams(item, User.Identity.Name)
                 'add class header to sidebar
@@ -326,8 +336,15 @@ Partial Class _Default
 
     Sub btn_Click(sender As Object, e As EventArgs)
         Dim btn As Button = CType(sender, Button)  'get button that called the event
-        debug("BUTTON CLICKED: " & btn.ID)
-        '
+
+        Try
+            Dim strID As String = btn.ID    '| Try to get the button ID and 
+            debug("btn clicked: " & strID)  '| write it to the javascript console
+        Catch ex As Exception
+            debug("Button click failed.")   ' If that fails (because the button was not properly created and given an ID) write that to javascript console too.
+            Exit Sub
+        End Try
+
         'if button is a new class button
         If btn.ID = "btnWriteClass" Then
             ' make a New field in tbl_classes called classIdentifier
@@ -365,27 +382,25 @@ Partial Class _Default
 
 QueryComplete:
             Next
-            'TODO: Document this
-            addSidebarLbl("lbl" & txtClassID.Text, txtClassID.Text)
-            addSidebarClientBtn("NewStream('BodyContent_divNewStream', this); hamburger(document.getElementsByClassName('container')[0])", "NEW STREAM IN " & txtClassID.Text)
-            'TODO: make that client button work
+            addSidebarLbl("lbl" & txtClassID.Text, txtClassID.Text) 'add new label to sidebar
+            addSidebarClientBtn("NewStream('BodyContent_divNewStream', this); hamburger(document.getElementsByClassName('container')[0])", "NEW STREAM IN " & txtClassID.Text) 'add new stream button
+            'TODO: make that client button work, make it appear on page load for existing classes too
             addSidebarDivider()
 
         ElseIf btn.ID = "btnWriteAlert" Then 'if button is a new alert button
             'run script to update tbl_alerts with new message
 
-            'todo: document
             'todo: this doesn't allow HTML. We get the request blocked before we even reach this point where we can make the HTML safe.
 
-            Dim strAccessBoolFixer As String = ""
-            Dim cbxUrgent As CheckBox = CType(findDynamicBodyControl("divNewAlert,cbxUrgent"), CheckBox)
-            Dim txtMessage As TextBox = CType(findDynamicBodyControl("divNewAlert,txtMessage"), TextBox)
-            Dim ddlRoles As DropDownList = CType(findDynamicBodyControl("divNewAlert,ddlRoles"), DropDownList)
-            If cbxUrgent.Checked Then strAccessBoolFixer = "YES" Else strAccessBoolFixer = "NO"
-            Dim intUserCode As Integer
-            intUserCode = intRoleArray(ddlRoles.SelectedIndex)
-            debug(runSQL("INSERT INTO tbl_notifications (str_message, int_userGroup, bool_urgent, dt_timeStamp) VALUES (""" & MakeSQLSafe(txtMessage.Text) & """, " & intUserCode & ", " & strAccessBoolFixer & ", """ & DateTime.Now & """)"))
-            'TODO: The above script writes user groups that are not bound as they are in the database. This is instead a job for the client end to decipher if they are part of the alert's user group.
+            Dim strAccessBoolFixer As String = ""                                                               'New string for use later.
+            Dim cbxUrgent As CheckBox = CType(findDynamicBodyControl("divNewAlert,cbxUrgent"), CheckBox)        'Get our checkbox
+            Dim txtMessage As TextBox = CType(findDynamicBodyControl("divNewAlert,txtMessage"), TextBox)        'Get our message
+            Dim ddlRoles As DropDownList = CType(findDynamicBodyControl("divNewAlert,ddlRoles"), DropDownList)  'get our dropdownlist
+            If cbxUrgent.Checked Then strAccessBoolFixer = "YES" Else strAccessBoolFixer = "NO"                 'If the checkbox is TRUE, set our string to YES, else set it to NO
+            Dim intUserCode As Integer                                                                          'New integer
+            intUserCode = intRoleArray(ddlRoles.SelectedIndex)                                                  'Set the integer to the selected index of the dropdownlist
+            'run sql
+            runSQL("INSERT INTO tbl_notifications (str_message, int_userGroup, bool_urgent, dt_timeStamp) VALUES (""" & MakeSQLSafe(txtMessage.Text) & """, " & intUserCode & ", " & strAccessBoolFixer & ", """ & DateTime.Now & """)")
 
         ElseIf btn.ID = "btnNewStream" Then 'if button is a new stream button
 
@@ -397,20 +412,19 @@ QueryComplete:
             txtBody.Text = ""
             Dim streamButton As Button = findDynamicSidebarControl("btn" & lblStreamName.Text)
             btn_Click(streamButton, EventArgs.Empty)
-            'todo: what happens when we hit this without first hitting a stream in the sidebar?
 
         ElseIf btn.ID.StartsWith("btnAlert") Then
-            'todo: document!
 
-            debug("alert: " & btn.ID.Replace("btnAlert", "") & " pressed.")
-            Dim pnlMessages As New Panel
-            pnlMessages.CssClass = "messagesContainer"
-            pnlMessages.ID = "pnlMessages"
-            Me.Master.FindControl("BodyContent").Controls.Add(pnlMessages)
+            debug("alert: " & btn.ID.Replace("btnAlert", "") & " pressed.") 'debugging
+            Dim pnlMessages As New Panel                                    '| make new div to house message content
+            pnlMessages.CssClass = "messagesContainer"                      '| with messagesContainer class
+            pnlMessages.ID = "pnlMessages"                                  '| and add it to the page
+            Me.Master.FindControl("BodyContent").Controls.Add(pnlMessages)  '|
 
-            Dim litNotificationHTML As New LiteralControl()
+            Dim litNotificationHTML As New LiteralControl()                 '| New literal HTML control
+            '                                                               '| Set literal HTML to the message body (which is HTML formatted)
             litNotificationHTML.Text = Server.HtmlDecode(readNotification(btn.ID.Replace("btnAlert", "")).Replace("''", "'"))
-            pnlMessages.Controls.Add(litNotificationHTML)
+            pnlMessages.Controls.Add(litNotificationHTML)                   '| Add literal control to message div
 
         Else 'if button is a regular, existing stream button
 
@@ -433,8 +447,6 @@ QueryComplete:
 
             For Each message In strMessages                                 'for every message
                 If (Not message = Nothing) And (Not IsNumeric(message)) Then                               'if the message isn't blank
-
-                    'todo: documentation
 
                     intMessageCount += 1
 

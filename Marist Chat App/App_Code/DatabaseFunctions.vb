@@ -459,6 +459,40 @@ Public Class DatabaseFunctions
         Return strOutput 'return output 2D array
     End Function
 
+    Public Shared Function isAlertUrgent(ByVal alertID As Integer) As Boolean 'function to read alert urgency column
+        'Create a Connection object.
+        Dim oleConn = New OleDb.OleDbConnection
+        oleConn.ConnectionString = strConn
+
+        'Create a Command object.
+        Dim oleCmd = oleConn.CreateCommand
+        oleCmd.CommandText = "select bool_urgent from tbl_notifications where int_ID = " & alertID
+
+        'Open the connection.
+
+        Try
+            oleConn.Open()
+        Catch ex As Exception
+            Return "FailConnOpen " & ex.Message
+        End Try
+
+        Dim result As Boolean = True 'this is what the function will return. Assume false in case we get an error.
+
+        Try
+            Dim reader As OleDb.OleDbDataReader = oleCmd.ExecuteReader() 'run sql script
+            While reader.Read
+                result = reader.GetBoolean(0) 'get first value of field (because there should only be one record returned as there shouldn't be notification ID doubleups).
+            End While
+            oleConn.Close() 'close connection
+        Catch ex As Exception 'if a catastrophic error occurs
+            'console.writeline(ex.ToString)
+            oleConn.Close() 'close the connection
+            'result = "Fail due to " & ex.Message & ex.StackTrace
+        End Try
+
+        Return result
+    End Function
+
     'define role names and database codes for use when sending & recieving alerts.
     Public Shared strRoleArray As String() = {"All", "Parents", "Students", "Educators", "Admins", "Parents & Students", "Parents & Educators", "Parents, Students & Educators", "Students & Educators", "Students, Educators & Admins"}
     Public Shared intRoleArray As Integer() = {4, 0, 1, 2, 3, 5, 6, 7, 8, 9}
