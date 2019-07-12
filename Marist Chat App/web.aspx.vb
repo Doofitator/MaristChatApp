@@ -389,7 +389,7 @@ Partial Class _Default
                                 pnl.CssClass = "urgent"                                     '| Add buttons to main content as well.
                             End If                                                          '| This allows the 'Show older...' button to work
                             AddHandler btn.Click, AddressOf btn_Click                       '| And resolves the issue of the dynamic controls
-                            If inSidebar Then btn.Attributes.Add("style", "display: none")  '| not being there after postback
+                            If inSidebar Then pnl.Attributes.Add("style", "display: none")  '| not being there after postback
                             pnl.Controls.Add(btn)                                           '|
                             pnlMessages.Controls.Add(pnl)                                   '|
 
@@ -459,8 +459,14 @@ Partial Class _Default
             addNewStreamDiv()
         End If
     End Sub
-    'TODO: Run validation on all inputs to ensure that there is no scripting attacks, and find out why inputs can't parse HTML with attributes
-    'https://docs.microsoft.com/en-us/aspnet/whitepapers/request-validation
+    Public Function cleanHTML(ByVal badHTML As String) As String
+        'https://stackoverflow.com/questions/307013/how-do-i-filter-all-html-tags-except-a-certain-whitelist
+        'todo: this still doesn't block iframes
+        Dim AcceptableTags As String = "i|b|u|sup|sub|ol|ul|li|br|h2|h3|h4|h5|span|div|p|a|img|blockquote"
+        Dim WhiteListPattern As String = "</?(?(?=" & AcceptableTags & ")notag|[a-zA-Z0-9]+)(?:\s[a-zA-Z0-9\-]+=?(?:([""']?).*?\1?)?)*\s*/?>"
+        'debug(Regex.Replace(badHTML, WhiteListPattern, "", RegexOptions.Compiled))
+        Return Regex.Replace(badHTML, WhiteListPattern, "", RegexOptions.Compiled)
+    End Function
     Sub btn_Click(sender As Object, e As EventArgs)
         Dim btn As Button = CType(sender, Button)  'get button that called the event
         Dim lblStreamName As Label = findDynamicTopBarControl("divStreamHeading,lblStreamName") 'get heading label
@@ -521,8 +527,6 @@ QueryComplete:
         ElseIf btn.ID = "btnWriteAlert" Then 'if button is a new alert button
             'run script to update tbl_alerts with new message
 
-            'todo: this doesn't allow HTML. We get the request blocked before we even reach this point where we can make the HTML safe.
-
             Dim strAccessBoolFixer As String = ""                                                               'New string for use later.
             Dim cbxUrgent As CheckBox = CType(findDynamicBodyControl("divNewAlert,cbxUrgent"), CheckBox)        'Get our checkbox
             Dim txtMessage As TextBox = CType(findDynamicBodyControl("divNewAlert,txtMessage"), TextBox)        'Get our message
@@ -531,7 +535,7 @@ QueryComplete:
             Dim intUserCode As Integer                                                                          'New integer
             intUserCode = intRoleArray(ddlRoles.SelectedIndex)                                                  'Set the integer to the selected index of the dropdownlist
             'run sql
-            runSQL("INSERT INTO tbl_notifications (str_message, int_userGroup, bool_urgent, dt_timeStamp) VALUES (""" & MakeSQLSafe(txtMessage.Text) & """, " & intUserCode & ", " & strAccessBoolFixer & ", """ & DateTime.Now & """)")
+            runSQL("INSERT INTO tbl_notifications (str_message, int_userGroup, bool_urgent, dt_timeStamp) VALUES (""" & MakeSQLSafe(cleanHTML(txtMessage.Text)) & """, " & intUserCode & ", " & strAccessBoolFixer & ", """ & DateTime.Now & """)")
 
         ElseIf btn.ID = "btnWriteStream" Then 'if button is a new stream button
 
@@ -557,10 +561,10 @@ QueryComplete:
             'run sql
             Dim strSql As String = "insert into tbl_streams (str_ClassID, bool_isClassWide, str_StreamName) VALUES ('" & MakeSQLSafe(txtStreamID.Text) & "', FALSE, '" & strStreamName & "')"
             debug(runSQL(strSql))
-            'todo: add button now
+            'todo: add button now in the right spot
         ElseIf btn.ID = "btnSend" Then 'if button is the send message button
             Dim txtBody As TextBox = findDynamicBodyControl("divMessageControls,txtBody")   'get the textbox
-            Dim strMessage As String = txtBody.Text                                         'Get the message
+            Dim strMessage As String = Server.HtmlEncode(cleanHTML(txtBody.Text))           'Get the message
             'Write the message to the database
             runSQL("insert into tbl_messages (int_streamID, int_fromID, dt_timeStamp, str_message, bool_active, bool_read) VALUES (" & readStreamID(lblStreamName.Text.Split(">")(1).Substring(1), lblStreamName.Text.Split(">")(0).Replace(" ", "")) & ", " & readUserInfo(User.Identity.Name, "int_ID") & ", """ & DateTime.Now & """, """ & MakeSQLSafe(strMessage) & """, True, False)")
             txtBody.Text = ""   'clear the textbox
@@ -680,16 +684,16 @@ QueryComplete:
 
                                 Dim lblMessage As New Label                         'New label
                                 lblMessage.ID = "lblMessage" & intMessageCount      'Set label ID to message count
+                                'remove SQL-injection prevention double quotes
+                                lblMessage.Text = Server.HtmlDecode(cleanHTML(toFind.Replace("''", "'")))
                                 If readUserInfo(User.Identity.Name, "int_ID") = strMessages(x, y - 1) Then
                                     'If the current user sent the message, set css class accordingly
                                     lblMessage.CssClass = "yourMessage"
                                 Else
                                     'If not, set the other class then.
-                                    'TODO: add a css ::before element or something that has the username of who actually sent this stuff
                                     lblMessage.CssClass = "theirMessage"
+                                    lblMessage.Text = "<span style=""font-weight: 700"">" & readUserName(strMessages(x, y - 1)).Replace("@marist.vic.edu.au", "") & "></span> " & lblMessage.Text
                                 End If
-                                'remove SQL-injection prevention double quotes
-                                lblMessage.Text = toFind.Replace("''", "'")
                                 'add label to main content
                                 pnlMessages.Controls.Add(lblMessage)
                             End If
@@ -718,5 +722,5 @@ QueryComplete:
         Return Me.Master.FindControl("frmPage").FindControl("Sidebar").FindControl(id)
     End Function
 
-    'TODO: Make a timer work! Messages need to come through without reloads!
+    'TODO: Make a timer work! Messages need to come through without manual reloads!
 End Class

@@ -223,7 +223,7 @@ body {
         background-repeat: no-repeat;
         min-height: 33px;
         min-width: 33px;
-        display: inherit; /* todo: this doesn't make it display:none when .urgent is display:none. */
+        display: inherit;
         float: right;
         position: absolute;
         right: 0px;

@@ -20,7 +20,7 @@
     </script>
     <script>
         $(document).ready(function () {
-            if ($(window).width() < 388)
+            if ($(window).width() < 450)
                 $('#topBar_lblStreamName').css('display', 'none');
         });
         function collapse(label) {
