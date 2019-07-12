@@ -228,7 +228,7 @@ Public Class DatabaseFunctions
 
         Dim strValues As New Generic.List(Of String)    '|this will be the first dimension of our eventual array
         Dim strColumns As New Generic.List(Of String)   'this will be the second dimension of our eventual array
-        'TODO: Does the above line work as a list(of Boolean)?
+        'todo: Does the above line work as a list(of Boolean)?
 
         Try
             Dim reader As OleDb.OleDbDataReader = oleCmd.ExecuteReader() 'run sql script

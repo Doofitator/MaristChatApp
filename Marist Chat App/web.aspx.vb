@@ -2,6 +2,7 @@
 Imports DatabaseFunctions
 Partial Class _Default
     Inherits System.Web.UI.Page
+    'TODO: If someone reloads, their last request is re-processed. This is relatively harmless if their last request was opening a stream, but an issue if it was something like writing a new class.
 
     Protected Sub Page_PreInit(sender As Object, e As EventArgs) Handles Me.PreInit
         'check if device is mobile & set master page accordingly
@@ -14,7 +15,6 @@ Partial Class _Default
         Dim intRole As Integer = CInt(readUserInfo(User.Identity.Name, "int_role"))
         LoadSidebar(intRole)
     End Sub
-
     Sub addSidebarBtn(ByVal controlID As String, ByVal controlContent As String, Optional isUrgentAlert As Boolean = False)
         Dim btn As New Button                               'New button
         Dim pnl As New Panel                                'New panel
@@ -45,7 +45,6 @@ Partial Class _Default
         lit.Text = "<hr />"                                 'set it as a <hr> tag
         Me.Master.FindControl("sidebar").Controls.Add(lit)  'add to sidebar
     End Sub
-
     Sub debug(ByVal strOutput As String)
         'write to javascript console for immediate output
         Try
@@ -55,9 +54,6 @@ Partial Class _Default
             debug("Failed to write to console: " & ex.Message)                      'Write fail to console
         End Try
     End Sub
-
-
-
     Sub addNewAlertsDiv()
         Dim divNewAlert As New HtmlGenericControl("div")                'New div
         divNewAlert.ID = "divNewAlert"                                  'Set ID
@@ -149,6 +145,17 @@ Partial Class _Default
         txtUserList.ID = "txtUserList"                                  '| Add to div
         divNewClass.Controls.Add(txtUserList)                           '|
 
+        'add newline to div
+        divNewClass.Controls.Add(New LiteralControl("<br>"))
+
+        Dim lblStreamName As New Label                                  '|
+        lblUserList.Text = "Classwide Stream Name:"                     '| New label, add to div
+        divNewClass.Controls.Add(lblUserList)                           '|
+
+        Dim txtClassStreamName As New TextBox                           '|
+        txtClassStreamName.ID = "txtClassStreamName"                    '| Add to div
+        divNewClass.Controls.Add(txtClassStreamName)                    '|
+
         'add newlines to div
         divNewClass.Controls.Add(New LiteralControl("<br>"))
         divNewClass.Controls.Add(New LiteralControl("<br>"))
@@ -206,7 +213,6 @@ Partial Class _Default
         AddHandler btnWriteStream.Click, AddressOf Me.btn_Click          '|
         divNewStream.Controls.Add(btnWriteStream)                        '|
     End Sub
-
     Sub addReaderDiv()
         Dim divReader As New HtmlGenericControl("div")                  'New div
         divReader.ID = "divReader"                                      'Set ID
@@ -277,7 +283,6 @@ Partial Class _Default
         AddHandler btnQueryDB.Click, AddressOf Me.btn_Click             '|
         divReader.Controls.Add(btnQueryDB)                              '|
     End Sub
-
     Sub addDataTableDiv()
         Dim divDataTable As New HtmlGenericControl("div")                'New div
         divDataTable.ID = "divDataTable"                                 'Set ID
@@ -302,7 +307,6 @@ Partial Class _Default
         gvResults.ID = "gvResults"                                      '| new gridview, add to div
         divDataTable.Controls.Add(gvResults)                            '|
     End Sub
-
     Sub LoadSidebar(ByVal intRole As Integer)
 
         LoadAlerts()
@@ -336,7 +340,6 @@ Partial Class _Default
 
         LoadContent(intRole) 'load other required DOM elements
     End Sub
-
     Sub LoadAlerts(Optional inSidebar As Boolean = True)
         Try
             pnlMessages.Controls.Clear()            'Clear main controls
@@ -400,7 +403,6 @@ Partial Class _Default
             End If
         Next
     End Sub
-
     Sub LoadContent(ByVal intRole As Integer)
         Select Case intRole
             Case 2 'user is an educator
@@ -457,7 +459,8 @@ Partial Class _Default
             addNewStreamDiv()
         End If
     End Sub
-
+    'TODO: Run validation on all inputs to ensure that there is no scripting attacks, and find out why inputs can't parse HTML with attributes
+    'https://docs.microsoft.com/en-us/aspnet/whitepapers/request-validation
     Sub btn_Click(sender As Object, e As EventArgs)
         Dim btn As Button = CType(sender, Button)  'get button that called the event
         Dim lblStreamName As Label = findDynamicTopBarControl("divStreamHeading,lblStreamName") 'get heading label
@@ -474,6 +477,7 @@ Partial Class _Default
         If btn.ID = "btnWriteClass" Then
             ' make a New field in tbl_classes called classIdentifier
 
+            Dim txtClassStreamName As TextBox = CType(findDynamicBodyControl("divNewClass,txtClassStreamName"), TextBox) 'find the stream name textbox
             Dim txtClassID As TextBox = CType(findDynamicBodyControl("divNewClass,txtClassID"), TextBox) 'find the class identifier textbox
             debug(runSQL("ALTER TABLE tbl_classes ADD COLUMN " & MakeSQLSafe(txtClassID.Text) & " YESNO NOT NULL")) 'debugging
 
@@ -489,7 +493,6 @@ Partial Class _Default
                 End Try
             Next
             listUserIDs.Add(readUserInfo(User.Identity.Name, "int_ID"))   'Add me to the class
-            Dim strSql As String = "update tbl_classes set "                                'begin writing sql
             For Each intID In listUserIDs                                                   'for each id in the list
                 '                                                                            attempt to update the row
                 Dim strUpdateCmd As String = runSQL("update tbl_classes set " & MakeSQLSafe(txtClassID.Text) & " = 1 where int_UserID = " & intID)
@@ -507,7 +510,11 @@ Partial Class _Default
 
 QueryComplete:
             Next
+            'todo: this stuff adds after the "new class" / "new alert" / "SQL reader" buttons. I want it to add before that
             addSidebarLbl("lbl" & txtClassID.Text, txtClassID.Text) 'add new label to sidebar
+            'add classwide stream
+            runSQL("insert into tbl_streams (str_ClassID, bool_isClassWide, str_StreamName) VALUES ('" & MakeSQLSafe(txtClassID.Text) & "', TRUE, '" & txtClassStreamName.Text & "')")
+            addSidebarBtn("btn" & txtClassID.Text & txtClassStreamName.Text, txtClassStreamName.Text)
             addSidebarClientBtn("NewStream('BodyContent_divNewStream', this); hamburger(document.getElementsByClassName('container')[0])", "NEW STREAM IN " & txtClassID.Text) 'add new stream button
             addSidebarDivider()
 
@@ -528,30 +535,29 @@ QueryComplete:
 
         ElseIf btn.ID = "btnWriteStream" Then 'if button is a new stream button
 
-            'todo: test & document
             Dim txtStreamID As TextBox = CType(findDynamicBodyControl("divNewStream,txtStreamID"), TextBox) 'find the class identifier textbox
             Dim txtStreamUserList As TextBox = CType(findDynamicBodyControl("divNewStream,txtStreamUserList"), TextBox) 'find csv textbox
 
-            Dim strMembersArr() As String = txtStreamUserList.Text.Replace(" ", "").Split(",")
-            Dim strStreamName As String = ""
+            Dim strMembersArr() As String = txtStreamUserList.Text.Replace(" ", "").Split(",")  'Get list of members
+            Dim strStreamName As String = ""                                                    'New string
 
-            For Each strMember In strMembersArr
-                strStreamName += strMember
-                If Array.IndexOf(strMembersArr, strMember) = strMembersArr.Length - 2 Then
-                    debug(strMember & " is second last")
-                    strStreamName += " and "
-                ElseIf Array.IndexOf(strMembersArr, strMember) = strMembersArr.Length - 1 Then
-                    debug(strMember & "is last")
-                Else
-                    debug(strMember & "is before second last")
-                    strStreamName += ", "
+            For Each strMember In strMembersArr                                                 'For each member
+                strStreamName += strMember                                                      'Add their name to the stream name
+                If Array.IndexOf(strMembersArr, strMember) = strMembersArr.Length - 2 Then      'If the member is the second last one in the list
+                    strStreamName += " and "                                                    'Add the word 'and' after their name
+                ElseIf Array.IndexOf(strMembersArr, strMember) = strMembersArr.Length - 1 Then  'If they are the last,
+                    'add nothing after their name
+                Else                                                                            'If they're before second last
+                    strStreamName += ", "                                                       'Add a comma
                 End If
+                'If there's the marist domain in the stream name, remove it.
                 If strStreamName.ToLower.Contains("@marist.vic.edu.au") Then strStreamName = strStreamName.ToLower.Replace("@marist.vic.edu.au", "")
             Next
 
+            'run sql
             Dim strSql As String = "insert into tbl_streams (str_ClassID, bool_isClassWide, str_StreamName) VALUES ('" & MakeSQLSafe(txtStreamID.Text) & "', FALSE, '" & strStreamName & "')"
             debug(runSQL(strSql))
-
+            'todo: add button now
         ElseIf btn.ID = "btnSend" Then 'if button is the send message button
             Dim txtBody As TextBox = findDynamicBodyControl("divMessageControls,txtBody")   'get the textbox
             Dim strMessage As String = txtBody.Text                                         'Get the message
@@ -648,7 +654,6 @@ QueryComplete:
             lblStreamName.Text = strClassID & " > " & strStreamName              'set heading label text
 
             'Load stream messages
-            'todo: this breaks when there are two streams in different classes with the same person. Need to fix. Maybe by using the SIMON ID we removed a few lines up?
             Dim strMessages(,) = getMessages(readStreamID(strStreamName, strClassID))       'get the messages
 
             pnlMessages.Controls.Clear()                                        'empty main body content
@@ -680,6 +685,7 @@ QueryComplete:
                                     lblMessage.CssClass = "yourMessage"
                                 Else
                                     'If not, set the other class then.
+                                    'TODO: add a css ::before element or something that has the username of who actually sent this stuff
                                     lblMessage.CssClass = "theirMessage"
                                 End If
                                 'remove SQL-injection prevention double quotes
@@ -694,21 +700,18 @@ QueryComplete:
             Next
         End If
     End Sub
-
     Function findDynamicBodyControl(ByVal path As String) As Control 'a real dirty way of doing something that should be a lot easier
         Dim strIDArray As Array = path.Split(",")   'split the inputted path
 
         'output the control defined in the path
         Return Me.Master.FindControl("frmPage").FindControl("BodyContent").FindControl(strIDArray(0)).FindControl(strIDArray(1))
     End Function
-
     Function findDynamicTopBarControl(ByVal path As String) As Control 'a real dirty way of doing something that should be a lot easier
         Dim strIDArray As Array = path.Split(",")   'split the inputted path
 
         'output the control defined in the path
         Return Me.Master.FindControl("frmPage").FindControl("topBar").FindControl(strIDArray(0)).FindControl(strIDArray(1))
     End Function
-
     Function findDynamicSidebarControl(ByVal id As String) As Control 'a real dirty way of doing something that should be a lot easier
 
         'output the control defined in the path
