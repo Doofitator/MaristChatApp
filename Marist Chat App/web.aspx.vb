@@ -331,7 +331,7 @@ Partial Class _Default
                 addSidebarLbl("lbl" & item, item)
                 'add streams to sidebar
                 For Each stream In strStreamsArr
-                    addSidebarBtn("btn" & stream, stream)
+                    addSidebarBtn("btn" & item & stream, stream)
                 Next
                 addSidebarClientBtn("NewStream('BodyContent_divNewStream', this); hamburger(document.getElementsByClassName('container')[0])", "NEW STREAM IN " & item) 'add new stream button
                 'next class
@@ -544,9 +544,28 @@ QueryComplete:
         ElseIf btn.ID = "btnWriteStream" Then 'if button is a new stream button
 
             'todo: stuff
+            Dim txtStreamID As TextBox = CType(findDynamicBodyControl("divNewStream,txtStreamID"), TextBox) 'find the class identifier textbox
+            Dim txtStreamUserList As TextBox = CType(findDynamicBodyControl("divNewStream,txtStreamUserList"), TextBox) 'find csv textbox
 
-            Dim strSql As String = "insert into tbl_streams (str_ClassID, bool_isClassWide, strStreamName) VALUES (" & "" & ")"
-            runSQL(strSql)
+            Dim strMembersArr() As String = txtStreamUserList.Text.Replace(" ", "").Split(",")
+            Dim strStreamName As String = ""
+
+            For Each strMember In strMembersArr
+                strStreamName += strMember
+                If Array.IndexOf(strMembersArr, strMember) = strMembersArr.Length - 2 Then
+                    debug(strMember & " is second last")
+                    strStreamName += " and "
+                ElseIf Array.IndexOf(strMembersArr, strMember) = strMembersArr.Length - 1 Then
+                    debug(strMember & "is last")
+                Else
+                    debug(strMember & "is before second last")
+                    strStreamName += ", "
+                End If
+                If strStreamName.ToLower.Contains("@marist.vic.edu.au") Then strStreamName = strStreamName.ToLower.Replace("@marist.vic.edu.au", "")
+            Next
+
+            Dim strSql As String = "insert into tbl_streams (str_ClassID, bool_isClassWide, str_StreamName) VALUES ('" & MakeSQLSafe(txtStreamID.Text) & "', FALSE, '" & strStreamName & "')"
+            debug(runSQL(strSql))
 
         ElseIf btn.ID = "btnSend" Then 'if button is the send message button
             Dim txtBody As TextBox = findDynamicBodyControl("divMessageControls,txtBody")
@@ -638,12 +657,15 @@ QueryComplete:
 
         Else 'if button is a regular, existing stream button
 
-            Dim strStreamName As String = btn.ID.Replace("btn", "")             'get stream name
+            Dim strStreamName As String = btn.ID.Replace("btn", "")             '|get stream name
+            strStreamName = strStreamName.Remove(0, 7)                          '|remove SIMON ID
             'debug("You pressed the """ & strStreamName & """ stream!")         'debug to make sure that worked
             lblStreamName.Text = strStreamName                                  'set heading label text
 
             'Load stream messages
+            'todo: this breaks when there are two streams in different classes with the same person. Need to fix. Maybe by using the SIMON ID we removed a few lines up?
             Dim strMessages(,) = getMessages(readStreamID(strStreamName))       'get the messages
+
 
             pnlMessages.Controls.Clear()                                        'empty main body content
 
@@ -666,7 +688,7 @@ QueryComplete:
                             If strMessages(x, y) = toFind Then 'if we find what we are looking for
                                 xIndex = x  'for debugging
                                 yIndex = y  'for debugging
-                                'debug(toFind & " [(" & x & "," & y & ")] has the fromID " & strMessages(x, y - 1)) 'for debugging
+                                debug(toFind & " [(" & x & "," & y & ")] has the fromID " & strMessages(x, y - 1)) 'for debugging
 
                                 Dim lblMessage As New Label                         'New label
                                 lblMessage.ID = "lblMessage" & intMessageCount      'Set label ID to message count
