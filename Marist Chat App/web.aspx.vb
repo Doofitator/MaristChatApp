@@ -184,9 +184,9 @@ Partial Class _Default
         divNewStreamTitleBar.InnerHtml = "<h3>New Stream Wizard<input style=""float: right;"" type=""button"" onclick=""HideShow('BodyContent_divNewStream')"" value=""X"" /></h3>"
         divNewStream.Controls.Add(divNewStreamTitleBar)                  'Add titlebar to div
 
-        Dim lblStreamID As New Label                                     '|
-        lblStreamID.Text = "Stream Name:"                                '| New label, add to div
-        divNewStream.Controls.Add(lblStreamID)                           '|
+        Dim lblClassID As New Label                                      '|
+        lblClassID.Text = "Class Name:"                                  '| New label, add to div
+        divNewStream.Controls.Add(lblClassID)                            '|
 
         Dim txtStreamID As New TextBox                                   '|
         txtStreamID.TextMode = TextBoxMode.SingleLine                    '| New textbox,
@@ -200,10 +200,10 @@ Partial Class _Default
         lblUserList.Text = "CSV user list:"                              '| New label, add to div
         divNewStream.Controls.Add(lblUserList)                           '|
 
-        Dim txtUserList As New TextBox                                   '|
-        txtUserList.TextMode = TextBoxMode.MultiLine                     '| New textbox,
-        txtUserList.ID = "txtUserList"                                   '| Add to div
-        divNewStream.Controls.Add(txtUserList)                           '|
+        Dim txtStreamUserList As New TextBox                             '|
+        txtStreamUserList.TextMode = TextBoxMode.MultiLine               '| New textbox,
+        txtStreamUserList.ID = "txtStreamUserList"                       '| Add to div
+        divNewStream.Controls.Add(txtStreamUserList)                     '|
 
         'add newlines to div
         divNewStream.Controls.Add(New LiteralControl("<br>"))
@@ -333,6 +333,7 @@ Partial Class _Default
                 For Each stream In strStreamsArr
                     addSidebarBtn("btn" & stream, stream)
                 Next
+                addSidebarClientBtn("NewStream('BodyContent_divNewStream', this); hamburger(document.getElementsByClassName('container')[0])", "NEW STREAM IN " & item) 'add new stream button
                 'next class
             Next
         End If
@@ -464,6 +465,10 @@ Partial Class _Default
             lblStreamName.ID = "lblStreamName"                        'Set textbox ID
 
             divStreamHeading.Controls.Add(lblStreamName)            'Add textbox to page
+
+            '--------------------------------------------------------------------------------------
+
+            addNewStreamDiv()
         End If
     End Sub
 
@@ -536,7 +541,12 @@ QueryComplete:
             'run sql
             runSQL("INSERT INTO tbl_notifications (str_message, int_userGroup, bool_urgent, dt_timeStamp) VALUES (""" & MakeSQLSafe(txtMessage.Text) & """, " & intUserCode & ", " & strAccessBoolFixer & ", """ & DateTime.Now & """)")
 
-        ElseIf btn.ID = "btnNewStream" Then 'if button is a new stream button
+        ElseIf btn.ID = "btnWriteStream" Then 'if button is a new stream button
+
+            'todo: stuff
+
+            Dim strSql As String = "insert into tbl_streams (str_ClassID, bool_isClassWide, strStreamName) VALUES (" & "" & ")"
+            runSQL(strSql)
 
         ElseIf btn.ID = "btnSend" Then 'if button is the send message button
             Dim txtBody As TextBox = findDynamicBodyControl("divMessageControls,txtBody")
