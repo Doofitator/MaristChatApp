@@ -218,90 +218,78 @@ Partial Class _Default
     End Sub
 
     Sub addReaderDiv()
-        'todo: document
-        Dim divReader As New HtmlGenericControl("div")                'New div
-        divReader.ID = "divReader"                                 'Set ID
-        divReader.Attributes.Add("class", "wizard")                   'Set CSS Class
+        Dim divReader As New HtmlGenericControl("div")                  'New div
+        divReader.ID = "divReader"                                      'Set ID
+        divReader.Attributes.Add("class", "wizard")                     'Set CSS Class
 
-        Me.Master.FindControl("BodyContent").Controls.Add(divReader)  'Add the div to the page
+        Me.Master.FindControl("BodyContent").Controls.Add(divReader)    'Add the div to the page
 
-        Dim divReaderTitleBar = New HtmlGenericControl("div")         'New 'titlebar' div
-        divReaderTitleBar.ID = "divReaderTitleBar"                 'Set ID
-        divReaderTitleBar.Attributes.Add("class", "titleBar")        'Set CSS Class
-        '                                                                'Add innerHTML incl. 'close' button
+        Dim divReaderTitleBar = New HtmlGenericControl("div")           'New 'titlebar' div
+        divReaderTitleBar.ID = "divReaderTitleBar"                      'Set ID
+        divReaderTitleBar.Attributes.Add("class", "titleBar")           'Set CSS Class
+        '                                                               'Add innerHTML incl. 'close' button
         divReaderTitleBar.InnerHtml = "<h3>Administrator Data Reader<input style=""float: right;"" type=""button"" onclick=""HideShow('BodyContent_divReader')"" value=""X"" /></h3>"
-        divReader.Controls.Add(divReaderTitleBar)                  'Add titlebar to div
+        divReader.Controls.Add(divReaderTitleBar)                       'Add titlebar to div
 
-        Dim lblSearch As New Label                                     '|
-        lblSearch.Text = "Search for messages by:"                                '| New label, add to div
-        divReader.Controls.Add(lblSearch)                           '|
+        Dim lblSearch As New Label                                      '|
+        lblSearch.Text = "Search for messages by:"                      '| New label, add to div
+        divReader.Controls.Add(lblSearch)                               '|
 
-        'add newline to div
-        divReader.Controls.Add(New LiteralControl("<br>"))
+        divReader.Controls.Add(New LiteralControl("<br>"))              'Add linebreak to div
 
-        Dim rbtnList As New RadioButtonList
-        rbtnList.ID = "rbtnList"
+        Dim rbtnList As New RadioButtonList                             '|
+        rbtnList.ID = "rbtnList"                                        '| New radiobuttonlist, add to div
+        divReader.Controls.Add(rbtnList)                                '|
 
-        Dim rbtnUser As New ListItem
-        rbtnUser.Text = "User (eg. 'asharkey268')"
+        Dim rbtnUser As New ListItem                                    '|
+        rbtnUser.Text = "User (eg. 'asharkey268')"                      '|
+        '                                                               '|
+        Dim rbtnStream As New ListItem                                  '|
+        rbtnStream.Text = "Stream (eg. 'Mr V's SoftDev Class')"         '| 
+        '                                                               '| 
+        Dim rbtnClass As New ListItem                                   '|
+        rbtnClass.Text = "Class (eg. 'IT0331A')"                        '| New listItems,
+        '                                                               '| Set text values,
+        Dim rbtnYearLevel As New ListItem                               '| Add to radioButtonList
+        rbtnYearLevel.Text = "Year Level (eg. '11')"                    '|
+        '                                                               '|
+        rbtnList.Items.Add(rbtnUser)                                    '|
+        rbtnList.Items.Add(rbtnStream)                                  '|
+        rbtnList.Items.Add(rbtnClass)                                   '|
+        rbtnList.Items.Add(rbtnYearLevel)                               '|
 
-        Dim rbtnStream As New ListItem
-        rbtnStream.Text = "Stream (eg. 'Mr V's SoftDev Class')"
+        divReader.Controls.Add(New LiteralControl("<br>"))              'Add linebreak to div
 
-        Dim rbtnClass As New ListItem
-        rbtnClass.Text = "Class (eg. 'IT0331A')"
+        Dim lblTerm As New Label                                        '|
+        lblTerm.Text = "Search Query: "                                 '| New label, add to div
+        divReader.Controls.Add(lblTerm)                                 '|
 
-        Dim rbtnYearLevel As New ListItem
-        rbtnYearLevel.Text = "Year Level (eg. '11')"
+        Dim txtTerm As New TextBox                                      '|
+        txtTerm.ID = "txtTerm"                                          '| New textbox, add to div
+        divReader.Controls.Add(txtTerm)                                 '|
 
-        rbtnList.Items.Add(rbtnUser)
-        rbtnList.Items.Add(rbtnStream)
-        rbtnList.Items.Add(rbtnClass)
-        rbtnList.Items.Add(rbtnYearLevel)
-        divReader.Controls.Add(rbtnList)
+        divReader.Controls.Add(New LiteralControl("<br>"))              'Add linebreak to div
+        divReader.Controls.Add(New LiteralControl("<br>"))              'Add linebreak to div
+        divReader.Controls.Add(New LiteralControl("<hr>"))              'Add horizontal line to div
+        divReader.Controls.Add(New LiteralControl("<br>"))              'Add linebreak to div
 
-        divReader.Controls.Add(New LiteralControl("<br>"))
+        Dim lblAdvanced As New Label                                    '|
+        lblAdvanced.Text = "Or type an Access SQL query: "              '| New label, add to div
+        divReader.Controls.Add(lblAdvanced)                             '|
 
-        Dim lblTerm As New Label
-        lblTerm.Text = "Search Query: "
-        divReader.Controls.Add(lblTerm)
+        Dim txtAdvanced As New TextBox                                  '|
+        txtAdvanced.ID = "txtAdvanced"                                  '| New textbox, add to div
+        divReader.Controls.Add(txtAdvanced)                             '|
 
-        Dim txtTerm As New TextBox
-        txtTerm.ID = "txtTerm"
-        divReader.Controls.Add(txtTerm)
+        divReader.Controls.Add(New LiteralControl("<br>"))              'Add linebreak to div
+        divReader.Controls.Add(New LiteralControl("<br>"))              'Add linebreak to div
 
-        divReader.Controls.Add(New LiteralControl("<br>"))
-        divReader.Controls.Add(New LiteralControl("<br>"))
-        divReader.Controls.Add(New LiteralControl("<hr>"))
-        divReader.Controls.Add(New LiteralControl("<br>"))
-
-        Dim lblAdvanced As New Label
-        lblAdvanced.Text = "Or type an Access SQL query: "
-        divReader.Controls.Add(lblAdvanced)
-
-        Dim txtAdvanced As New TextBox
-        txtAdvanced.ID = "txtAdvanced"
-        divReader.Controls.Add(txtAdvanced)
-
-        divReader.Controls.Add(New LiteralControl("<br>"))
-
-        Dim lblAdvancedTable As New Label
-        lblAdvancedTable.Text = "And please reiterate the name of the table you wish to query: "
-        divReader.Controls.Add(lblAdvancedTable)
-
-        Dim txtAdvancedTable As New TextBox
-        txtAdvancedTable.ID = "txtAdvancedTable"
-        divReader.Controls.Add(txtAdvancedTable)
-
-        divReader.Controls.Add(New LiteralControl("<br>"))
-        divReader.Controls.Add(New LiteralControl("<br>"))
-
-        Dim btnQueryDB As New Button                                 '|
-        btnQueryDB.Text = "Query Database"                             '|
-        btnQueryDB.ID = "btnQueryDB"                             '| New button, link to btn_Click & Add to div.
-        btnQueryDB.UseSubmitBehavior = False                         '|
-        AddHandler btnQueryDB.Click, AddressOf Me.btn_Click          '|
-        divReader.Controls.Add(btnQueryDB)                        '|
+        Dim btnQueryDB As New Button                                    '|
+        btnQueryDB.Text = "Query Database"                              '|
+        btnQueryDB.ID = "btnQueryDB"                                    '| New button, link to btn_Click & Add to div.
+        btnQueryDB.UseSubmitBehavior = False                            '|
+        AddHandler btnQueryDB.Click, AddressOf Me.btn_Click             '|
+        divReader.Controls.Add(btnQueryDB)                              '|
     End Sub
 
     Sub addDataTableDiv()
@@ -318,9 +306,15 @@ Partial Class _Default
         divDataTableTitleBar.InnerHtml = "<h3>Results DataTable<input style=""float: right;"" type=""button"" onclick=""HideShow('BodyContent_divDataTable')"" value=""X"" /></h3>"
         divDataTable.Controls.Add(divDataTableTitleBar)                  'Add titlebar to div
 
-        Dim dvResults As New GridView                                   '|
-        dvResults.ID = "dvResults"                                      '| new gridview, add to div
-        divDataTable.Controls.Add(dvResults)                            '|
+        Dim btnExport As New Button                                     '|
+        btnExport.Text = "Export to Excel"                              '|
+        btnExport.ID = "btnExport"                                      '| New button, add to div
+        AddHandler btnExport.Click, AddressOf btn_Click                 '|
+        divDataTable.Controls.Add(btnExport)                            '|
+
+        Dim gvResults As New GridView                                   '|
+        gvResults.ID = "gvResults"                                      '| new gridview, add to div
+        divDataTable.Controls.Add(gvResults)                            '|
     End Sub
 
     Sub LoadSidebar(ByVal intRole As Integer)
@@ -358,24 +352,22 @@ Partial Class _Default
 
     Sub LoadAlerts(Optional inSidebar As Boolean = True)
         Try
-            pnlMessages.Controls.Clear()
+            pnlMessages.Controls.Clear()            'Clear main controls
         Catch
         End Try
 
-        debug(inSidebar)
-
         If inSidebar Then
-            addSidebarLbl("lblAlerts", "Alerts")
+            addSidebarLbl("lblAlerts", "Alerts")    'Add heading in sidebar
         End If
 
-        Dim strNotificationsArr(,) = getAlerts(User.Identity.Name)
+        Dim strNotificationsArr(,) = getAlerts(User.Identity.Name)  'Get notifications for this user
 
-        Dim intAlertButtonCount = 0
+        Dim intAlertButtonCount = 0 'New integer
 
         For Each notification In strNotificationsArr                                                             'for every message
             If (Not notification = Nothing) And (Not IsNumeric(notification)) Then                               'if the message isn't blank
 
-                intAlertButtonCount += 1
+                intAlertButtonCount += 1    'increase button count
 
                 Dim cols As Integer = strNotificationsArr.GetUpperBound(0)                                       '|Get the array's rows and columns
                 Dim rows As Integer = strNotificationsArr.GetUpperBound(1)                                       '|
@@ -399,21 +391,20 @@ Partial Class _Default
                             End Try
                             If (inSidebar) And (intAlertButtonCount < 4) Then addSidebarBtn("btnAlert" & strNotificationsArr(x, y - 1), strShortText, isAlertUrgent(strNotificationsArr(x, y - 1))) 'add button to sidebar for the alert including urgent class if applicable
 
-                            Dim btn As New Button
-                            btn.ID = "btnAlert" & strNotificationsArr(x, y - 1)
-                            btn.Text = strShortText
-                            Dim pnl As New Panel
-                            If isAlertUrgent(strNotificationsArr(x, y - 1)) Then
-                                pnl.CssClass = "urgent"
-                            End If
-                            AddHandler btn.Click, AddressOf btn_Click
-                            If inSidebar Then btn.Attributes.Add("style", "display: none")
-                            pnl.Controls.Add(btn)
-                            pnlMessages.Controls.Add(pnl)
+                            Dim btn As New Button                                           '|
+                            btn.ID = "btnAlert" & strNotificationsArr(x, y - 1)             '|
+                            btn.Text = strShortText                                         '|
+                            Dim pnl As New Panel                                            '|
+                            If isAlertUrgent(strNotificationsArr(x, y - 1)) Then            '|
+                                pnl.CssClass = "urgent"                                     '| Add buttons to main content as well.
+                            End If                                                          '| This allows the 'Show older...' button to work
+                            AddHandler btn.Click, AddressOf btn_Click                       '| And resolves the issue of the dynamic controls
+                            If inSidebar Then btn.Attributes.Add("style", "display: none")  '| not being there after postback
+                            pnl.Controls.Add(btn)                                           '|
+                            pnlMessages.Controls.Add(pnl)                                   '|
 
-                            'debug(intAlertButtonCount)
                             If (intAlertButtonCount = 3) And (inSidebar) Then
-                                addSidebarBtn("btnMoreAlerts", "Show older...")
+                                addSidebarBtn("btnMoreAlerts", "Show older...")             'Add button to show older alerts than the three in the sidebar
                             End If
                         End If
                     Next
@@ -569,95 +560,116 @@ QueryComplete:
 
         ElseIf btn.ID = "btnMoreAlerts" Then
 
-            lblStreamName.Text = "All Alerts"
-            LoadAlerts(False)
+            lblStreamName.Text = "All Alerts"   'set heading label text
+            LoadAlerts(False)                   'load alerts in main content window
 
         ElseIf btn.ID = "btnQueryDB" Then
-            lblStreamName.Text = "Database Query"
-            'get controls, find what is queried
-            'determine sql query
-            'addNewQueryWizard()
-            'find dynamic datagrid control
-            'populate datagrid control with query results
-            'TODO: docuement properly
-            Dim rbtnList As RadioButtonList = CType(findDynamicBodyControl("divReader,rbtnList"), RadioButtonList)
-            Dim txtTerm As TextBox = CType(findDynamicBodyControl("divReader,txtTerm"), TextBox)
-            Dim txtAdvanced As TextBox = CType(findDynamicBodyControl("divReader,txtAdvanced"), TextBox)
-            Dim txtAdvancedTable As TextBox = CType(findDynamicBodyControl("divReader,txtAdvancedTable"), TextBox)
+            Dim rbtnList As RadioButtonList = CType(findDynamicBodyControl("divReader,rbtnList"), RadioButtonList)  '|
+            Dim txtTerm As TextBox = CType(findDynamicBodyControl("divReader,txtTerm"), TextBox)                    '| Get controls
+            Dim txtAdvanced As TextBox = CType(findDynamicBodyControl("divReader,txtAdvanced"), TextBox)            '|
 
-            Dim dsResult As New DataSet
+            Dim dsResult As New DataSet 'new dataset for storing database output
 
-            If txtAdvanced.Text = "" Then
-                Dim intToQuery As String = rbtnList.SelectedIndex
-                Dim strQueryData As String = MakeSQLSafe(txtTerm.Text)
-                Dim strSql As String
+            If txtAdvanced.Text = "" Then   'if the advanced section wasn't used
+                Dim intToQuery As String = rbtnList.SelectedIndex   'get the selected radio button
+                Dim strQueryData As String = MakeSQLSafe(txtTerm.Text)  'get the textbox search query
+                Dim strSql As String    'new string for storing database input
                 Select Case intToQuery
-                    Case 0
+                    Case 0  'If the radiobutton selected was the 'user' one
                         strSql = "select * from tbl_messages where int_fromID = " & readUserInfo(strQueryData & "@marist.vic.edu.au", "int_ID")
-                    Case 1
+                    Case 1  'If the radiobutton selected was the 'stream' one
                         strSql = "select * from tbl_messages where int_streamID = " & readStreamID(strQueryData)
-                    Case 2
+                    Case 2  'If the radiobutton selected was the 'class' one
                         strSql = "select * from tbl_messages where int_streamID in (select int_streamID from tbl_streams where str_classID = '" & strQueryData & "')"
-                    Case 3
-                        Dim dtCurrentYear As Date = Date.Now
-                        Dim intGradYear As Integer = 12 - (CInt(strQueryData) - dtCurrentYear.Date.Year)
+                    Case 3  'If the radiobutton selected was the 'yearlevel' one
+                        Dim dtCurrentYear As Date = Date.Now    'get current date
+                        Dim intGradYear As Integer = 12 - (CInt(strQueryData) - dtCurrentYear.Date.Year) 'calculate graduation year of that year level
                         strSql = "select * from tbl_messages where int_fromID in (select int_ID from tbl_users where dt_graduationYear = #" & New Date(intGradYear, "1", "1") & "#)"
-                    Case Else
+                    Case Else 'if all else fails, just grab all the messages
                         strSql = "select str_message from tbl_messages"
                 End Select
-                dsResult = readSql(strSql)
-            Else
-                dsResult = readSql(txtAdvanced.Text, txtAdvancedTable.Text)
+                dsResult = readSql(strSql)  'set output to sql results
+
+            Else    'if the advanced section was used
+                Dim strTable As String  'new string
+                Dim strWordsArr() As String = txtAdvanced.Text.Split(" ") 'split the query into words
+                For Each word In strWordsArr        'for each word
+                    If word.StartsWith("tbl") Then  'if it starts with 'tbl'
+                        strTable = word             'then that is the table we are querying
+                        Exit For                    'disregard all the other words
+                    End If
+                Next
+                dsResult = readSql(txtAdvanced.Text, strTable)  'query the requested table, set output to the results
             End If
 
-            Dim dvResults As GridView = CType(findDynamicBodyControl("divDataTable,dvResults"), GridView)
-            dvResults.DataSource = dsResult
-            dvResults.DataBind()
+            Dim gvResults As GridView = CType(findDynamicBodyControl("divDataTable,gvResults"), GridView)   'find control
+            gvResults.DataSource = dsResult 'set datasource to the results
+            gvResults.DataBind()            'bind datasource
 
+            'show results
             Response.Write("<script>document.addEventListener(""DOMContentLoaded"", function(event) { HideShow('BodyContent_divDataTable'); });</script>")
+
+        ElseIf btn.ID = "btnExport" Then
+
+            Dim strFile As String = "attachment;filename=results.xls"                                           'delcare attachment type
+            Response.ClearContent()                                                                             'clear page
+            Response.AddHeader("content-disposition", strFile)                                                  'tell the browser that we are sending a file
+            Response.ContentType = "application/ms-excel"                                                       'tell the browser it's an excel file
+            Dim sw As New IO.StringWriter                                                                       'new stringwriter
+            Dim htw As New HtmlTextWriter(sw)                                                                   'new htmlTextWriter
+            Dim gvResults As GridView = CType(findDynamicBodyControl("divDataTable,gvResults"), GridView)       'Find the gridview
+            Dim pgNew As New Page()                                                                             'New webpage                             | These lines prevent a 
+            Dim frmNew As New HtmlForm()                                                                        'New form                                | RegisterForEventValidation exception,
+            pgNew.Controls.Add(frmNew)                                                                          'Add form to new page                    | and allow HTML content to be written 
+            frmNew.Controls.Add(gvResults)                                                                      'Add gridview to form                    | without being parsed.
+            HttpContext.Current.Server.Execute(pgNew, sw, True)                                                 'Write page contents to stringwriter     | The alternative command would be 'gvResults.RenderControl(htw)'
+            Response.Write(sw.ToString())                                                                       'Write the stringwriter to the excel file we are sending
+            Response.[End]()                                                                                    'end the transfer
 
         Else 'if button is a regular, existing stream button
 
-            'todo: document!
-
-            Dim strStreamName As String = btn.ID.Replace("btn", "")         'get stream name
-            'debug("You pressed the """ & strStreamName & """ stream!")      'debug to make sure that worked
-            lblStreamName.Text = strStreamName                              'set heading label text
+            Dim strStreamName As String = btn.ID.Replace("btn", "")             'get stream name
+            'debug("You pressed the """ & strStreamName & """ stream!")         'debug to make sure that worked
+            lblStreamName.Text = strStreamName                                  'set heading label text
 
             'Load stream messages
-            Dim strMessages(,) = getMessages(readStreamID(strStreamName))   'get the messages
+            Dim strMessages(,) = getMessages(readStreamID(strStreamName))       'get the messages
 
-            pnlMessages.Controls.Clear()                                    'empty main body content
+            pnlMessages.Controls.Clear()                                        'empty main body content
 
             Dim intMessageCount = 0
 
-            For Each message In strMessages                                 'for every message
-                If (Not message = Nothing) And (Not IsNumeric(message)) Then                               'if the message isn't blank
+            For Each message In strMessages                                     'for every message
+                If (Not message = Nothing) And (Not IsNumeric(message)) Then    'if the message isn't blank
 
-                    intMessageCount += 1
+                    intMessageCount += 1                                    'Add one to the count
 
-                    Dim cols As Integer = strMessages.GetUpperBound(0)
-                    Dim rows As Integer = strMessages.GetUpperBound(1)
+                    Dim cols As Integer = strMessages.GetUpperBound(0)      'Get cols
+                    Dim rows As Integer = strMessages.GetUpperBound(1)      'Get rows
 
-                    Dim toFind As String = message
-                    Dim xIndex As Integer
-                    Dim yIndex As Integer
+                    Dim toFind As String = message  'Set what we are looking for
+                    Dim xIndex As Integer   'for debugging
+                    Dim yIndex As Integer   'for debugging
 
-                    For x As Integer = 0 To cols - 1
-                        For y As Integer = 0 To rows - 1
-                            If strMessages(x, y) = toFind Then
-                                xIndex = x
-                                yIndex = y
-                                'debug(toFind & " [(" & x & "," & y & ")] has the fromID " & strMessages(x, y - 1))
+                    For x As Integer = 0 To cols - 1        'for each col
+                        For y As Integer = 0 To rows - 1    'for each row
+                            If strMessages(x, y) = toFind Then 'if we find what we are looking for
+                                xIndex = x  'for debugging
+                                yIndex = y  'for debugging
+                                'debug(toFind & " [(" & x & "," & y & ")] has the fromID " & strMessages(x, y - 1)) 'for debugging
 
-                                Dim lblMessage As New Label
-                                lblMessage.ID = "lblMessage" & intMessageCount
+                                Dim lblMessage As New Label                         'New label
+                                lblMessage.ID = "lblMessage" & intMessageCount      'Set label ID to message count
                                 If readUserInfo(User.Identity.Name, "int_ID") = strMessages(x, y - 1) Then
+                                    'If the current user sent the message, set css class accordingly
                                     lblMessage.CssClass = "yourMessage"
                                 Else
+                                    'If not, set the other class then.
                                     lblMessage.CssClass = "theirMessage"
                                 End If
+                                'remove SQL-injection prevention double quotes
                                 lblMessage.Text = toFind.Replace("''", "'")
+                                'add label to main content
                                 pnlMessages.Controls.Add(lblMessage)
                             End If
                         Next
