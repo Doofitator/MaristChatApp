@@ -5,6 +5,9 @@ Imports Microsoft.VisualBasic
 Public Class DatabaseFunctions
     Public Shared strConn As String = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=e:\hshome\marist2\mca.maristapps.com\App_Data\mca_db.accdb"
 
+    Public Shared Function eDebug(ByVal strOutput As String) 'emergency debug
+        Throw New Exception(strOutput)
+    End Function
     Public Shared Function MakeSQLSafe(ByVal sql As String) As String
         If sql.Contains("'") Then
             sql = sql.Replace("'", "''")
@@ -81,15 +84,14 @@ Public Class DatabaseFunctions
         Return result
     End Function
 
-    Public Shared Function readStreamID(ByVal streamName As String) As String 'function to read stream IDs from database.
+    Public Shared Function readStreamID(ByVal streamName As String, ByVal classID As String) As String 'function to read stream IDs from database.
         'Create a Connection object.
         Dim oleConn = New OleDb.OleDbConnection
         oleConn.ConnectionString = strConn
 
         'Create a Command object.
         Dim oleCmd = oleConn.CreateCommand
-        oleCmd.CommandText = "select int_streamID from tbl_streams where str_streamName = '" & MakeSQLSafe(streamName) & "'"
-
+        oleCmd.CommandText = "select int_streamID from tbl_streams where str_streamName = '" & MakeSQLSafe(streamName) & "' and str_classID = '" & classID & "'"
         'Open the connection.
 
         Try
@@ -276,7 +278,7 @@ Public Class DatabaseFunctions
     End Function
 
     Public Shared Function getStreams(ByVal ClassID As String, ByVal eml As String) As String() 'returns string array of class names that the user is a member of
-        Dim strCommand As String = "SELECT bool_isClassWide, str_streamName FROM tbl_streams WHERE str_classID = """ & ClassID & """"
+        Dim strCommand As String = "SELECT bool_isClassWide, str_streamName FROM tbl_streams WHERE str_classID = '" & ClassID & "'"
         Dim strUserName As String = eml.ToLower.Replace("@marist.vic.edu.au", "") 'get first part of email (username)
 
         'create connection object

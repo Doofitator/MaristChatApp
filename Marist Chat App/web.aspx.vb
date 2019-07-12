@@ -16,28 +16,18 @@ Partial Class _Default
     End Sub
 
     Sub addSidebarBtn(ByVal controlID As String, ByVal controlContent As String, Optional isUrgentAlert As Boolean = False)
-        'todo: code doubleup here. fix.
         Dim btn As New Button                               'New button
+        Dim pnl As New Panel                                'New panel
         If isUrgentAlert Then
-            Dim pnl As New Panel
             pnl.CssClass = "urgent"
             Me.Master.FindControl("sidebar").Controls.Add(pnl)
-
-
-            btn.ID = controlID                                  'set button ID
-            btn.Text = controlContent                           'set button text
-            'TODO: The following line needs to be uncommented, however it can't because it breaks something in javascript.
-            'btn.UseSubmitBehavior = False                       'disable button from submitting form on enter
-            AddHandler btn.Click, AddressOf Me.btn_Click        'add button onclick event
-            pnl.Controls.Add(btn)  'add button to sidebar
-            Exit Sub
         End If
         btn.ID = controlID                                  'set button ID
         btn.Text = controlContent                           'set button text
         'TODO: The following line needs to be uncommented, however it can't because it breaks something in javascript.
         'btn.UseSubmitBehavior = False                       'disable button from submitting form on enter
         AddHandler btn.Click, AddressOf Me.btn_Click        'add button onclick event
-        Me.Master.FindControl("sidebar").Controls.Add(btn)  'add button to sidebar
+        If isUrgentAlert Then pnl.Controls.Add(btn) Else Me.Master.FindControl("sidebar").Controls.Add(btn)  'add button to sidebar / form accordingly
     End Sub
     Sub addSidebarLbl(ByVal controlID As String, ByVal controlContent As String)
         Dim lbl As New Literal                              'New Label
@@ -244,9 +234,6 @@ Partial Class _Default
         Dim rbtnUser As New ListItem                                    '|
         rbtnUser.Text = "User (eg. 'asharkey268')"                      '|
         '                                                               '|
-        Dim rbtnStream As New ListItem                                  '|
-        rbtnStream.Text = "Stream (eg. 'Mr V's SoftDev Class')"         '| 
-        '                                                               '| 
         Dim rbtnClass As New ListItem                                   '|
         rbtnClass.Text = "Class (eg. 'IT0331A')"                        '| New listItems,
         '                                                               '| Set text values,
@@ -254,7 +241,6 @@ Partial Class _Default
         rbtnYearLevel.Text = "Year Level (eg. '11')"                    '|
         '                                                               '|
         rbtnList.Items.Add(rbtnUser)                                    '|
-        rbtnList.Items.Add(rbtnStream)                                  '|
         rbtnList.Items.Add(rbtnClass)                                   '|
         rbtnList.Items.Add(rbtnYearLevel)                               '|
 
@@ -523,7 +509,6 @@ QueryComplete:
             Next
             addSidebarLbl("lbl" & txtClassID.Text, txtClassID.Text) 'add new label to sidebar
             addSidebarClientBtn("NewStream('BodyContent_divNewStream', this); hamburger(document.getElementsByClassName('container')[0])", "NEW STREAM IN " & txtClassID.Text) 'add new stream button
-            'TODO: make that client button work, make it appear on page load for existing classes too
             addSidebarDivider()
 
         ElseIf btn.ID = "btnWriteAlert" Then 'if button is a new alert button
@@ -543,7 +528,7 @@ QueryComplete:
 
         ElseIf btn.ID = "btnWriteStream" Then 'if button is a new stream button
 
-            'todo: stuff
+            'todo: test & document
             Dim txtStreamID As TextBox = CType(findDynamicBodyControl("divNewStream,txtStreamID"), TextBox) 'find the class identifier textbox
             Dim txtStreamUserList As TextBox = CType(findDynamicBodyControl("divNewStream,txtStreamUserList"), TextBox) 'find csv textbox
 
@@ -568,12 +553,13 @@ QueryComplete:
             debug(runSQL(strSql))
 
         ElseIf btn.ID = "btnSend" Then 'if button is the send message button
-            Dim txtBody As TextBox = findDynamicBodyControl("divMessageControls,txtBody")
-            Dim strMessage As String = txtBody.Text
-            runSQL("insert into tbl_messages (int_streamID, int_fromID, dt_timeStamp, str_message, bool_active, bool_read) VALUES (" & readStreamID(lblStreamName.Text) & ", " & readUserInfo(User.Identity.Name, "int_ID") & ", """ & DateTime.Now & """, """ & MakeSQLSafe(strMessage) & """, True, False)")
-            txtBody.Text = ""
-            Dim streamButton As Button = findDynamicSidebarControl("btn" & lblStreamName.Text)
-            btn_Click(streamButton, EventArgs.Empty)
+            Dim txtBody As TextBox = findDynamicBodyControl("divMessageControls,txtBody")   'get the textbox
+            Dim strMessage As String = txtBody.Text                                         'Get the message
+            'Write the message to the database
+            runSQL("insert into tbl_messages (int_streamID, int_fromID, dt_timeStamp, str_message, bool_active, bool_read) VALUES (" & readStreamID(lblStreamName.Text.Split(">")(1).Substring(1), lblStreamName.Text.Split(">")(0).Replace(" ", "")) & ", " & readUserInfo(User.Identity.Name, "int_ID") & ", """ & DateTime.Now & """, """ & MakeSQLSafe(strMessage) & """, True, False)")
+            txtBody.Text = ""   'clear the textbox
+            Dim streamButton As Button = findDynamicSidebarControl("btn" & lblStreamName.Text.Replace(" > ", "")) 'find the stream button
+            btn_Click(streamButton, EventArgs.Empty) 'click it to reload the stream content
 
         ElseIf btn.ID.StartsWith("btnAlert") Then
 
@@ -606,11 +592,9 @@ QueryComplete:
                 Select Case intToQuery
                     Case 0  'If the radiobutton selected was the 'user' one
                         strSql = "select * from tbl_messages where int_fromID = " & readUserInfo(strQueryData & "@marist.vic.edu.au", "int_ID")
-                    Case 1  'If the radiobutton selected was the 'stream' one
-                        strSql = "select * from tbl_messages where int_streamID = " & readStreamID(strQueryData)
-                    Case 2  'If the radiobutton selected was the 'class' one
+                    Case 1  'If the radiobutton selected was the 'class' one
                         strSql = "select * from tbl_messages where int_streamID in (select int_streamID from tbl_streams where str_classID = '" & strQueryData & "')"
-                    Case 3  'If the radiobutton selected was the 'yearlevel' one
+                    Case 2  'If the radiobutton selected was the 'yearlevel' one
                         Dim dtCurrentYear As Date = Date.Now    'get current date
                         Dim intGradYear As Integer = 12 - (CInt(strQueryData) - dtCurrentYear.Date.Year) 'calculate graduation year of that year level
                         strSql = "select * from tbl_messages where int_fromID in (select int_ID from tbl_users where dt_graduationYear = #" & New Date(intGradYear, "1", "1") & "#)"
@@ -658,14 +642,14 @@ QueryComplete:
         Else 'if button is a regular, existing stream button
 
             Dim strStreamName As String = btn.ID.Replace("btn", "")             '|get stream name
+            Dim strClassID As String = strStreamName.Substring(0, 7)
             strStreamName = strStreamName.Remove(0, 7)                          '|remove SIMON ID
             'debug("You pressed the """ & strStreamName & """ stream!")         'debug to make sure that worked
-            lblStreamName.Text = strStreamName                                  'set heading label text
+            lblStreamName.Text = strClassID & " > " & strStreamName              'set heading label text
 
             'Load stream messages
             'todo: this breaks when there are two streams in different classes with the same person. Need to fix. Maybe by using the SIMON ID we removed a few lines up?
-            Dim strMessages(,) = getMessages(readStreamID(strStreamName))       'get the messages
-
+            Dim strMessages(,) = getMessages(readStreamID(strStreamName, strClassID))       'get the messages
 
             pnlMessages.Controls.Clear()                                        'empty main body content
 
@@ -673,22 +657,21 @@ QueryComplete:
 
             For Each message In strMessages                                     'for every message
                 If (Not message = Nothing) And (Not IsNumeric(message)) Then    'if the message isn't blank
-
+                    debug(message)
                     intMessageCount += 1                                    'Add one to the count
 
                     Dim cols As Integer = strMessages.GetUpperBound(0)      'Get cols
                     Dim rows As Integer = strMessages.GetUpperBound(1)      'Get rows
-
                     Dim toFind As String = message  'Set what we are looking for
                     Dim xIndex As Integer   'for debugging
                     Dim yIndex As Integer   'for debugging
 
-                    For x As Integer = 0 To cols - 1        'for each col
-                        For y As Integer = 0 To rows - 1    'for each row
+                    For x As Integer = 0 To cols        'for each col
+                        For y As Integer = 0 To rows    'for each row
                             If strMessages(x, y) = toFind Then 'if we find what we are looking for
                                 xIndex = x  'for debugging
                                 yIndex = y  'for debugging
-                                debug(toFind & " [(" & x & "," & y & ")] has the fromID " & strMessages(x, y - 1)) 'for debugging
+                                'debug(toFind & " [(" & x & "," & y & ")] has the fromID " & strMessages(x, y - 1)) 'for debugging
 
                                 Dim lblMessage As New Label                         'New label
                                 lblMessage.ID = "lblMessage" & intMessageCount      'Set label ID to message count
