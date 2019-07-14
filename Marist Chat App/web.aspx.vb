@@ -46,14 +46,14 @@ Partial Class _Default
         Me.Master.FindControl("sidebar").Controls.Add(lit)  'add to sidebar
     End Sub
     'Sub debug(ByVal strOutput As String)
-    'write to javascript console for immediate output
+    ' 'Write to javascript console for immediate output
     ' Try
-    'Dim strEscaped As String = strOutput.Replace("'", "\'")                 'Javascript escape quotes
-    '       Response.Write("<script>console.log('" & strEscaped & "')</script>")    'write javascript to DOM
-    'Catch ex As Exception
-    '       debug("Failed to write to console: " & ex.Message)                      'Write fail to console
-    'End Try
-    'End Sub
+    ' Dim strEscaped As String = strOutput.Replace("'", "\'")                 'Javascript escape quotes
+    '         Response.Write("<script>console.log('" & strEscaped & "')</script>")    'write javascript to DOM
+    ' Catch ex As Exception
+    '         debug("Failed to write to console: " & ex.Message)                      'Write fail to console
+    ' End Try
+    ' End Sub
     Sub addNewAlertsDiv()
         Dim divNewAlert As New HtmlGenericControl("div")                'New div
         divNewAlert.ID = "divNewAlert"                                  'Set ID
@@ -353,12 +353,11 @@ Partial Class _Default
         End If
 
         Dim strNotificationsArr(,) = getAlerts(User.Identity.Name)  'Get notifications for this user
-
         Dim intAlertButtonCount = 0 'New integer
 
         For Each notification In strNotificationsArr                                                             'for every message
             If (Not notification = Nothing) And (Not IsNumeric(notification)) Then                               'if the message isn't blank
-
+                'debug(notification)
                 intAlertButtonCount += 1    'increase button count
 
                 Dim cols As Integer = strNotificationsArr.GetUpperBound(0)                                       '|Get the array's rows and columns
@@ -368,8 +367,8 @@ Partial Class _Default
                 'Dim xIndex As Integer   '| Define eventual location points
                 'Dim yIndex As Integer   '| for debugging purposes
 
-                For x As Integer = 0 To cols - 1                                    'For each column
-                    For y As Integer = 0 To rows - 1                                'For each row
+                For x As Integer = 0 To cols                                    'For each column
+                    For y As Integer = 0 To rows                                'For each row
                         If strNotificationsArr(x, y) = toFind Then                  'If the point we are at is the location we want
                             'xIndex = x                                              '| Set the vars to the location we are at now
                             'yIndex = y                                              '|
@@ -536,7 +535,7 @@ QueryComplete:
             Dim intUserCode As Integer                                                                          'New integer
             intUserCode = intRoleArray(ddlRoles.SelectedIndex)                                                  'Set the integer to the selected index of the dropdownlist
             'run sql
-            runSQL("INSERT INTO tbl_notifications (str_message, int_userGroup, bool_urgent, dt_timeStamp) VALUES (""" & MakeSQLSafe(cleanHTML(txtMessage.Text)) & """, " & intUserCode & ", " & strAccessBoolFixer & ", """ & DateTime.Now & """)")
+            runSQL("INSERT INTO tbl_notifications (str_message, int_userGroup, bool_urgent, dt_timeStamp) VALUES ('" & MakeSQLSafe(cleanHTML(txtMessage.Text)) & "', " & intUserCode & ", " & strAccessBoolFixer & ", #" & DateTime.Now & "#)")
 
         ElseIf btn.ID = "btnWriteStream" Then 'if button is a new stream button
 
