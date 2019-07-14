@@ -567,8 +567,8 @@ QueryComplete:
             'Write the message to the database
             runSQL("insert into tbl_messages (int_streamID, int_fromID, dt_timeStamp, str_message, bool_active, bool_read) VALUES (" & readStreamID(lblStreamName.Text.Split(">")(1).Substring(1), lblStreamName.Text.Split(">")(0).Replace(" ", "")) & ", " & readUserInfo(User.Identity.Name, "int_ID") & ", """ & DateTime.Now & """, """ & MakeSQLSafe(strMessage) & """, True, False)")
             txtBody.Text = ""   'clear the textbox
-            Dim streamButton As Button = findDynamicSidebarControl("btn" & lblStreamName.Text.Replace(" > ", "")) 'find the stream button
             tmrUpdate_Tick(tmrUpdate, EventArgs.Empty) 'update messages
+            'TODO: On clicking the send button, there is a bit of a delay. Can this be removed?
 
         ElseIf btn.ID.StartsWith("btnAlert") Then
 
