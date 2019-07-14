@@ -6,10 +6,12 @@
     Sign Up for your New Account
 </asp:Content>
 <asp:Content ID="Content3" ContentPlaceHolderID="BodyContent" runat="Server">
+    <asp:Image ID="imgBanner" runat="server" ImageUrl="~/banner.png" CssClass="banner" />
+
     <asp:Panel ID="pnlRegisterForm" runat="server">
         <table>
             <tr>
-                <td align="right">
+                <td>
                     <asp:Label ID="EmailLabel" runat="server" AssociatedControlID="Email">E-mail:</asp:Label>
                 </td>
                 <td>
@@ -17,7 +19,7 @@
                 </td>
             </tr>
             <tr>
-                <td align="right">
+                <td>
                     <asp:Label ID="PasswordLabel" runat="server" AssociatedControlID="Password">Password:</asp:Label>
                 </td>
                 <td>
@@ -25,7 +27,7 @@
                 </td>
             </tr>
             <tr>
-                <td align="right">
+                <td>
                     <asp:Label ID="ConfirmPasswordLabel" runat="server" AssociatedControlID="ConfirmPassword">Confirm Password:</asp:Label>
                 </td>
                 <td>
@@ -33,7 +35,7 @@
                 </td>
             </tr>
             <tr>
-                <td align="right">
+                <td>
                     <asp:Label ID="GraduationLabel" runat="server" AssociatedControlID="Graduation">Graduation Year (leave blank if not a student):</asp:Label>
                 </td>
                 <td>
