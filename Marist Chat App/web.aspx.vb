@@ -640,11 +640,12 @@ QueryComplete:
             Dim sw As New IO.StringWriter                                                                       'new stringwriter
             Dim htw As New HtmlTextWriter(sw)                                                                   'new htmlTextWriter
             Dim gvResults As GridView = CType(findDynamicBodyControl("divDataTable,gvResults"), GridView)       'Find the gridview
-            Dim pgNew As New Page()                                                                             'New webpage                             | These lines prevent a 
-            Dim frmNew As New HtmlForm()                                                                        'New form                                | RegisterForEventValidation exception,
-            pgNew.Controls.Add(frmNew)                                                                          'Add form to new page                    | and allow HTML content to be written 
-            frmNew.Controls.Add(gvResults)                                                                      'Add gridview to form                    | without being parsed.
-            HttpContext.Current.Server.Execute(pgNew, sw, True)                                                 'Write page contents to stringwriter     | The alternative command would be 'gvResults.RenderControl(htw)'
+            'Dim pgNew As New Page()                                                                             'New webpage                             | These lines prevent a 
+            'Dim frmNew As New HtmlForm()                                                                        'New form                                | RegisterForEventValidation exception,
+            'pgNew.Controls.Add(frmNew)                                                                          'Add form to new page                    | and allow HTML content to be written 
+            'frmNew.Controls.Add(gvResults)                                                                      'Add gridview to form                    | without being parsed.
+            'HttpContext.Current.Server.Execute(pgNew, sw, True)                                                 'Write page contents to stringwriter     | The alternative command would be 'gvResults.RenderControl(htw)'
+            gvResults.RenderControl(htw)
             Response.Write(sw.ToString())                                                                       'Write the stringwriter to the excel file we are sending
             Response.[End]()                                                                                    'end the transfer
 
@@ -661,6 +662,9 @@ QueryComplete:
 
             loadMessages(strMessages)
         End If
+    End Sub
+    Public Overrides Sub VerifyRenderingInServerForm(ByVal control As Control)
+
     End Sub
     Private Sub loadMessages(ByVal messagesArr(,) As String)
         clearPanelControls()
