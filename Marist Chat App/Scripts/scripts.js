@@ -16,7 +16,7 @@ function button_click(e) {
 }
 
 function ScrollDown() {
-    var objDiv = document.getElementById("BodyContent_pnlMessages");
+    var objDiv = document.getElementById("BodyContent_pnlUpdate");
     objDiv.scrollTop = objDiv.scrollHeight;
 }
 

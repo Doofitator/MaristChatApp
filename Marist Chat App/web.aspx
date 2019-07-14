@@ -38,9 +38,11 @@
     </script>
 
     <asp:ScriptManager ID="smgrTimer" runat="server" EnableCdn="true"></asp:ScriptManager>
+    <div class="messagesContainer">
             <asp:UpdatePanel ID="pnlUpdate" runat="server">
                 <ContentTemplate>                    
                     <asp:Timer ID="tmrUpdate" runat="server" Interval="10000"></asp:Timer>
                 </ContentTemplate>
             </asp:UpdatePanel>
+    </div>
 </asp:Content>

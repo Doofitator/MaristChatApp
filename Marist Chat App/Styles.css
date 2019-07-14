@@ -182,13 +182,13 @@ body {
     border-left: 5px solid red;
 }
 
-.messagesContainer {
+.messagesContainer > div {
     overflow: scroll;
     overflow-x: hidden;
     height: 83vh;
 }
 
-    .messagesContainer > div > input[type=submit] {
+    .messagesContainer > div > div > input[type=submit] {
         background: var(--main-colour);
         border: 0px;
         color: var(--text-colour);
@@ -197,13 +197,13 @@ body {
         text-align: left;
     }
 
-    .messagesContainer > div > input[type=submit]:hover {
+    .messagesContainer > div > div > input[type=submit]:hover {
         background: var(--light-colour);
         color: #fff;
         cursor: pointer;
     }
 
-    .messagesContainer > div {
+    .messagesContainer > div > div {
         padding-bottom: 2.5px;
     }
 
