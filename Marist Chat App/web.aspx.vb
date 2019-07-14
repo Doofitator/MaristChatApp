@@ -45,15 +45,15 @@ Partial Class _Default
         lit.Text = "<hr />"                                 'set it as a <hr> tag
         Me.Master.FindControl("sidebar").Controls.Add(lit)  'add to sidebar
     End Sub
-    'Sub debug(ByVal strOutput As String)
-    ' 'Write to javascript console for immediate output
-    ' Try
-    ' Dim strEscaped As String = strOutput.Replace("'", "\'")                 'Javascript escape quotes
-    '         Response.Write("<script>console.log('" & strEscaped & "')</script>")    'write javascript to DOM
-    ' Catch ex As Exception
-    '         debug("Failed to write to console: " & ex.Message)                      'Write fail to console
-    ' End Try
-    ' End Sub
+    Sub debug(ByVal strOutput As String)
+        'Write to javascript console for immediate output
+        Try
+            Dim strEscaped As String = strOutput.Replace("'", "\'")                 'Javascript escape quotes
+            Response.Write("<script>console.log('" & strEscaped & "')</script>")    'write javascript to DOM
+        Catch ex As Exception
+            debug("Failed to write to console: " & ex.Message)                      'Write fail to console
+        End Try
+    End Sub
     Sub addNewAlertsDiv()
         Dim divNewAlert As New HtmlGenericControl("div")                'New div
         divNewAlert.ID = "divNewAlert"                                  'Set ID
@@ -149,8 +149,8 @@ Partial Class _Default
         divNewClass.Controls.Add(New LiteralControl("<br>"))
 
         Dim lblStreamName As New Label                                  '|
-        lblUserList.Text = "Classwide Stream Name:"                     '| New label, add to div
-        divNewClass.Controls.Add(lblUserList)                           '|
+        lblStreamName.Text = "Classwide Stream Name:"                     '| New label, add to div
+        divNewClass.Controls.Add(lblStreamName)                           '|
 
         Dim txtClassStreamName As New TextBox                           '|
         txtClassStreamName.ID = "txtClassStreamName"                    '| Add to div
@@ -519,7 +519,7 @@ QueryComplete:
             'todo: this stuff adds after the "new class" / "new alert" / "SQL reader" buttons. I want it to add before that
             addSidebarLbl("lbl" & txtClassID.Text, txtClassID.Text) 'add new label to sidebar
             'add classwide stream
-            runSQL("insert into tbl_streams (str_ClassID, bool_isClassWide, str_StreamName) VALUES ('" & MakeSQLSafe(txtClassID.Text) & "', TRUE, '" & txtClassStreamName.Text & "')")
+            runSQL("insert into tbl_streams (str_ClassID, bool_isClassWide, str_StreamName) VALUES ('" & MakeSQLSafe(txtClassID.Text) & "', TRUE, '" & MakeSQLSafe(txtClassStreamName.Text) & "')")
             addSidebarBtn("btn" & txtClassID.Text & txtClassStreamName.Text, txtClassStreamName.Text)
             addSidebarClientBtn("NewStream('BodyContent_divNewStream', this); hamburger(document.getElementsByClassName('container')[0])", "NEW STREAM IN " & txtClassID.Text) 'add new stream button
             addSidebarDivider()

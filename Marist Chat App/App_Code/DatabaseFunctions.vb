@@ -290,8 +290,8 @@ Public Class DatabaseFunctions
         Dim cols As Integer = strTable.GetUpperBound(0)             'get the cols of the 2D string
         Dim rows As Integer = strTable.GetUpperBound(1)             'get the rows of the 2D string
 
-        For x As Integer = 0 To cols - 1                            'for each col
-            For y As Integer = 0 To rows - 1                        'for each row
+        For x As Integer = 0 To cols                                'for each col
+            For y As Integer = 0 To rows                            'for each row
                 If strTable(x, y) = "" Then Continue For 'if there's blanks in the array (because sometimes there is), skip them
                 If y = 1 Then                                       'if the row is the true/false one
                     If strTable(x, y) = False Then Continue For     'if it is false, we don't want it. Skip
