@@ -182,7 +182,7 @@ body {
         border-bottom-left-radius: 10px;
         border-top-left-radius: 10px;
         border-style: none;
-        width: calc(100% - 50px);
+        width: calc(100% - 52px);
     }
 
         .messageControls > input[type="text"]:focus {
@@ -261,7 +261,7 @@ span#topBar_lblStreamName {
         margin-top: -33px;
     }
 
-.messagesContainer > div > input[type=submit] {
+.messagesContainer > div > div > input[type=submit] {
     background: var(--main-colour);
     border: 0px;
     color: var(--text-colour);
@@ -270,13 +270,13 @@ span#topBar_lblStreamName {
     text-align: left;
 }
 
-    .messagesContainer > div > input[type=submit]:hover {
+    .messagesContainer >  div > div > input[type=submit]:hover {
         background: var(--light-colour);
         color: #fff;
         cursor: pointer;
     }
 
-    .messagesContainer > div {
+    .messagesContainer > div > div {
         padding-bottom: 2.5px;
     }
 

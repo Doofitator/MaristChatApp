@@ -422,7 +422,7 @@ Partial Class _Default
             Dim divMessageControls As New HtmlGenericControl("div")                 'New div
             divMessageControls.ID = "divMessageControls"                            'Set ID
             divMessageControls.Attributes.Add("class", "messageControls")           'Set class
-            Me.Master.FindControl("BodyContent").Controls.Add(divMessageControls)   'Add to page
+            pnlUpdate.ContentTemplateContainer.Controls.Add(divMessageControls)     'Add to page
 
             Dim txtBody As New TextBox                          'New Textbox
             Dim btnSend As New Button                           'New button
