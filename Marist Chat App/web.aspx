@@ -37,7 +37,10 @@
         }
     </script>
 
-    <asp:Panel runat="server" ID="pnlMessages" CssClass="messagesContainer">
-
-    </asp:Panel>
+    <asp:ScriptManager ID="smgrTimer" runat="server" EnableCdn="true"></asp:ScriptManager>
+            <asp:UpdatePanel ID="pnlUpdate" runat="server">
+                <ContentTemplate>                    
+                    <asp:Timer ID="tmrUpdate" runat="server" Interval="1000"></asp:Timer>
+                </ContentTemplate>
+            </asp:UpdatePanel>
 </asp:Content>

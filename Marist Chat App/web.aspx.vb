@@ -45,15 +45,15 @@ Partial Class _Default
         lit.Text = "<hr />"                                 'set it as a <hr> tag
         Me.Master.FindControl("sidebar").Controls.Add(lit)  'add to sidebar
     End Sub
-    Sub debug(ByVal strOutput As String)
-        'write to javascript console for immediate output
-        Try
-            Dim strEscaped As String = strOutput.Replace("'", "\'")                 'Javascript escape quotes
-            Response.Write("<script>console.log('" & strEscaped & "')</script>")    'write javascript to DOM
-        Catch ex As Exception
-            debug("Failed to write to console: " & ex.Message)                      'Write fail to console
-        End Try
-    End Sub
+    'Sub debug(ByVal strOutput As String)
+    'write to javascript console for immediate output
+    ' Try
+    'Dim strEscaped As String = strOutput.Replace("'", "\'")                 'Javascript escape quotes
+    '       Response.Write("<script>console.log('" & strEscaped & "')</script>")    'write javascript to DOM
+    'Catch ex As Exception
+    '       debug("Failed to write to console: " & ex.Message)                      'Write fail to console
+    'End Try
+    'End Sub
     Sub addNewAlertsDiv()
         Dim divNewAlert As New HtmlGenericControl("div")                'New div
         divNewAlert.ID = "divNewAlert"                                  'Set ID
@@ -342,7 +342,7 @@ Partial Class _Default
     End Sub
     Sub LoadAlerts(Optional inSidebar As Boolean = True)
         Try
-            pnlMessages.Controls.Clear()            'Clear main controls
+            clearPanelControls()            'Clear main controls
         Catch
         End Try
 
@@ -391,7 +391,7 @@ Partial Class _Default
                             AddHandler btn.Click, AddressOf btn_Click                       '| And resolves the issue of the dynamic controls
                             If inSidebar Then pnl.Attributes.Add("style", "display: none")  '| not being there after postback
                             pnl.Controls.Add(btn)                                           '|
-                            pnlMessages.Controls.Add(pnl)                                   '|
+                            pnlUpdate.ContentTemplateContainer.Controls.Add(pnl)            '|
 
                             If (intAlertButtonCount = 3) And (inSidebar) Then
                                 addSidebarBtn("btnMoreAlerts", "Show older...")             'Add button to show older alerts than the three in the sidebar
@@ -417,7 +417,6 @@ Partial Class _Default
             Case Else
                 'do nothing
         End Select
-        Response.Write("<script src=""/Scripts/scripts.js""></script>")
 
         If intRole > 0 Then
             Dim divMessageControls As New HtmlGenericControl("div")                 'New div
@@ -473,9 +472,9 @@ Partial Class _Default
 
         Try
             Dim strID As String = btn.ID    '| Try to get the button ID and 
-            debug("btn clicked: " & strID)  '| write it to the javascript console
+            'debug("btn clicked: " & strID)  '| write it to the javascript console
         Catch ex As Exception
-            debug("Button click failed.")   ' If that fails (because the button was not properly created and given an ID) write that to javascript console too.
+            'debug("Button click failed.")   ' If that fails (because the button was not properly created and given an ID) write that to javascript console too.
             Exit Sub
         End Try
 
@@ -485,7 +484,7 @@ Partial Class _Default
 
             Dim txtClassStreamName As TextBox = CType(findDynamicBodyControl("divNewClass,txtClassStreamName"), TextBox) 'find the stream name textbox
             Dim txtClassID As TextBox = CType(findDynamicBodyControl("divNewClass,txtClassID"), TextBox) 'find the class identifier textbox
-            debug(runSQL("ALTER TABLE tbl_classes ADD COLUMN " & MakeSQLSafe(txtClassID.Text) & " YESNO NOT NULL")) 'debugging
+            runSQL("ALTER TABLE tbl_classes ADD COLUMN " & MakeSQLSafe(txtClassID.Text) & " YESNO NOT NULL")
 
             Dim txtUserList As TextBox = CType(findDynamicBodyControl("divNewClass,txtUserList"), TextBox) 'find the user list textbox
             Dim strUsers As String = txtUserList.Text.Replace(",", "@marist.vic.edu.au,")   'add email domains to each username
@@ -495,7 +494,7 @@ Partial Class _Default
                 Try
                     listUserIDs.Add(readUserInfo(strEmail, "int_ID"))     'add the userID from tbl_users to our list
                 Catch
-                    debug("Invalid username: " & strEmail)                                  'invalid u/n error
+                    'debug("Invalid username: " & strEmail)                                  'invalid u/n error
                 End Try
             Next
             listUserIDs.Add(readUserInfo(User.Identity.Name, "int_ID"))   'Add me to the class
@@ -560,7 +559,7 @@ QueryComplete:
 
             'run sql
             Dim strSql As String = "insert into tbl_streams (str_ClassID, bool_isClassWide, str_StreamName) VALUES ('" & MakeSQLSafe(txtStreamID.Text) & "', FALSE, '" & strStreamName & "')"
-            debug(runSQL(strSql))
+            runSQL(strSql)
             'todo: add button now in the right spot
         ElseIf btn.ID = "btnSend" Then 'if button is the send message button
             Dim txtBody As TextBox = findDynamicBodyControl("divMessageControls,txtBody")   'get the textbox
@@ -574,14 +573,14 @@ QueryComplete:
         ElseIf btn.ID.StartsWith("btnAlert") Then
 
             Dim strAlertName As String = btn.Text     'get alert name
-            debug("alert: " & strAlertName & " pressed.") 'debugging
-            lblStreamName.Text = strAlertName                               'set heading label text
-            pnlMessages.Controls.Clear()                                    'empty main body content
+            'debug("alert: " & strAlertName & " pressed.") 'debugging
+            lblStreamName.Text = strAlertName                                    'set heading label text
+            clearPanelControls()                                                 'empty main body content
 
-            Dim litNotificationHTML As New LiteralControl()                 '| New literal HTML control
-            '                                                               '| Set literal HTML to the message body (which is HTML formatted)
+            Dim litNotificationHTML As New LiteralControl()                      '| New literal HTML control
+            '                                                                    '| Set literal HTML to the message body (which is HTML formatted)
             litNotificationHTML.Text = Server.HtmlDecode(readNotification(btn.ID.Replace("btnAlert", "")).Replace("''", "'"))
-            pnlMessages.Controls.Add(litNotificationHTML)                   '| Add literal control to message div
+            pnlUpdate.ContentTemplateContainer.Controls.Add(litNotificationHTML) '| Add literal control to message div
 
         ElseIf btn.ID = "btnMoreAlerts" Then
 
@@ -660,49 +659,64 @@ QueryComplete:
             'Load stream messages
             Dim strMessages(,) = getMessages(readStreamID(strStreamName, strClassID))       'get the messages
 
-            pnlMessages.Controls.Clear()                                        'empty main body content
-
-            Dim intMessageCount = 0
-
-            For Each message In strMessages                                     'for every message
-                If (Not message = Nothing) And (Not IsNumeric(message)) Then    'if the message isn't blank
-                    debug(message)
-                    intMessageCount += 1                                    'Add one to the count
-
-                    Dim cols As Integer = strMessages.GetUpperBound(0)      'Get cols
-                    Dim rows As Integer = strMessages.GetUpperBound(1)      'Get rows
-                    Dim toFind As String = message  'Set what we are looking for
-                    Dim xIndex As Integer   'for debugging
-                    Dim yIndex As Integer   'for debugging
-
-                    For x As Integer = 0 To cols        'for each col
-                        For y As Integer = 0 To rows    'for each row
-                            If strMessages(x, y) = toFind Then 'if we find what we are looking for
-                                xIndex = x  'for debugging
-                                yIndex = y  'for debugging
-                                'debug(toFind & " [(" & x & "," & y & ")] has the fromID " & strMessages(x, y - 1)) 'for debugging
-
-                                Dim lblMessage As New Label                         'New label
-                                lblMessage.ID = "lblMessage" & intMessageCount      'Set label ID to message count
-                                'remove SQL-injection prevention double quotes
-                                lblMessage.Text = Server.HtmlDecode(cleanHTML(toFind.Replace("''", "'")))
-                                If readUserInfo(User.Identity.Name, "int_ID") = strMessages(x, y - 1) Then
-                                    'If the current user sent the message, set css class accordingly
-                                    lblMessage.CssClass = "yourMessage"
-                                Else
-                                    'If not, set the other class then.
-                                    lblMessage.CssClass = "theirMessage"
-                                    lblMessage.Text = "<span style=""font-weight: 700"">" & readUserName(strMessages(x, y - 1)).Replace("@marist.vic.edu.au", "") & "></span> " & lblMessage.Text
-                                End If
-                                'add label to main content
-                                pnlMessages.Controls.Add(lblMessage)
-                            End If
-                        Next
-                    Next
-
-                End If
-            Next
+            loadMessages(strMessages)
         End If
+    End Sub
+    Private Sub loadMessages(ByVal messagesArr(,) As String)
+        clearPanelControls()
+
+        Dim intMessageCount = 0
+
+        For Each message In messagesArr                                     'for every message
+            If (Not message = Nothing) And (Not IsNumeric(message)) Then    'if the message isn't blank
+                'debug(message)
+                intMessageCount += 1                                    'Add one to the count
+
+                Dim cols As Integer = messagesArr.GetUpperBound(0)      'Get cols
+                Dim rows As Integer = messagesArr.GetUpperBound(1)      'Get rows
+                Dim toFind As String = message  'Set what we are looking for
+                Dim xIndex As Integer   'for debugging
+                Dim yIndex As Integer   'for debugging
+
+                For x As Integer = 0 To cols        'for each col
+                    For y As Integer = 0 To rows    'for each row
+                        If messagesArr(x, y) = toFind Then 'if we find what we are looking for
+                            xIndex = x  'for debugging
+                            yIndex = y  'for debugging
+                            'debug(toFind & " [(" & x & "," & y & ")] has the fromID " & messagesArr(x, y - 1)) 'for debugging
+
+                            Dim lblMessage As New Label                         'New label
+                            lblMessage.ID = "lblMessage" & intMessageCount      'Set label ID to message count
+                            'remove SQL-injection prevention double quotes
+                            lblMessage.Text = Server.HtmlDecode(cleanHTML(toFind.Replace("''", "'")))
+                            If readUserInfo(User.Identity.Name, "int_ID") = messagesArr(x, y - 1) Then
+                                'If the current user sent the message, set css class accordingly
+                                lblMessage.CssClass = "yourMessage"
+                            Else
+                                'If not, set the other class then.
+                                lblMessage.CssClass = "theirMessage"
+                                lblMessage.Text = "<span style=""font-weight: 700"">" & readUserName(messagesArr(x, y - 1)).Replace("@marist.vic.edu.au", "") & "></span> " & lblMessage.Text
+                            End If
+                            'add label to main content
+                            pnlUpdate.ContentTemplateContainer.Controls.Add(lblMessage)
+                        End If
+                    Next
+                Next
+
+            End If
+        Next
+    End Sub
+    Sub clearPanelControls()
+        Dim lblList As New Generic.List(Of Label)
+        For Each ctrl In pnlUpdate.ContentTemplateContainer.Controls
+            If TypeOf ctrl Is Label Then
+                lblList.Add(ctrl)
+            End If
+        Next
+
+        For Each lbl In lblList
+            pnlUpdate.ContentTemplateContainer.Controls.Remove(lbl)
+        Next
     End Sub
     Function findDynamicBodyControl(ByVal path As String) As Control 'a real dirty way of doing something that should be a lot easier
         Dim strIDArray As Array = path.Split(",")   'split the inputted path
@@ -721,6 +735,15 @@ QueryComplete:
         'output the control defined in the path
         Return Me.Master.FindControl("frmPage").FindControl("Sidebar").FindControl(id)
     End Function
+    Private Sub tmrUpdate_Tick(sender As Object, e As EventArgs) Handles tmrUpdate.Tick
+        Dim lblStreamName As Label = findDynamicTopBarControl("divStreamHeading,lblStreamName") 'get heading label
 
-    'TODO: Make a timer work! Messages need to come through without manual reloads!
+        Dim strClassID As String = lblStreamName.Text.Substring(0, 7)
+        Dim strStreamName = lblStreamName.Text.Remove(0, 7).Replace(" > ", "")                          '|remove SIMON ID
+
+        Dim strMessages(,) = getMessages(readStreamID(strStreamName, strClassID))       'get the messages
+
+        loadMessages(strMessages)
+    End Sub
+
 End Class
