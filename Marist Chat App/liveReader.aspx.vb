@@ -1,9 +1,20 @@
 ﻿Imports DatabaseFunctions
-Partial Class timerTests_Default
+Partial Class liveReader
     Inherits System.Web.UI.Page
+    Protected Sub Page_PreInit(sender As Object, e As EventArgs) Handles Me.PreInit
+        'ensure user is authenticated
+        If Not User.Identity.IsAuthenticated Then
+            Response.Redirect("/Default.aspx")
+        End If
 
-    Private Sub x(sender As Object, e As EventArgs) Handles Timer1.Tick
-        Dim strmessages(,) As String = getMessages(2)
+        Dim intRole As Integer = CInt(readUserInfo(User.Identity.Name, "int_role"))
+        If Not intRole = 3 Then
+            Response.Redirect("/Default.aspx")
+        End If
+    End Sub
+
+    Private Sub tmrRead_Tick(sender As Object, e As EventArgs) Handles tmrRead.Tick
+        Dim strmessages(,) As String = getMessages(Request.QueryString("ID"))
 
         Dim intMessageCount = 0
 
@@ -37,8 +48,8 @@ Partial Class timerTests_Default
                                 lblMessage.Text = "<span style=""font-weight: 700"">" & readUserName(strmessages(x, y - 1)).Replace("@marist.vic.edu.au", "") & "></span> " & lblMessage.Text
                             End If
                             'add label to main content
-                            UpdatePanel1.ContentTemplateContainer.Controls.Add(lblMessage)
-                            UpdatePanel1.ContentTemplateContainer.Controls.Add(New LiteralControl("<br>"))
+                            pnlUpdate.ContentTemplateContainer.Controls.Add(lblMessage)
+                            pnlUpdate.ContentTemplateContainer.Controls.Add(New LiteralControl("<br>"))
                         End If
                     Next
                 Next

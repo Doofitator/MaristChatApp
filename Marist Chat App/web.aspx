@@ -5,7 +5,7 @@
 <%-- Add content controls here --%>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="Sidebar" Runat="Server">
-    <input type="text" placeholder="Search" id="sbox" />
+    <input type="text" placeholder="Search" id="sbox" disabled/>
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="topBar" Runat="Server">
@@ -41,8 +41,16 @@
     <div class="messagesContainer">
             <asp:UpdatePanel ID="pnlUpdate" runat="server">
                 <ContentTemplate>                    
-                    <asp:Timer ID="tmrUpdate" runat="server" Interval="10000"></asp:Timer>
+                    <asp:Timer ID="tmrUpdate" runat="server" Interval="1000"></asp:Timer>
                 </ContentTemplate>
             </asp:UpdatePanel>
     </div>
+        <asp:UpdatePanel ID="pnlControls" runat="server" UpdateMode="Conditional">
+            <ContentTemplate>
+
+            </ContentTemplate>
+             <Triggers>
+                   <asp:AsyncPostBackTrigger ControlID="btnSend" />
+             </Triggers>
+        </asp:UpdatePanel>
 </asp:Content>

@@ -338,6 +338,8 @@ Partial Class _Default
             addSidebarClientBtn("HideShow('BodyContent_divReader'); hamburger(document.getElementsByClassName('container')[0])", "SQL READER") 'add reader button
         End If
 
+        'todo: add admin button for liveReader.aspx
+
         LoadContent(intRole) 'load other required DOM elements
     End Sub
     Sub LoadAlerts(Optional inSidebar As Boolean = True)
@@ -422,7 +424,7 @@ Partial Class _Default
             Dim divMessageControls As New HtmlGenericControl("div")                 'New div
             divMessageControls.ID = "divMessageControls"                            'Set ID
             divMessageControls.Attributes.Add("class", "messageControls")           'Set class
-            pnlUpdate.ContentTemplateContainer.Controls.Add(divMessageControls)     'Add to page
+            pnlControls.ContentTemplateContainer.Controls.Add(divMessageControls)     'Add to page
 
             Dim txtBody As New TextBox                          'New Textbox
             Dim btnSend As New Button                           'New button
@@ -567,9 +569,8 @@ QueryComplete:
             'Write the message to the database
             runSQL("insert into tbl_messages (int_streamID, int_fromID, dt_timeStamp, str_message, bool_active, bool_read) VALUES (" & readStreamID(lblStreamName.Text.Split(">")(1).Substring(1), lblStreamName.Text.Split(">")(0).Replace(" ", "")) & ", " & readUserInfo(User.Identity.Name, "int_ID") & ", """ & DateTime.Now & """, """ & MakeSQLSafe(strMessage) & """, True, False)")
             txtBody.Text = ""   'clear the textbox
-            tmrUpdate_Tick(tmrUpdate, EventArgs.Empty) 'update messages
-            'TODO: On clicking the send button, there is a bit of a delay. Can this be removed?
-
+            'TODO: On clicking the send button, there is a delay until the timer manually ticks over. Why does the below line not work?
+            updateMessages()
         ElseIf btn.ID.StartsWith("btnAlert") Then
 
             Dim strAlertName As String = btn.Text     'get alert name
@@ -735,6 +736,9 @@ QueryComplete:
         Return Me.Master.FindControl("frmPage").FindControl("Sidebar").FindControl(id)
     End Function
     Private Sub tmrUpdate_Tick(sender As Object, e As EventArgs) Handles tmrUpdate.Tick
+        updateMessages()
+    End Sub
+    Private Sub updateMessages()
         Dim lblStreamName As Label = findDynamicTopBarControl("divStreamHeading,lblStreamName") 'get heading label
 
         Dim strClassID As String = lblStreamName.Text.Substring(0, 7)
@@ -743,5 +747,6 @@ QueryComplete:
         Dim strMessages(,) = getMessages(readStreamID(strStreamName, strClassID))       'get the messages
 
         loadMessages(strMessages)
+        'TODO: make pnlupdate scroll to bottom
     End Sub
 End Class
