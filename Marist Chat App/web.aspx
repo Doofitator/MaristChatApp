@@ -40,7 +40,7 @@
     <asp:ScriptManager ID="smgrTimer" runat="server" EnableCdn="true"></asp:ScriptManager>
             <asp:UpdatePanel ID="pnlUpdate" runat="server">
                 <ContentTemplate>                    
-                    <asp:Timer ID="tmrUpdate" runat="server" Interval="1000"></asp:Timer>
+                    <asp:Timer ID="tmrUpdate" runat="server" Interval="10000"></asp:Timer>
                 </ContentTemplate>
             </asp:UpdatePanel>
 </asp:Content>

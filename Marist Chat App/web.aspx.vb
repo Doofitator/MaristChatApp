@@ -568,7 +568,7 @@ QueryComplete:
             runSQL("insert into tbl_messages (int_streamID, int_fromID, dt_timeStamp, str_message, bool_active, bool_read) VALUES (" & readStreamID(lblStreamName.Text.Split(">")(1).Substring(1), lblStreamName.Text.Split(">")(0).Replace(" ", "")) & ", " & readUserInfo(User.Identity.Name, "int_ID") & ", """ & DateTime.Now & """, """ & MakeSQLSafe(strMessage) & """, True, False)")
             txtBody.Text = ""   'clear the textbox
             Dim streamButton As Button = findDynamicSidebarControl("btn" & lblStreamName.Text.Replace(" > ", "")) 'find the stream button
-            btn_Click(streamButton, EventArgs.Empty) 'click it to reload the stream content
+            tmrUpdate_Tick(tmrUpdate, EventArgs.Empty) 'update messages
 
         ElseIf btn.ID.StartsWith("btnAlert") Then
 
@@ -745,5 +745,4 @@ QueryComplete:
 
         loadMessages(strMessages)
     End Sub
-
 End Class
