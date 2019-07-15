@@ -1,5 +1,7 @@
 ﻿Imports System.Data
 Imports DatabaseFunctions
+Imports System.IO
+Imports System.Xml
 Partial Class _Default
     Inherits System.Web.UI.Page
 
@@ -10,6 +12,20 @@ Partial Class _Default
         If Not User.Identity.IsAuthenticated Then
             Response.Redirect("/Default.aspx")
         End If
+
+        Dim xmldoc As New XmlDataDocument()
+        Dim xmlnode As XmlNodeList
+        Dim i As Integer
+        Dim str As String
+        Dim fs As New FileStream("e:\hshome\marist2\mca.maristapps.com\App_Data\DirtyWords.xml", FileMode.Open, FileAccess.Read)
+        xmldoc.Load(fs)
+        xmlnode = xmldoc.GetElementsByTagName("RECORD")
+        Censor.CensoredWords = New Generic.List(Of String)
+        For i = 0 To xmlnode.Count - 1
+            xmlnode(i).ChildNodes.Item(0).InnerText.Trim()
+            str = xmlnode(i).ChildNodes.Item(0).InnerText.Trim()
+            Censor.CensoredWords.Add(str)
+        Next
 
         Dim intRole As Integer = CInt(readUserInfo(User.Identity.Name, "int_role"))
         LoadSidebar(intRole)
@@ -549,7 +565,8 @@ QueryComplete:
 
         ElseIf btn.ID = "btnSend" Then 'if button is the send message button
             Dim txtBody As TextBox = findDynamicBodyControl("divMessageControls,txtBody")
-            Dim cnsCleanText As Censor = New Censor(Censor.CensoredWords)
+
+            Dim cnsCleanText As Censor = New Censor()
             Dim strMessage As String = cnsCleanText.CensorText(txtBody.Text)
 
             runSQL("insert into tbl_messages (int_streamID, int_fromID, dt_timeStamp, str_message, bool_active, bool_read) VALUES (" & readStreamID(lblStreamName.Text) & ", " & readUserInfo(User.Identity.Name, "int_ID") & ", """ & DateTime.Now & """, """ & MakeSQLSafe(strMessage) & """, True, False)")

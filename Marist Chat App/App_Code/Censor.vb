@@ -2,9 +2,9 @@
 Public Class Censor
     Public Shared CensoredWords As Generic.IList(Of String)
     'TODO: CensoredWords = ~/App_Data/DirtyWords.XML
-    Public Sub New(ByVal censoredWords As Generic.IEnumerable(Of String))
-        If censoredWords Is Nothing Then Throw New ArgumentNullException("censoredWords")
-        censoredWords = New Generic.List(Of String)(censoredWords)
+    Public Sub New()
+        If CensoredWords Is Nothing Then Throw New ArgumentNullException("censoredWords")
+        CensoredWords = New Generic.List(Of String)(CensoredWords)
     End Sub
 
     Public Function CensorText(ByVal text As String) As String
