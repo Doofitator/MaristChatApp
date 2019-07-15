@@ -1,5 +1,7 @@
 ﻿Imports System.Data
 Imports DatabaseFunctions
+Imports System.IO
+Imports System.Xml
 Partial Class _Default
     Inherits System.Web.UI.Page
     'TODO: If someone reloads, their last request is re-processed. This is relatively harmless if their last request was opening a stream, but an issue if it was something like writing a new class.
@@ -12,8 +14,28 @@ Partial Class _Default
             Response.Redirect("/Default.aspx")
         End If
 
+        ' ------------------ Read bad words to censor ------------------ '
+        Dim xmldoc As New XmlDataDocument()
+        Dim xmlnode As XmlNodeList
+        Dim i As Integer
+        Dim str As String
+        Dim fs As New FileStream("e:\hshome\marist2\mca.maristapps.com\App_Data\DirtyWords.xml", FileMode.Open, FileAccess.Read)
+        xmldoc.Load(fs)
+        xmlnode = xmldoc.GetElementsByTagName("RECORD")
+        Censor.CensoredWords = New Generic.List(Of String)
+        For i = 0 To xmlnode.Count - 1
+            xmlnode(i).ChildNodes.Item(0).InnerText.Trim()
+            str = xmlnode(i).ChildNodes.Item(0).InnerText.Trim()
+            Censor.CensoredWords.Add(str)
+        Next
+        fs.Close()
+
+        ' -------------- End reading bad words to censor -------------- '
+
+        'Begin loading page based on user type
         Dim intRole As Integer = CInt(readUserInfo(User.Identity.Name, "int_role"))
         LoadSidebar(intRole)
+
     End Sub
     Sub addSidebarBtn(ByVal controlID As String, ByVal controlContent As String, Optional isUrgentAlert As Boolean = False)
         Dim btn As New Button                               'New button
@@ -564,7 +586,10 @@ QueryComplete:
             'todo: add button now in the right spot
         ElseIf btn.ID = "btnSend" Then 'if button is the send message button
             Dim txtBody As TextBox = findDynamicBodyControl("divMessageControls,txtBody")   'get the textbox
-            Dim strMessage As String = Server.HtmlEncode(cleanHTML(txtBody.Text))           'Get the message
+
+            Dim cnsCleanText As Censor = New Censor()                           '|Censor text
+            Dim strMessage As String = cnsCleanText.CensorText(txtBody.Text)    '|
+
             'Write the message to the database
             runSQL("insert into tbl_messages (int_streamID, int_fromID, dt_timeStamp, str_message, bool_active, bool_read) VALUES (" & readStreamID(lblStreamName.Text.Split(">")(1).Substring(1), lblStreamName.Text.Split(">")(0).Replace(" ", "")) & ", " & readUserInfo(User.Identity.Name, "int_ID") & ", """ & DateTime.Now & """, """ & MakeSQLSafe(strMessage) & """, True, False)")
             txtBody.Text = ""   'clear the textbox

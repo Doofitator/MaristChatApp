@@ -1,4 +1,6 @@
 <?xml version="1.0"?>
+<!-- From https://github.com/turalus/encycloDB/blob/master/Dirty%20Words/DirtyWords.xml -->
+<!-- Credit for this XML to turalus -->
 <RECORDS>
 <RECORD>
 	<word>anal</word>
@@ -145,7 +147,7 @@
 	<language>en</language>
 </RECORD>
 <RECORD>
-	<word>fuck</word>
+	<word>fuck*</word>
 	<language>en</language>
 </RECORD>
 <RECORD>
@@ -203,6 +205,10 @@
 <RECORD>
 	<word>muff</word>
 	<language>en</language>
+</RECORD>
+<RECORD>
+  <word>motherfucker</word>
+  <language>en</language>
 </RECORD>
 <RECORD>
 	<word>nigga</word>
