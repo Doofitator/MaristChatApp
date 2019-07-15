@@ -6,17 +6,14 @@
 
 function button_click(e) {
     var keyCode = e.keyCode ? e.keyCode : e.which;
-    console.log("WINDOW EVENT KEYCODE: " + keyCode);
     if (keyCode == 13) {
         document.getElementById('BodyContent_btnSend').focus();
-        console.log("focused")
         document.getElementById('BodyContent_btnSend').click();
-        console.log("sent")
     }
 }
 
 function ScrollDown() {
-    var objDiv = document.getElementById("BodyContent_pnlMessages");
+    var objDiv = document.getElementById("BodyContent_pnlUpdate");
     objDiv.scrollTop = objDiv.scrollHeight;
 }
 

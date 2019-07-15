@@ -1,11 +1,11 @@
-﻿<%@ Page Title="" Language="VB" MasterPageFile="~/MasterPage.master" AutoEventWireup="false" CodeFile="web.aspx.vb" Inherits="_Default" %>
+﻿<%@ Page Title="" Language="VB" MasterPageFile="~/MasterPage.master" AutoEventWireup="false" CodeFile="web.aspx.vb" Inherits="_Default" EnableEventValidation="false" validateRequest="false" %>
 
 <%@ Register assembly="System.Web.Extensions, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" namespace="System.Web.UI" tagprefix="asp" %>
 
 <%-- Add content controls here --%>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="Sidebar" Runat="Server">
-    <input type="text" placeholder="Search" id="sbox" />
+    <input type="text" placeholder="Search" id="sbox" disabled/>
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="topBar" Runat="Server">
@@ -20,7 +20,7 @@
     </script>
     <script>
         $(document).ready(function () {
-            if ($(window).width() < 388)
+            if ($(window).width() < 450)
                 $('#topBar_lblStreamName').css('display', 'none');
         });
         function collapse(label) {
@@ -37,7 +37,20 @@
         }
     </script>
 
-    <asp:Panel runat="server" ID="pnlMessages" CssClass="messagesContainer">
+    <asp:ScriptManager ID="smgrTimer" runat="server" EnableCdn="true"></asp:ScriptManager>
+    <div class="messagesContainer">
+            <asp:UpdatePanel ID="pnlUpdate" runat="server">
+                <ContentTemplate>                    
+                    <asp:Timer ID="tmrUpdate" runat="server" Interval="1000"></asp:Timer>
+                </ContentTemplate>
+            </asp:UpdatePanel>
+    </div>
+        <asp:UpdatePanel ID="pnlControls" runat="server" UpdateMode="Conditional">
+            <ContentTemplate>
 
-    </asp:Panel>
+            </ContentTemplate>
+             <Triggers>
+                   <asp:AsyncPostBackTrigger ControlID="btnSend" />
+             </Triggers>
+        </asp:UpdatePanel>
 </asp:Content>
