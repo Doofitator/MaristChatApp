@@ -549,7 +549,9 @@ QueryComplete:
 
         ElseIf btn.ID = "btnSend" Then 'if button is the send message button
             Dim txtBody As TextBox = findDynamicBodyControl("divMessageControls,txtBody")
-            Dim strMessage As String = txtBody.Text
+            Dim cnsCleanText As Censor = New Censor(Censor.CensoredWords)
+            Dim strMessage As String = cnsCleanText.CensorText(txtBody.Text)
+
             runSQL("insert into tbl_messages (int_streamID, int_fromID, dt_timeStamp, str_message, bool_active, bool_read) VALUES (" & readStreamID(lblStreamName.Text) & ", " & readUserInfo(User.Identity.Name, "int_ID") & ", """ & DateTime.Now & """, """ & MakeSQLSafe(strMessage) & """, True, False)")
             txtBody.Text = ""
             Dim streamButton As Button = findDynamicSidebarControl("btn" & lblStreamName.Text)
