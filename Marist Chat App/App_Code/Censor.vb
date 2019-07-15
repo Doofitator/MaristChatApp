@@ -1,7 +1,6 @@
 ﻿Imports Microsoft.VisualBasic
 Public Class Censor
     Public Shared CensoredWords As Generic.IList(Of String)
-    'TODO: CensoredWords = ~/App_Data/DirtyWords.XML
     Public Sub New()
         If CensoredWords Is Nothing Then Throw New ArgumentNullException("censoredWords")
         CensoredWords = New Generic.List(Of String)(CensoredWords)

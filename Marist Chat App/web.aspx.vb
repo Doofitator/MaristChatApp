@@ -437,6 +437,7 @@ Partial Class _Default
                 addNewClassDiv()
                 addReaderDiv()
                 addDataTableDiv()
+                'TODO: make admin writeSQL div (as oppose to ReaderDiv) so they can delete messages and stuff
             Case Else
                 'do nothing
         End Select
