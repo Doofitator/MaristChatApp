@@ -34,6 +34,8 @@ Partial Class _Default
 
         'Begin loading page based on user type
         Dim intRole As Integer = CInt(readUserInfo(User.Identity.Name, "int_role"))
+        'todo: the above throws the following error if the user has been removed but the cookie still exists:
+        'System.FormatException: Input string was not in a correct format.
         LoadSidebar(intRole)
 
     End Sub
@@ -46,7 +48,7 @@ Partial Class _Default
         End If
         btn.ID = controlID                                  'set button ID
         btn.Text = controlContent                           'set button text
-        'TODO: The following line needs to be uncommented, however it can't because it breaks something in javascript.
+        'TODO: The following line needs to be uncommented in order to allow enter click in the message field, however it can't because it breaks something in javascript.
         'btn.UseSubmitBehavior = False                       'disable button from submitting form on enter
         AddHandler btn.Click, AddressOf Me.btn_Click        'add button onclick event
         If isUrgentAlert Then pnl.Controls.Add(btn) Else Me.Master.FindControl("sidebar").Controls.Add(btn)  'add button to sidebar / form accordingly
@@ -69,6 +71,7 @@ Partial Class _Default
     End Sub
     Sub debug(ByVal strOutput As String)
         'Write to javascript console for immediate output
+        'WARNING: Breaks timer tick if used due to it requiring a full (non-partial) postback. Only use for debugging, never when in production.
         Try
             Dim strEscaped As String = strOutput.Replace("'", "\'")                 'Javascript escape quotes
             Response.Write("<script>console.log('" & strEscaped & "')</script>")    'write javascript to DOM
@@ -305,6 +308,47 @@ Partial Class _Default
         AddHandler btnQueryDB.Click, AddressOf Me.btn_Click             '|
         divReader.Controls.Add(btnQueryDB)                              '|
     End Sub
+    Sub addWriterDiv()
+        Dim divWriter As New HtmlGenericControl("div")                  'New div
+        divWriter.ID = "divWriter"                                      'Set ID
+        divWriter.Attributes.Add("class", "wizard")                     'Set CSS Class
+
+        Me.Master.FindControl("BodyContent").Controls.Add(divWriter)    'Add the div to the page
+
+        Dim divWriterTitleBar = New HtmlGenericControl("div")           'New 'titlebar' div
+        divWriterTitleBar.ID = "divWriterTitleBar"                      'Set ID
+        divWriterTitleBar.Attributes.Add("class", "titleBar")           'Set CSS Class
+        '                                                               'Add innerHTML incl. 'close' button
+        divWriterTitleBar.InnerHtml = "<h3>Administrator Data Writer<input style=""float: right;"" type=""button"" onclick=""HideShow('BodyContent_divWriter')"" value=""X"" /></h3>"
+        divWriter.Controls.Add(divWriterTitleBar)                       'Add titlebar to div
+
+        Dim lblQuery1 As New Label
+        lblQuery1.Text = "DELETE FROM "
+
+        Dim txtTable As New TextBox
+        txtTable.ID = "txtTable"
+
+        Dim lblQuery2 As New Label
+        lblQuery2.Text = " WHERE "
+
+        Dim txtCondition As New TextBox
+        txtCondition.ID = "txtCondition"
+
+        divWriter.Controls.Add(lblQuery1)
+        divWriter.Controls.Add(txtTable)
+        divWriter.Controls.Add(lblQuery2)
+        divWriter.Controls.Add(txtCondition)
+
+        divWriter.Controls.Add(New LiteralControl("<br>"))              'Add linebreak to div
+        divWriter.Controls.Add(New LiteralControl("<br>"))              'Add linebreak to div
+
+        Dim btnWriteDB As New Button                                    '|
+        btnWriteDB.Text = "Write to Database"                           '|
+        btnWriteDB.ID = "btnWriteDB"                                    '| New button, link to btn_Click & Add to div.
+        btnWriteDB.UseSubmitBehavior = False                            '|
+        AddHandler btnWriteDB.Click, AddressOf Me.btn_Click             '|
+        divWriter.Controls.Add(btnWriteDB)                              '|
+    End Sub
     Sub addDataTableDiv()
         Dim divDataTable As New HtmlGenericControl("div")                'New div
         divDataTable.ID = "divDataTable"                                 'Set ID
@@ -358,6 +402,7 @@ Partial Class _Default
         If intRole = 3 Then 'if user is an admin
             addSidebarClientBtn("HideShow('BodyContent_divNewAlert'); hamburger(document.getElementsByClassName('container')[0])", "NEW ALERT") 'add new alert button
             addSidebarClientBtn("HideShow('BodyContent_divReader'); hamburger(document.getElementsByClassName('container')[0])", "SQL READER") 'add reader button
+            addSidebarClientBtn("HideShow('BodyContent_divWriter'); hamburger(document.getElementsByClassName('container')[0])", "SQL WRITER") 'add writer button
         End If
 
         'todo: add admin button for liveReader.aspx
@@ -437,7 +482,7 @@ Partial Class _Default
                 addNewClassDiv()
                 addReaderDiv()
                 addDataTableDiv()
-                'TODO: make admin writeSQL div (as oppose to ReaderDiv) so they can delete messages and stuff
+                addWriterDiv()
             Case Else
                 'do nothing
         End Select
@@ -613,6 +658,13 @@ QueryComplete:
             lblStreamName.Text = "All Alerts"   'set heading label text
             LoadAlerts(False)                   'load alerts in main content window
 
+        ElseIf btn.ID = "btnWriteDB" Then
+            Dim txtTable As TextBox = CType(findDynamicBodyControl("divWriter,txtTable"), TextBox)
+            Dim txtCondition As TextBox = CType(findDynamicBodyControl("divWriter,txtCondition"), TextBox)
+
+            runSQL("DELETE FROM " & txtTable.Text & " WHERE " & txtCondition.Text)
+            'TODO: This has the posibility of allowing script injection. It needs to be made a bit safer. It also returns no feedback as to weather or not the command was successful
+
         ElseIf btn.ID = "btnQueryDB" Then
             Dim rbtnList As RadioButtonList = CType(findDynamicBodyControl("divReader,rbtnList"), RadioButtonList)  '|
             Dim txtTerm As TextBox = CType(findDynamicBodyControl("divReader,txtTerm"), TextBox)                    '| Get controls
@@ -685,7 +737,7 @@ QueryComplete:
         End If
     End Sub
     Public Overrides Sub VerifyRenderingInServerForm(ByVal control As Control)
-
+        'Fixes btnExport.click throwing errors
     End Sub
     Private Sub loadMessages(ByVal messagesArr(,) As String)
         clearPanelControls()
