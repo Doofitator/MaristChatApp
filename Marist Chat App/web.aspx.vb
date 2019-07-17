@@ -29,7 +29,6 @@ Partial Class _Default
             Censor.CensoredWords.Add(str)
         Next
         fs.Close()
-
         ' -------------- End reading bad words to censor -------------- '
 
         'Begin loading page based on user type
@@ -632,9 +631,7 @@ QueryComplete:
             'todo: add button now in the right spot
         ElseIf btn.ID = "btnSend" Then 'if button is the send message button
             Dim txtBody As TextBox = findDynamicBodyControl("divMessageControls,txtBody")   'get the textbox
-
-            Dim cnsCleanText As Censor = New Censor()                           '|Censor text
-            Dim strMessage As String = cnsCleanText.CensorText(txtBody.Text)    '|
+            Dim strMessage As String = txtBody.Text 'get the message
 
             'Write the message to the database
             runSQL("insert into tbl_messages (int_streamID, int_fromID, dt_timeStamp, str_message, bool_active, bool_read) VALUES (" & readStreamID(lblStreamName.Text.Split(">")(1).Substring(1), lblStreamName.Text.Split(">")(0).Replace(" ", "")) & ", " & readUserInfo(User.Identity.Name, "int_ID") & ", """ & DateTime.Now & """, """ & MakeSQLSafe(strMessage) & """, True, False)")
@@ -765,7 +762,9 @@ QueryComplete:
                             Dim lblMessage As New Label                         'New label
                             lblMessage.ID = "lblMessage" & intMessageCount      'Set label ID to message count
                             'remove SQL-injection prevention double quotes
-                            lblMessage.Text = Server.HtmlDecode(cleanHTML(toFind.Replace("''", "'")))
+                            Dim cnsCleanText As Censor = New Censor()                           '|Censor text
+                            Dim strMessage As String = cnsCleanText.CensorText(toFind)          '|
+                            lblMessage.Text = Server.HtmlDecode(cleanHTML(strMessage.Replace("''", "'")))
                             If readUserInfo(User.Identity.Name, "int_ID") = messagesArr(x, y - 1) Then
                                 'If the current user sent the message, set css class accordingly
                                 lblMessage.CssClass = "yourMessage"
