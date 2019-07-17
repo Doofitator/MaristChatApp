@@ -2,6 +2,7 @@
 Imports DatabaseFunctions
 Imports System.IO
 Imports System.Xml
+
 Partial Class _Default
     Inherits System.Web.UI.Page
     'TODO: If someone reloads, their last request is re-processed. This is relatively harmless if their last request was opening a stream, but an issue if it was something like writing a new class.
@@ -534,6 +535,18 @@ Partial Class _Default
         'debug(Regex.Replace(badHTML, WhiteListPattern, "", RegexOptions.Compiled))
         Return Regex.Replace(badHTML, WhiteListPattern, "", RegexOptions.Compiled)
     End Function
+    Public Shared Function IsNullOrWhiteSpace(value As String) As Boolean 'to replace string.IsNullOrWhiteSpace because that isn't implemented until .NET 4.0
+        'Code by Tim Schmelter found at https://stackoverflow.com/questions/12849528/vb-how-do-you-remove-empty-items-from-a-generic-list
+        If value Is Nothing Then
+            Return True
+        End If
+        For i As Integer = 0 To value.Length - 1
+            If Not Char.IsWhiteSpace(value(i)) Then
+                Return False
+            End If
+        Next
+        Return True
+    End Function
     Sub btn_Click(sender As Object, e As EventArgs)
         Dim btn As Button = CType(sender, Button)  'get button that called the event
         Dim lblStreamName As Label = findDynamicTopBarControl("divStreamHeading,lblStreamName") 'get heading label
@@ -612,6 +625,28 @@ QueryComplete:
             Dim strMembersArr() As String = txtStreamUserList.Text.Replace(" ", "").Split(",")  'Get list of members
             Dim strStreamName As String = ""                                                    'New string
 
+            Dim lstMembersStr As New Generic.List(Of String)                                'Make a new list
+            lstMembersStr.AddRange(strMembersArr)                                           'Add the CSV content to it
+            If Not lstMembersStr.Contains(User.Identity.Name.Replace("@marist.vic.edu.au", "")) Then 'If I'm not in the CSV list
+                lstMembersStr.Add(User.Identity.Name.Replace("@marist.vic.edu.au", ""))         'Add me to it
+
+                'TODO: THIS ISN'T REMOVING WHITESPACES!!
+                For i = lstMembersStr.Count - 1 To 0 Step -1
+                    If IsNullOrWhiteSpace(lstMembersStr(i)) Then
+                        lstMembersStr.RemoveAt(i)
+                    End If
+                Next
+
+                ReDim strMembersArr(lstMembersStr.Count - 1)                                    'Reset the array
+                strMembersArr = lstMembersStr.ToArray()                                         'Set the array to have the same contents as the list
+            End If
+
+            Dim y As String = ""
+            For Each thing In strMembersArr
+                y = y & "'" & thing & "',"
+            Next
+            eDebug(y)
+
             For Each strMember In strMembersArr                                                 'For each member
                 strStreamName += strMember                                                      'Add their name to the stream name
                 If Array.IndexOf(strMembersArr, strMember) = strMembersArr.Length - 2 Then      'If the member is the second last one in the list
@@ -625,10 +660,12 @@ QueryComplete:
                 If strStreamName.ToLower.Contains("@marist.vic.edu.au") Then strStreamName = strStreamName.ToLower.Replace("@marist.vic.edu.au", "")
             Next
 
+            'TODO: there's nothing here checking to see if the stream already exists before it is written
             'run sql
             Dim strSql As String = "insert into tbl_streams (str_ClassID, bool_isClassWide, str_StreamName) VALUES ('" & MakeSQLSafe(txtStreamID.Text) & "', FALSE, '" & strStreamName & "')"
             runSQL(strSql)
-            'todo: add button now in the right spot
+            Response.Redirect("/")
+            'TODO: add button now in the right spot (or refresh?)
         ElseIf btn.ID = "btnSend" Then 'if button is the send message button
             Dim txtBody As TextBox = findDynamicBodyControl("divMessageControls,txtBody")   'get the textbox
             Dim strMessage As String = txtBody.Text 'get the message
@@ -764,6 +801,7 @@ QueryComplete:
                             'remove SQL-injection prevention double quotes
                             Dim cnsCleanText As Censor = New Censor()                           '|Censor text
                             Dim strMessage As String = cnsCleanText.CensorText(toFind)          '|
+                            'Todo: pretty sure that this for loop means that duplicate messages (ie. 'hi' and 'hi') won't show up because they aren't technically a different message
                             lblMessage.Text = Server.HtmlDecode(cleanHTML(strMessage.Replace("''", "'")))
                             If readUserInfo(User.Identity.Name, "int_ID") = messagesArr(x, y - 1) Then
                                 'If the current user sent the message, set css class accordingly
@@ -775,6 +813,7 @@ QueryComplete:
                             End If
                             'add label to main content
                             pnlUpdate.ContentTemplateContainer.Controls.Add(lblMessage)
+                            'TODO: send read recipts now
                         End If
                     Next
                 Next
