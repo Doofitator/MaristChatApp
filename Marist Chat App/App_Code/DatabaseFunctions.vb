@@ -48,7 +48,7 @@ Public Class DatabaseFunctions
 
         Return result
     End Function
-    Public Shared Function readUserInfo(ByVal email As String, ByVal column As String) As String 'function to read user IDs and Roles from database.
+    Public Shared Function readUserInfo(ByVal email As String, ByVal column As String) As Integer 'function to read user IDs and Roles from database.
         'Create a Connection object.
         Dim oleConn = New OleDb.OleDbConnection
         oleConn.ConnectionString = strConn
@@ -62,10 +62,10 @@ Public Class DatabaseFunctions
         Try
             oleConn.Open()
         Catch ex As Exception
-            Return "FailConnOpen " & ex.Message
+            'Return "FailConnOpen " & ex.Message
         End Try
 
-        Dim result As String = "False" 'this is what the function will return
+        Dim result As Integer = 0 'this is what the function will return
 
         Try
             Dim reader As OleDb.OleDbDataReader = oleCmd.ExecuteReader() 'run sql script
@@ -76,7 +76,7 @@ Public Class DatabaseFunctions
         Catch ex As Exception 'if a catastrophic error occurs
             'console.writeline(ex.ToString)
             oleConn.Close() 'close the connection
-            Return "Fail due to " & ex.Message & ex.StackTrace
+            'Return "Fail due to " & ex.Message & ex.StackTrace
         End Try
 
         Return result
