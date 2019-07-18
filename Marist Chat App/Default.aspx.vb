@@ -43,4 +43,6 @@ Partial Class _Default
             'e.Authenticated = False
         End If
     End Sub
+
+    'todo: there needs to be a way to reset the password if forgotten
 End Class
