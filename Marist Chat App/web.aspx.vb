@@ -580,6 +580,7 @@ Partial Class _Default
             Next
             listUserIDs.Add(readUserInfo(User.Identity.Name, "int_ID"))   'Add me to the class
 
+            'TODO: Need to check that classID follows correct structure
             'TODO: Need to ensure class doesn't already exist
 
             For Each intID In listUserIDs                                                   'for each id in the list
