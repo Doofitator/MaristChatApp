@@ -579,6 +579,9 @@ Partial Class _Default
                 End Try
             Next
             listUserIDs.Add(readUserInfo(User.Identity.Name, "int_ID"))   'Add me to the class
+
+            'TODO: Need to ensure class doesn't already exist
+
             For Each intID In listUserIDs                                                   'for each id in the list
                 '                                                                            attempt to update the row
                 Dim strUpdateCmd As String = runSQL("update tbl_classes set " & MakeSQLSafe(txtClassID.Text) & " = 1 where int_UserID = " & intID)
@@ -629,23 +632,16 @@ QueryComplete:
             lstMembersStr.AddRange(strMembersArr)                                           'Add the CSV content to it
             If Not lstMembersStr.Contains(User.Identity.Name.Replace("@marist.vic.edu.au", "")) Then 'If I'm not in the CSV list
                 lstMembersStr.Add(User.Identity.Name.Replace("@marist.vic.edu.au", ""))         'Add me to it
-
-                'TODO: THIS ISN'T REMOVING WHITESPACES!!
-                For i = lstMembersStr.Count - 1 To 0 Step -1
-                    If IsNullOrWhiteSpace(lstMembersStr(i)) Then
-                        lstMembersStr.RemoveAt(i)
-                    End If
-                Next
-
-                ReDim strMembersArr(lstMembersStr.Count - 1)                                    'Reset the array
-                strMembersArr = lstMembersStr.ToArray()                                         'Set the array to have the same contents as the list
             End If
 
-            Dim y As String = ""
-            For Each thing In strMembersArr
-                y = y & "'" & thing & "',"
+            For i = lstMembersStr.Count - 1 To 0 Step -1
+                If IsNullOrWhiteSpace(lstMembersStr(i)) Then
+                    lstMembersStr.RemoveAt(i)
+                End If
             Next
-            eDebug(y)
+
+            ReDim strMembersArr(lstMembersStr.Count - 1)                                    'Reset the array
+            strMembersArr = lstMembersStr.ToArray()                                         'Set the array to have the same contents as the list
 
             For Each strMember In strMembersArr                                                 'For each member
                 strStreamName += strMember                                                      'Add their name to the stream name

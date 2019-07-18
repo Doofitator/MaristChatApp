@@ -62,6 +62,8 @@ Partial Class Register
         Dim ecrWrapper As Encryption = New Encryption(strEml)      'make a new encrypted string with the key of username
         strEcrPw = ecrWrapper.EncryptData(strPW1)                   'encrypt the password with the key of the username
 
+        'TODO: ensure the user doesn't already exist
+
         'write to database
         Dim strSql = "insert into tbl_users (str_email, str_ecrPassword, int_role, dt_graduationYear) values ('" & strEml & "', '" & DatabaseFunctions.MakeSQLSafe(strEcrPw) & "', '" & intRole & "', '" & yrGraduation & "')"
         Dim out As String = DatabaseFunctions.runSQL(strSql) 'run command
