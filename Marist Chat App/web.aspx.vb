@@ -672,6 +672,8 @@ QueryComplete:
             txtBody.Text = ""   'clear the textbox
             'TODO: On clicking the send button, there is a delay until the timer manually ticks over. Why does the below line not work?
             updateMessages()
+
+            'TODO: disable button, change text to 'sending..', reenable on timer tick?
         ElseIf btn.ID.StartsWith("btnAlert") Then
 
             Dim strAlertName As String = btn.Text     'get alert name
