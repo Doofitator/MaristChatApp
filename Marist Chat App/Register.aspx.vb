@@ -1,4 +1,5 @@
 ﻿
+Imports Email
 Partial Class Register
     Inherits System.Web.UI.Page
 
@@ -69,15 +70,29 @@ Partial Class Register
             Exit Sub
         End If
 
+        debug(confirmEmailMessage(strEml, strEcrPw))
+
         'write to database
-        Dim strSql = "insert into tbl_users (str_email, str_ecrPassword, int_role, dt_graduationYear) values ('" & strEml & "', '" & DatabaseFunctions.MakeSQLSafe(strEcrPw) & "', '" & intRole & "', '" & yrGraduation & "')"
-        Dim out As String = DatabaseFunctions.runSQL(strSql) 'run command
-        If out.StartsWith("Success") Then 'if command worked
-            Response.Redirect("/Default.aspx") 'redirect to login
-        Else
-            ErrorMessage.Text = "There was an error creating the user: <br><br> " & out 'show error
-        End If
+        'Dim strSql = "insert into tbl_users (str_email, str_ecrPassword, int_role, dt_graduationYear) values ('" & strEml & "', '" & DatabaseFunctions.MakeSQLSafe(strEcrPw) & "', '" & intRole & "', '" & yrGraduation & "')"
+        'Dim out As String = DatabaseFunctions.runSQL(strSql) 'run command
+        'If out.StartsWith("Success") Then 'if command worked
+        ' Response.Redirect("/Default.aspx") 'redirect to login
+        ' Else
+        ' ErrorMessage.Text = "There was an error creating the user: <br><br> " & out 'show error
+        ' End If
     End Sub
+
+    Sub debug(ByVal strOutput As String)
+        'Write to javascript console for immediate output
+        'WARNING: Breaks timer tick if used due to it requiring a full (non-partial) postback. Only use for debugging, never when in production.
+        Try
+            Dim strEscaped As String = strOutput.Replace("'", "\'")                 'Javascript escape quotes
+            Response.Write("<script>console.log('" & strEscaped & "')</script>")    'write javascript to DOM
+        Catch ex As Exception
+            debug("Failed to write to console: " & ex.Message)                      'Write fail to console
+        End Try
+    End Sub
+
 
     Function HasNumber(strData As String) As Boolean
         'stolen from https://www.ozgrid.com/forum/forum/help-forums/excel-general/29317-check-if-string-contains-a-number?p=1044961#post1044961
