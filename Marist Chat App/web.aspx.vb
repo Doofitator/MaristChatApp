@@ -673,6 +673,7 @@ QueryComplete:
             updateMessages()
 
             'TODO: disable button, change text to 'sending..', reenable on timer tick?
+            'Tried the above. it changes to 'sending' after the timer ticks and doesn't change back.
         ElseIf btn.ID.StartsWith("btnAlert") Then
 
             Dim strAlertName As String = btn.Text     'get alert name
