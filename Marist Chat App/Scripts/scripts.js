@@ -12,6 +12,11 @@ function button_click(e) {
     }
 }
 
+function writeToTextBox(elmntID) {
+    document.getElementById('BodyContent_txtStreamJsHandler').value += document.getElementById(elmntID).value + ", ";
+    console.log(document.getElementById('BodyContent_txtStreamJsHandler').value);
+}
+
 function ScrollDown() {
     var objDiv = document.getElementById("BodyContent_pnlUpdate");
     objDiv.scrollTop = objDiv.scrollHeight;

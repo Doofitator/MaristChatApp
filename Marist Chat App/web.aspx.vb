@@ -197,13 +197,13 @@ Partial Class _Default
         divNewStream.ID = "divNewStream"                                 'Set ID
         divNewStream.Attributes.Add("class", "wizard")                   'Set CSS Class
 
-        Me.Master.FindControl("BodyContent").Controls.Add(divNewStream)  'Add the div to the page
+        pnlWizards.ContentTemplateContainer.Controls.Add(divNewStream)  'Add the div to the page
 
         Dim divNewStreamTitleBar = New HtmlGenericControl("div")         'New 'titlebar' div
         divNewStreamTitleBar.ID = "divNewStreamTitleBar"                 'Set ID
         divNewStreamTitleBar.Attributes.Add("class", "titleBar")         'Set CSS Class
         '                                                                'Add innerHTML incl. 'close' button
-        divNewStreamTitleBar.InnerHtml = "<h3>New Stream Wizard<input style=""float: right;"" type=""button"" onclick=""HideShow('BodyContent_divNewStream')"" value=""X"" /></h3>"
+        divNewStreamTitleBar.InnerHtml = "<h3>New Stream Wizard<input style=""float: right"" type=""button"" onclick=""location.reload()"" value=""X"" /></h3>"
         divNewStream.Controls.Add(divNewStreamTitleBar)                  'Add titlebar to div
 
         Dim lblClassID As New Label                                      '|
@@ -218,14 +218,22 @@ Partial Class _Default
         'add newline to div
         divNewStream.Controls.Add(New LiteralControl("<br>"))
 
-        Dim lblUserList As New Label                                     '|
-        lblUserList.Text = "CSV user list:"                              '| New label, add to div
-        divNewStream.Controls.Add(lblUserList)                           '|
+        Dim pnlStreamDropDownContainer As New Panel                     '| New panel to hold the eventual dropdownboxes
+        pnlStreamDropDownContainer.ID = "pnlStreamDropDownContainer"    '|
+        divNewStream.Controls.Add(pnlStreamDropDownContainer)           '|
 
-        Dim txtStreamUserList As New TextBox                             '|
-        txtStreamUserList.TextMode = TextBoxMode.MultiLine               '| New textbox,
-        txtStreamUserList.ID = "txtStreamUserList"                       '| Add to div
-        divNewStream.Controls.Add(txtStreamUserList)                     '|
+        Dim btnLoadNames As New Button                                  '|
+        btnLoadNames.ID = "btnLoadStreamNames"                          '|
+        btnLoadNames.Text = "Load lists"                                '| New button to trigger loading dropdowns
+        AddHandler btnLoadNames.Click, AddressOf Me.loadNames           '|
+        pnlStreamDropDownContainer.Controls.Add(btnLoadNames)           '|
+
+        '---------------------'
+        Dim txtJsHandler As New TextBox                                 '|
+        txtJsHandler.ID = "txtStreamJsHandler"                          '| Textbox to hold dropdown values as CSV (because the dropdowns are dynamic 
+        txtJsHandler.CssClass = "hiddenText"                            '| controls that aren't created every postback, so this is required
+        divNewStream.Controls.Add(txtJsHandler)                         '|
+        '---------------------'
 
         'add newlines to div
         divNewStream.Controls.Add(New LiteralControl("<br>"))
@@ -372,6 +380,45 @@ Partial Class _Default
         Dim gvResults As New GridView                                   '|
         gvResults.ID = "gvResults"                                      '| new gridview, add to div
         divDataTable.Controls.Add(gvResults)                            '|
+    End Sub
+    Sub loadNames(sender As Object, e As EventArgs)
+        Dim btn As Button = CType(sender, Button)
+        If btn.ID = "btnLoadStreamNames" Then 'if we are dealing with the stream one
+            Dim txtStreamID As TextBox = CType(findDynamicBodyControl("divNewStream,txtStreamID"), TextBox) 'get class ID textbox
+            Dim pnlStreamDropDownContainer As Panel = CType(findDynamicBodyControl("divNewStream,pnlStreamDropDownContainer"), Panel) 'get the panel we are putting it in
+
+            pnlStreamDropDownContainer.Controls.Clear() 'clear the panel controls (ie delete the button that called this)
+            Dim strUsers() As String = DatabaseFunctions.getUsers(txtStreamID.Text) 'Get the users in the class
+
+            Dim lbl As New Label                                                            '|
+            lbl.Text = "Please enter the users you wish to add to the stream:" & vbCrLf     '| New label, add to panel
+            pnlStreamDropDownContainer.Controls.Add(lbl)                                    '|
+
+            Dim i As Integer = strUsers.Length - 1  'For each user
+            While i > -1
+                If Not strUsers(i) = User.Identity.Name Then                'if it isn't me
+                    Dim ddlUsers As New DropDownList                        'new dropdownlist
+                    ddlUsers.ID = "ddlUsers" & i                            'Set ID
+                    ddlUsers.Items.Add("")                                  'Add blank (default) value
+                    For Each thing In strUsers              'for each user
+                        If Not thing = User.Identity.Name Then ddlUsers.Items.Add(thing) 'add their name as an option in the list
+                    Next
+                    ddlUsers.Attributes.Add("onchange", "writeToTextBox(this.id)")  'tell the list to run JS that will write the CSV onchange
+                    pnlStreamDropDownContainer.Controls.Add(ddlUsers)                           ' add the list to the panel
+                End If
+                i -= 1
+            End While
+
+            'add client button for revealing more dropdownlists
+
+            pnlStreamDropDownContainer.Controls.Add(New LiteralControl("<br>"))
+
+            Dim btnReveal As New Literal
+            btnReveal.Text = "<input type=""button"" onclick=""revealNext('BodyContent_pnlStreamDropDownContainer')"" value=""Add Recipient"" />"
+            pnlStreamDropDownContainer.Controls.Add(btnReveal)
+
+            smgrTimer.RegisterStartupScript(Page, GetType(Page), "data back", "HideShow('BodyContent_divNewStream')", True)
+        End If
     End Sub
     Sub LoadSidebar(ByVal intRole As Integer)
 
@@ -623,7 +670,7 @@ QueryComplete:
 
         ElseIf btn.ID = "btnWriteStream" Then 'if button is a new stream button
             Dim txtStreamID As TextBox = CType(findDynamicBodyControl("divNewStream,txtStreamID"), TextBox) 'find the class identifier textbox
-            Dim txtStreamUserList As TextBox = CType(findDynamicBodyControl("divNewStream,txtStreamUserList"), TextBox) 'find csv textbox
+            Dim txtStreamUserList As TextBox = CType(findDynamicBodyControl("divNewStream,txtStreamJsHandler"), TextBox) 'find csv textbox
 
             Dim strMembersArr() As String = txtStreamUserList.Text.Replace(" ", "").Split(",")  'Get list of members
             Dim strStreamName As String = ""                                                    'New string
@@ -867,7 +914,4 @@ QueryComplete:
         'TODO: make pnlupdate scroll to bottom
     End Sub
 
-    Private Sub _Default_PreRender(sender As Object, e As EventArgs) Handles Me.PreRender
-
-    End Sub
 End Class
