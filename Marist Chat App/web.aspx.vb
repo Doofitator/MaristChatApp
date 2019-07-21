@@ -197,13 +197,13 @@ Partial Class _Default
         divNewStream.ID = "divNewStream"                                 'Set ID
         divNewStream.Attributes.Add("class", "wizard")                   'Set CSS Class
 
-        pnlWizards.ContentTemplateContainer.Controls.Add(divNewStream)  'Add the div to the page
+        Me.Master.FindControl("BodyContent").Controls.Add(divNewStream)  'Add the div to the page
 
         Dim divNewStreamTitleBar = New HtmlGenericControl("div")         'New 'titlebar' div
         divNewStreamTitleBar.ID = "divNewStreamTitleBar"                 'Set ID
         divNewStreamTitleBar.Attributes.Add("class", "titleBar")         'Set CSS Class
         '                                                                'Add innerHTML incl. 'close' button
-        divNewStreamTitleBar.InnerHtml = "<h3>New Stream Wizard<input style=""float: right"" type=""button"" onclick=""location.reload()"" value=""X"" /></h3>"
+        divNewStreamTitleBar.InnerHtml = "<h3>New Stream Wizard<input style=""float: right;"" type=""button"" onclick=""HideShow('BodyContent_divNewStream')"" value=""X"" /></h3>"
         divNewStream.Controls.Add(divNewStreamTitleBar)                  'Add titlebar to div
 
         Dim lblClassID As New Label                                      '|
@@ -217,16 +217,15 @@ Partial Class _Default
 
         'add newline to div
         divNewStream.Controls.Add(New LiteralControl("<br>"))
-        'todo: document
-        Dim pnlStreamDropDownContainer As New Panel
-        pnlStreamDropDownContainer.ID = "pnlStreamDropDownContainer"
-        divNewStream.Controls.Add(pnlStreamDropDownContainer)
 
-        Dim btnLoadNames As New Button
-        btnLoadNames.ID = "btnLoadStreamNames"
-        btnLoadNames.Text = "Load lists"
-        AddHandler btnLoadNames.Click, AddressOf Me.loadNames
-        pnlStreamDropDownContainer.Controls.Add(btnLoadNames)
+        Dim lblUserList As New Label                                     '|
+        lblUserList.Text = "CSV user list:"                              '| New label, add to div
+        divNewStream.Controls.Add(lblUserList)                           '|
+
+        Dim txtStreamUserList As New TextBox                             '|
+        txtStreamUserList.TextMode = TextBoxMode.MultiLine               '| New textbox,
+        txtStreamUserList.ID = "txtStreamUserList"                       '| Add to div
+        divNewStream.Controls.Add(txtStreamUserList)                     '|
 
         'add newlines to div
         divNewStream.Controls.Add(New LiteralControl("<br>"))
@@ -373,44 +372,6 @@ Partial Class _Default
         Dim gvResults As New GridView                                   '|
         gvResults.ID = "gvResults"                                      '| new gridview, add to div
         divDataTable.Controls.Add(gvResults)                            '|
-    End Sub
-    Sub loadNames(sender As Object, e As EventArgs)
-        Dim btn As Button = CType(sender, Button)
-        If btn.ID = "btnLoadStreamNames" Then
-            Dim txtStreamID As TextBox = CType(findDynamicBodyControl("divNewStream,txtStreamID"), TextBox)
-            Dim pnlStreamDropDownContainer As Panel = CType(findDynamicBodyControl("divNewStream,pnlStreamDropDownContainer"), Panel)
-
-            pnlStreamDropDownContainer.Controls.Clear()
-            Dim strUsers() As String = DatabaseFunctions.getUsers(txtStreamID.Text)
-
-            Dim lbl As New Label
-            lbl.Text = "Please enter the users you wish to add to the stream:" & vbCrLf
-            pnlStreamDropDownContainer.Controls.Add(lbl)
-
-            Dim i As Integer = strUsers.Length - 1
-            While i > -1
-                If Not strUsers(i) = User.Identity.Name Then
-                    Dim ddlUsers As New DropDownList                                  '|
-                    ddlUsers.ID = "ddlUsers" & i                                  '| Add to div
-                    ddlUsers.Items.Add("")
-                    For Each thing In strUsers
-                        If Not thing = User.Identity.Name Then ddlUsers.Items.Add(thing)
-                    Next
-                    pnlStreamDropDownContainer.Controls.Add(ddlUsers)                           '|
-                End If
-                i -= 1
-            End While
-
-            'add client button for revealing more dropdownlists
-
-            pnlStreamDropDownContainer.Controls.Add(New LiteralControl("<br>"))
-
-            Dim btnReveal As New Literal
-            btnReveal.Text = "<input type=""button"" onclick=""revealNext('BodyContent_pnlStreamDropDownContainer')"" value=""Add Recipient"" />"
-            pnlStreamDropDownContainer.Controls.Add(btnReveal)
-
-            smgrTimer.RegisterStartupScript(Page, GetType(Page), "data back", "HideShow('BodyContent_divNewStream')", True)
-        End If
     End Sub
     Sub LoadSidebar(ByVal intRole As Integer)
 
@@ -661,33 +622,28 @@ QueryComplete:
             runSQL("INSERT INTO tbl_notifications (str_message, int_userGroup, bool_urgent, dt_timeStamp) VALUES ('" & MakeSQLSafe(cleanHTML(txtMessage.Text)) & "', " & intUserCode & ", " & strAccessBoolFixer & ", #" & DateTime.Now & "#)")
 
         ElseIf btn.ID = "btnWriteStream" Then 'if button is a new stream button
-            'todo: document
-
-            '    smgrTimer.RegisterStartupScript(Page, GetType(Page), "xyz", "alert('" &  & "')", True)
-
             Dim txtStreamID As TextBox = CType(findDynamicBodyControl("divNewStream,txtStreamID"), TextBox) 'find the class identifier textbox
+            Dim txtStreamUserList As TextBox = CType(findDynamicBodyControl("divNewStream,txtStreamUserList"), TextBox) 'find csv textbox
 
-            Dim strStreamName As String = ""
+            Dim strMembersArr() As String = txtStreamUserList.Text.Replace(" ", "").Split(",")  'Get list of members
+            Dim strStreamName As String = ""                                                    'New string
 
-            Dim lstDdls As New Generic.List(Of DropDownList)
+            Dim lstMembersStr As New Generic.List(Of String)                                'Make a new list
+            lstMembersStr.AddRange(strMembersArr)                                           'Add the CSV content to it
+            If Not lstMembersStr.Contains(User.Identity.Name.Replace("@marist.vic.edu.au", "")) Then 'If I'm not in the CSV list
+                lstMembersStr.Add(User.Identity.Name.Replace("@marist.vic.edu.au", ""))         'Add me to it
+            End If
 
-            Dim pnlStreamDropDownContainer As Panel = CType(findDynamicBodyControl("divNewStream,pnlStreamDropDownContainer"), Panel)
-
-            For Each ctrl As Control In pnlStreamDropDownContainer.Controls
-                If TypeOf (ctrl) Is DropDownList Then
-                    lstDdls.Add(ctrl)
+            For i = lstMembersStr.Count - 1 To 0 Step -1
+                If IsNullOrWhiteSpace(lstMembersStr(i)) Then
+                    lstMembersStr.RemoveAt(i)
                 End If
             Next
 
-            Dim lstMembersStr As New Generic.List(Of String)
-            For Each ddl In lstDdls
-                If Not ddl.SelectedValue = "" Then
-                    lstMembersStr.Add(ddl.SelectedValue)
-                End If
-            Next
-            Dim strMembersarr() As String = lstMembersStr.ToArray
+            ReDim strMembersArr(lstMembersStr.Count - 1)                                    'Reset the array
+            strMembersArr = lstMembersStr.ToArray()                                         'Set the array to have the same contents as the list
 
-            For Each strMember As String In strMembersArr                                                 'For each member
+            For Each strMember In strMembersArr                                                 'For each member
                 strStreamName += strMember                                                      'Add their name to the stream name
                 If Array.IndexOf(strMembersArr, strMember) = strMembersArr.Length - 2 Then      'If the member is the second last one in the list
                     strStreamName += " and "                                                    'Add the word 'and' after their name
