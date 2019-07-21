@@ -5,9 +5,9 @@ Imports Microsoft.VisualBasic
 Public Class DatabaseFunctions
     Public Shared strConn As String = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=e:\hshome\marist2\mca.maristapps.com\App_Data\mca_db.accdb"
 
-    Public Shared Function eDebug(ByVal strOutput As String) 'emergency debug
+    Public Shared Sub eDebug(ByVal strOutput As String) 'emergency debug
         Throw New Exception(strOutput)
-    End Function
+    End Sub
     Public Shared Function MakeSQLSafe(ByVal sql As String) As String
         If sql.Contains("'") Then
             sql = sql.Replace("'", "''")
@@ -17,11 +17,11 @@ Public Class DatabaseFunctions
     End Function
     Public Shared Function readUserPassword(ByVal email As String) As String 'function to read passwords from database.
         'Create a Connection object.
-        Dim oleConn = New OleDb.OleDbConnection
+        Dim oleConn As OleDb.OleDbConnection = New OleDb.OleDbConnection
         oleConn.ConnectionString = strConn
 
         'Create a Command object.
-        Dim oleCmd = oleConn.CreateCommand
+        Dim oleCmd As OleDb.OleDbCommand = oleConn.CreateCommand
         oleCmd.CommandText = "select str_ecrPassword from tbl_users where str_email = '" & MakeSQLSafe(email) & "'"
 
         'Open the connection.
@@ -50,11 +50,11 @@ Public Class DatabaseFunctions
     End Function
     Public Shared Function readUserInfo(ByVal email As String, ByVal column As String) As Integer 'function to read user IDs and Roles from database.
         'Create a Connection object.
-        Dim oleConn = New OleDb.OleDbConnection
+        Dim oleConn As OleDb.OleDbConnection = New OleDb.OleDbConnection
         oleConn.ConnectionString = strConn
 
         'Create a Command object.
-        Dim oleCmd = oleConn.CreateCommand
+        Dim oleCmd As OleDb.OleDbCommand = oleConn.CreateCommand
         oleCmd.CommandText = "select " & column & " from tbl_users where str_email = '" & MakeSQLSafe(email) & "'"
 
         'Open the connection.
@@ -81,14 +81,47 @@ Public Class DatabaseFunctions
 
         Return result
     End Function
-    Public Shared Function readUserName(ByVal id As Integer) As String 'function to read user IDs and Roles from database.
+    Public Shared Function readUserName(ByVal id As Integer) As String 'function to read user name from database.
         'Create a Connection object.
-        Dim oleConn = New OleDb.OleDbConnection
+        Dim oleConn As OleDb.OleDbConnection = New OleDb.OleDbConnection
         oleConn.ConnectionString = strConn
 
         'Create a Command object.
-        Dim oleCmd = oleConn.CreateCommand
+        Dim oleCmd As OleDb.OleDbCommand = oleConn.CreateCommand
         oleCmd.CommandText = "select str_email from tbl_users where int_ID = " & id
+
+        'Open the connection.
+
+        Try
+            oleConn.Open()
+        Catch ex As Exception
+            Return "FailConnOpen " & ex.Message
+        End Try
+
+        Dim result As String = "False" 'this is what the function will return
+
+        Try
+            Dim reader As OleDb.OleDbDataReader = oleCmd.ExecuteReader() 'run sql script
+            While reader.Read
+                result = reader.GetString(0) 'get first value of field (because there should only be one record returned as there shouldn't be username doubleups).
+            End While
+            oleConn.Close() 'close connection
+        Catch ex As Exception 'if a catastrophic error occurs
+            'console.writeline(ex.ToString)
+            oleConn.Close() 'close the connection
+            Return "Fail due to " & ex.Message & ex.StackTrace
+        End Try
+
+        Return result
+    End Function
+    Public Shared Function readUserNameFromECR(ByVal ecr As String) As String 'function to read user name from database.
+        'Create a Connection object.
+        Dim oleConn As OleDb.OleDbConnection = New OleDb.OleDbConnection
+        oleConn.ConnectionString = strConn
+
+        'Create a Command object.
+        Dim oleCmd As OleDb.OleDbCommand = oleConn.CreateCommand
+        oleCmd.CommandText = "select str_email from tbl_users where str_ecrPassword = '" & ecr & "'"
 
         'Open the connection.
 
@@ -116,11 +149,11 @@ Public Class DatabaseFunctions
     End Function
     Public Shared Function readStreamID(ByVal streamName As String, ByVal classID As String) As String 'function to read stream IDs from database.
         'Create a Connection object.
-        Dim oleConn = New OleDb.OleDbConnection
+        Dim oleConn As OleDb.OleDbConnection = New OleDb.OleDbConnection
         oleConn.ConnectionString = strConn
 
         'Create a Command object.
-        Dim oleCmd = oleConn.CreateCommand
+        Dim oleCmd As OleDb.OleDbCommand = oleConn.CreateCommand
         oleCmd.CommandText = "select int_streamID from tbl_streams where str_streamName = '" & MakeSQLSafe(streamName) & "' and str_classID = '" & classID & "'"
         'Open the connection.
 
@@ -148,11 +181,11 @@ Public Class DatabaseFunctions
     End Function
     Public Shared Function readNotification(ByVal ID As Integer) As String 'function to read notifications (HTML) from database.
         'Create a Connection object.
-        Dim oleConn = New OleDb.OleDbConnection
+        Dim oleConn As OleDb.OleDbConnection = New OleDb.OleDbConnection
         oleConn.ConnectionString = strConn
 
         'Create a Command object.
-        Dim oleCmd = oleConn.CreateCommand
+        Dim oleCmd As OleDb.OleDbCommand = oleConn.CreateCommand
         oleCmd.CommandText = "select str_message from tbl_notifications where int_ID = " & ID
 
         'Open the connection.
@@ -181,11 +214,11 @@ Public Class DatabaseFunctions
     End Function
     Public Shared Function runSQL(ByVal sql As String) As String 'function to write to the database
         'create connection object
-        Dim oleConn = New OleDb.OleDbConnection
+        Dim oleConn As OleDb.OleDbConnection = New OleDb.OleDbConnection
         oleConn.ConnectionString = strConn
 
         'create command object
-        Dim oleCmd = oleConn.CreateCommand
+        Dim oleCmd As OleDb.OleDbCommand = oleConn.CreateCommand
         oleCmd.CommandText = sql 'set command object's sql command as the inputted sql string
 
         'open the connection
@@ -210,18 +243,18 @@ Public Class DatabaseFunctions
     End Function
     Public Shared Function userExists(ByVal eml As String) As Boolean
         'Create a Connection object.
-        Dim oleConn = New OleDb.OleDbConnection
+        Dim oleConn As OleDb.OleDbConnection = New OleDb.OleDbConnection
         oleConn.ConnectionString = strConn
 
         'Create a Command object.
-        Dim oleCmd = oleConn.CreateCommand
+        Dim oleCmd As OleDb.OleDbCommand = oleConn.CreateCommand
         oleCmd.CommandText = "select count(*) from tbl_users where str_email = '" & MakeSQLSafe(eml) & "'"
 
         'Open the connection.
         Try
             oleConn.Open()
         Catch ex As Exception
-            Return "FailConnOpen " & ex.Message
+
         End Try
 
         If oleCmd.ExecuteScalar = 1 Then 'if there is one result returned, then the username already exists in the database.
@@ -237,11 +270,11 @@ Public Class DatabaseFunctions
         'command to select the record in the class table
 
         'create connection object
-        Dim oleConn = New OleDb.OleDbConnection
+        Dim oleConn As OleDb.OleDbConnection = New OleDb.OleDbConnection
         oleConn.ConnectionString = strConn
 
         'Create a Command object.
-        Dim oleCmd = oleConn.CreateCommand
+        Dim oleCmd As OleDb.OleDbCommand = oleConn.CreateCommand
         oleCmd.CommandText = strCommand
 
         'Open the connection.
@@ -277,7 +310,7 @@ Public Class DatabaseFunctions
 
         Dim strTable(strValues.Count, strValues.Count) As String   'New 2D string (output)
         Dim intIndex As Integer = 0                                 'new integer
-        For Each itm In strColumns                                  'for each column
+        For Each itm As String In strColumns                                  'for each column
             intIndex = strColumns.IndexOf(itm)                      'get the index of the column
             If intIndex > 0 Then                                    'disregard the first column (user ID)
                 strTable(intIndex - 1, 0) = itm                     'add the column name to the first dimension
@@ -307,11 +340,11 @@ Public Class DatabaseFunctions
         Dim strUserName As String = eml.ToLower.Replace("@marist.vic.edu.au", "") 'get first part of email (username)
 
         'create connection object
-        Dim oleConn = New OleDb.OleDbConnection
+        Dim oleConn As OleDb.OleDbConnection = New OleDb.OleDbConnection
         oleConn.ConnectionString = strConn
 
         'Create a Command object.
-        Dim oleCmd = oleConn.CreateCommand
+        Dim oleCmd As OleDb.OleDbCommand = oleConn.CreateCommand
         oleCmd.CommandText = strCommand
 
         'Open the connection.
@@ -355,11 +388,11 @@ Public Class DatabaseFunctions
         'command to select the record in the class table
 
         'create connection object
-        Dim oleConn = New OleDb.OleDbConnection
+        Dim oleConn As OleDb.OleDbConnection = New OleDb.OleDbConnection
         oleConn.ConnectionString = strConn
 
         'Create a Command object.
-        Dim oleCmd = oleConn.CreateCommand
+        Dim oleCmd As OleDb.OleDbCommand = oleConn.CreateCommand
         oleCmd.CommandText = strCommand
 
         'Open the connection.
@@ -394,7 +427,7 @@ Public Class DatabaseFunctions
         'todo: I have just realised that the following line should probably be 'strOutput(strMessages.Count, 1)', however I don't want to waste time debugging that change as it works atm
         Dim strOutput(strMessages.Count, strMessages.Count) As String   'New 2D string (output)
         Dim intIndex As Integer = 0                                     'new integer
-        For Each itm In strMessages                                      'for each message
+        For Each itm As String In strMessages                                      'for each message
             intIndex = strMessages.IndexOf(itm)                          'get the index of the sender item
             strOutput(intIndex, 0) = intSenders(intIndex)              'add the corresponding message value to the second dimension
             strOutput(intIndex, 1) = itm                                'add the sender ID to the first dimension
@@ -406,11 +439,11 @@ Public Class DatabaseFunctions
         Dim strCommand As String = "SELECT str_message, int_userGroup, int_ID FROM tbl_notifications"
 
         'create connection object
-        Dim oleConn = New OleDb.OleDbConnection
+        Dim oleConn As OleDb.OleDbConnection = New OleDb.OleDbConnection
         oleConn.ConnectionString = strConn
 
         'Create a Command object.
-        Dim oleCmd = oleConn.CreateCommand
+        Dim oleCmd As OleDb.OleDbCommand = oleConn.CreateCommand
         oleCmd.CommandText = strCommand
 
         'Open the connection.
@@ -478,7 +511,7 @@ Public Class DatabaseFunctions
 
         Dim strOutput(strNotificationContent.Count, strNotificationContent.Count) As String   'New 2D string (output)
         Dim intIndex As Integer = 0                                     'new integer
-        For Each itm In strNotificationContent                          'for each message
+        For Each itm As String In strNotificationContent                          'for each message
             intIndex = strNotificationContent.IndexOf(itm)              'get the index of the notification
             strOutput(intIndex, 0) = intIDs(intIndex).ToString()                   'add the corresponding notification ID to the second dimension
             strOutput(intIndex, 1) = itm                                'add the message content to the first dimension
@@ -488,11 +521,11 @@ Public Class DatabaseFunctions
     End Function
     Public Shared Function isAlertUrgent(ByVal alertID As Integer) As Boolean 'function to read alert urgency column
         'Create a Connection object.
-        Dim oleConn = New OleDb.OleDbConnection
+        Dim oleConn As OleDb.OleDbConnection = New OleDb.OleDbConnection
         oleConn.ConnectionString = strConn
 
         'Create a Command object.
-        Dim oleCmd = oleConn.CreateCommand
+        Dim oleCmd As OleDb.OleDbCommand = oleConn.CreateCommand
         oleCmd.CommandText = "select bool_urgent from tbl_notifications where int_ID = " & alertID
 
         'Open the connection.
@@ -503,7 +536,7 @@ Public Class DatabaseFunctions
             Return "FailConnOpen " & ex.Message
         End Try
 
-        Dim result As Boolean = True 'this is what the function will return. Assume false in case we get an error.
+        Dim result As Boolean = False 'this is what the function will return. Assume false in case we get an error.
 
         Try
             Dim reader As OleDb.OleDbDataReader = oleCmd.ExecuteReader() 'run sql script
@@ -523,7 +556,7 @@ Public Class DatabaseFunctions
         Dim dsResults As New DataSet(table)
 
         'Create a Connection object.
-        Dim oleConn = New OleDb.OleDbConnection
+        Dim oleConn As OleDb.OleDbConnection = New OleDb.OleDbConnection
         oleConn.ConnectionString = strConn
 
         'Create a Command object.
@@ -540,6 +573,78 @@ Public Class DatabaseFunctions
         oleAdp.Fill(dsResults, table)
 
         Return dsResults
+    End Function
+
+    Public Shared Function isAuthenticated(ByVal eml As String) As Boolean 'function to read if user is verified
+        'Create a Connection object.
+        Dim oleConn As OleDb.OleDbConnection = New OleDb.OleDbConnection
+        oleConn.ConnectionString = strConn
+
+        'Create a Command object.
+        Dim oleCmd As OleDb.OleDbCommand = oleConn.CreateCommand
+        oleCmd.CommandText = "select bool_verified from tbl_users where str_email = '" & eml & "'"
+        'eDebug(oleCmd.CommandText)
+        'Open the connection.
+
+        Try
+            oleConn.Open()
+        Catch ex As Exception
+            Return "FailConnOpen " & ex.Message
+        End Try
+
+        Dim result As Boolean = False 'this is what the function will return. Assume false in case we get an error.
+
+        Try
+            Dim reader As OleDb.OleDbDataReader = oleCmd.ExecuteReader() 'run sql script
+            While reader.Read
+                result = reader.GetBoolean(0) 'get first value of field (because there should only be one record returned as there shouldn't be user doubleups).
+            End While
+            oleConn.Close() 'close connection
+        Catch ex As Exception 'if a catastrophic error occurs
+            'console.writeline(ex.ToString)
+            oleConn.Close() 'close the connection
+            'result = "Fail due to " & ex.Message & ex.StackTrace
+        End Try
+
+        Return result
+    End Function
+
+    Public Shared Function getUsers(ByVal ClassID As String) As String() 'returns string array of users in a specified class
+        Dim strCommand As String = "select str_email from tbl_users where int_ID in (select int_userID from tbl_classes where " & ClassID & " = true)"
+
+        'create connection object
+        Dim oleConn As OleDb.OleDbConnection = New OleDb.OleDbConnection
+        oleConn.ConnectionString = strConn
+
+        'Create a Command object.
+        Dim oleCmd As OleDb.OleDbCommand = oleConn.CreateCommand
+        oleCmd.CommandText = strCommand
+
+        'Open the connection.
+
+        Try
+            oleConn.Open()
+        Catch ex As Exception
+            ' "FailConnOpen " & ex.Message
+        End Try
+
+        Dim strUsers As New Generic.List(Of String)   'this will be our output
+
+        Try
+            Dim reader As OleDb.OleDbDataReader = oleCmd.ExecuteReader() 'run sql script
+            While reader.Read
+                For i = 0 To reader.FieldCount - 1
+                    strUsers.Add(reader.GetString(i))
+                Next
+            End While
+            oleConn.Close() 'close connection
+        Catch ex As Exception 'if a catastrophic error occurs
+            'console.writeline(ex.ToString)
+            oleConn.Close() 'close the connection
+            'Console.WriteLine("Fail due to " & ex.Message & ex.StackTrace)
+        End Try
+
+        Return strUsers.ToArray()
     End Function
 
     'define role names and database codes for use when sending & recieving alerts.

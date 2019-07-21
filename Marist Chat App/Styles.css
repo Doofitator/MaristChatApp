@@ -21,9 +21,16 @@ body {
     padding-top: 20px;
 }
 
-.loginForm {
+.loginForm, #BodyContent_hlkForgot {
     position: relative;
     left: 60%;
+    max-width: 400px;
+    margin-bottom: 15px;
+}
+
+#BodyContent_lblEmailHint {
+    position: relative;
+    left: 45%;
     max-width: 400px;
     margin-bottom: 15px;
 }
@@ -118,6 +125,14 @@ body {
     top: calc(25px + 4vh);
     left: calc(200px + 6vw);
 }
+
+    .wizard > #BodyContent_pnlStreamDropDownContainer > select {
+        display: block;
+    }
+
+    .wizard > #BodyContent_pnlStreamDropDownContainer > select:nth-of-type(1n+2) {
+        display: none;
+    }
 
 .titleBar {
     background-color: var(--main-colour);

@@ -70,16 +70,16 @@ Partial Class Register
             Exit Sub
         End If
 
-        debug(confirmEmailMessage(strEml, strEcrPw))
+        confirmEmailMessage(strEml, strEcrPw) 'send confirmation email
 
         'write to database
-        'Dim strSql = "insert into tbl_users (str_email, str_ecrPassword, int_role, dt_graduationYear) values ('" & strEml & "', '" & DatabaseFunctions.MakeSQLSafe(strEcrPw) & "', '" & intRole & "', '" & yrGraduation & "')"
-        'Dim out As String = DatabaseFunctions.runSQL(strSql) 'run command
-        'If out.StartsWith("Success") Then 'if command worked
-        ' Response.Redirect("/Default.aspx") 'redirect to login
-        ' Else
-        ' ErrorMessage.Text = "There was an error creating the user: <br><br> " & out 'show error
-        ' End If
+        Dim strSql = "insert into tbl_users (str_email, str_ecrPassword, int_role, dt_graduationYear, bool_verified) values ('" & DatabaseFunctions.MakeSQLSafe(strEml) & "', '" & DatabaseFunctions.MakeSQLSafe(strEcrPw) & "', '" & intRole & "', '" & yrGraduation & "', False)"
+        Dim out As String = DatabaseFunctions.runSQL(strSql) 'run command
+        If out.StartsWith("Success") Then 'if command worked
+            Response.Redirect("/Default.aspx?verify=true") 'redirect to login
+        Else
+            ErrorMessage.Text = "There was an error creating the user: <br><br> " & out 'show error
+        End If
     End Sub
 
     Sub debug(ByVal strOutput As String)

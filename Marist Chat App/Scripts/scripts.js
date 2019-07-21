@@ -20,7 +20,7 @@ function ScrollDown() {
 function HideShow(div) {
     var element = document.getElementById(div);
     if (element.style.display == "block") {
-        element.style.display = "none";
+        location.reload();
     } else {
         element.style.display = "block";
     }

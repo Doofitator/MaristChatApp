@@ -43,7 +43,7 @@
                 </td>
             </tr>
             <tr>
-                <td align="center" colspan="2" style="color: Red;">
+                <td align="center" colspan="2" style="color: Red">
                     <asp:Literal ID="ErrorMessage" runat="server" EnableViewState="False"></asp:Literal>
                 </td>
             </tr>

@@ -10,6 +10,7 @@ Partial Class _Default
             Response.Redirect("web.aspx") 'login
         End If
     End Sub
+
     Protected Sub frmLogin_Authenticate(sender As Object, e As AuthenticateEventArgs) Handles frmLogin.Authenticate
         Dim strEml As String = frmLogin.UserName 'get username
         Dim strPw As String = frmLogin.Password 'get password
@@ -28,21 +29,43 @@ Partial Class _Default
         Dim ecrWrapper As Encryption = New Encryption(strEml)      'make a new encrypted string with the key of username
         strEcrPw = ecrWrapper.EncryptData(strPw)                   'encrypt the password with the key of the username
 
+        If Not DatabaseFunctions.isAuthenticated(strEml) Then
+            frmLogin.FailureText = "That address is not in our system or has not been authenticated. Please try again."
+            e.Authenticated = False
+            Exit Sub
+        End If
+
         'send to database
-        Dim connection As String = DatabaseFunctions.readUserPassword(strEml)
-        If connection = strEcrPw Then
+        Dim strStore As String = DatabaseFunctions.readUserPassword(strEml)
+        If strStore = strEcrPw Then
             'password is correct
             FormsAuthentication.SetAuthCookie(frmLogin.UserName, frmLogin.RememberMeSet)
             e.Authenticated = True 'login
-        ElseIf connection.StartsWith("FailConnOpen") Then
+        ElseIf strStore.StartsWith("FailConnOpen") Then
             'Database unreachable
             frmLogin.FailureText = "There was an error logging on. Please check your Internet connection."
         Else
             'password incorrect
             frmLogin.FailureText = "Your login attempt was not successful. Please try again."
-            'e.Authenticated = False
+            e.Authenticated = False
         End If
     End Sub
 
-    'todo: there needs to be a way to reset the password if forgotten
+    Private Sub _Default_LoadComplete(sender As Object, e As EventArgs) Handles Me.LoadComplete
+        'Code to handle various GET requests sent from other files
+
+        If Request.QueryString("verify") = "true" Then
+            lblEmailHint.Text = "Please check your emails for a verification link before proceeding."
+        End If
+        If Request.QueryString("verified") = "true" Then
+            lblEmailHint.Text = "Verified user successfully. Please login."
+        ElseIf Request.QueryString("verified") = "false" Then
+            lblEmailHint.Text = "User verification failed."
+        End If
+        If Request.QueryString("reset") = "true" Then
+            lblEmailHint.Text = "Please check your emails for a password reset link."
+        ElseIf Request.QueryString("reset") = "false" Then
+            lblEmailHint.Text = "Password reset failed."
+        End If
+    End Sub
 End Class

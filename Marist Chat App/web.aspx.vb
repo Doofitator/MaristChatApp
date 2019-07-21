@@ -84,13 +84,13 @@ Partial Class _Default
         divNewAlert.ID = "divNewAlert"                                  'Set ID
         divNewAlert.Attributes.Add("class", "wizard")                   'Set CSS class
 
-        Me.Master.FindControl("BodyContent").Controls.Add(divNewAlert)  'Add the div to the page
+        pnlWizards.ContentTemplateContainer.Controls.Add(divNewAlert)  'Add the div to the page
 
         Dim divNewAlertTitleBar = New HtmlGenericControl("div")         'New 'titlebar' div
         divNewAlertTitleBar.ID = "divNewAlertTitleBar"                  'Set ID
         divNewAlertTitleBar.Attributes.Add("class", "titleBar")         'Set CSS class
         '                                                                Add innerHTML incl. 'close' button
-        divNewAlertTitleBar.InnerHtml = "<h3>New Alert Wizard<input style=""float: right;"" type=""button"" onclick=""HideShow('BodyContent_divNewAlert')"" value=""X"" /></h3>"
+        divNewAlertTitleBar.InnerHtml = "<h3>New Alert Wizard<input style=""float: right"" type=""button"" onclick=""location.reload()"" value=""X"" /></h3>"
         divNewAlert.Controls.Add(divNewAlertTitleBar)                   ' Add titlebar to div
 
         Dim lblMessage As New Label                                     '|
@@ -140,13 +140,13 @@ Partial Class _Default
         divNewClass.ID = "divNewClass"                                  'Set ID
         divNewClass.Attributes.Add("class", "wizard")                   'Set CSS class
 
-        Me.Master.FindControl("BodyContent").Controls.Add(divNewClass)  'Add the div to the page
+        pnlWizards.ContentTemplateContainer.Controls.Add(divNewClass)  'Add the div to the page
 
         Dim divNewClassTitleBar = New HtmlGenericControl("div")         'New 'titlebar' div
         divNewClassTitleBar.ID = "divNewClassTitleBar"                  'Set ID
         divNewClassTitleBar.Attributes.Add("class", "titleBar")         'Set CSS class
         '                                                                Add innerHTML incl. 'close' button
-        divNewClassTitleBar.InnerHtml = "<h3>New Class Wizard<input style=""float: right;"" type=""button"" onclick=""HideShow('BodyContent_divNewClass')"" value=""X"" /></h3>"
+        divNewClassTitleBar.InnerHtml = "<h3>New Class Wizard<input style=""float: right"" type=""button"" onclick=""location.reload()"" value=""X"" /></h3>"
         divNewClass.Controls.Add(divNewClassTitleBar)                   'Add titlebar to div
 
         Dim lblClassID As New Label                                     '|
@@ -197,13 +197,13 @@ Partial Class _Default
         divNewStream.ID = "divNewStream"                                 'Set ID
         divNewStream.Attributes.Add("class", "wizard")                   'Set CSS Class
 
-        Me.Master.FindControl("BodyContent").Controls.Add(divNewStream)  'Add the div to the page
+        pnlWizards.ContentTemplateContainer.Controls.Add(divNewStream)  'Add the div to the page
 
         Dim divNewStreamTitleBar = New HtmlGenericControl("div")         'New 'titlebar' div
         divNewStreamTitleBar.ID = "divNewStreamTitleBar"                 'Set ID
         divNewStreamTitleBar.Attributes.Add("class", "titleBar")         'Set CSS Class
         '                                                                'Add innerHTML incl. 'close' button
-        divNewStreamTitleBar.InnerHtml = "<h3>New Stream Wizard<input style=""float: right;"" type=""button"" onclick=""HideShow('BodyContent_divNewStream')"" value=""X"" /></h3>"
+        divNewStreamTitleBar.InnerHtml = "<h3>New Stream Wizard<input style=""float: right"" type=""button"" onclick=""location.reload()"" value=""X"" /></h3>"
         divNewStream.Controls.Add(divNewStreamTitleBar)                  'Add titlebar to div
 
         Dim lblClassID As New Label                                      '|
@@ -217,15 +217,16 @@ Partial Class _Default
 
         'add newline to div
         divNewStream.Controls.Add(New LiteralControl("<br>"))
+        'todo: document
+        Dim pnlStreamDropDownContainer As New Panel
+        pnlStreamDropDownContainer.ID = "pnlStreamDropDownContainer"
+        divNewStream.Controls.Add(pnlStreamDropDownContainer)
 
-        Dim lblUserList As New Label                                     '|
-        lblUserList.Text = "CSV user list:"                              '| New label, add to div
-        divNewStream.Controls.Add(lblUserList)                           '|
-
-        Dim txtStreamUserList As New TextBox                             '|
-        txtStreamUserList.TextMode = TextBoxMode.MultiLine               '| New textbox,
-        txtStreamUserList.ID = "txtStreamUserList"                       '| Add to div
-        divNewStream.Controls.Add(txtStreamUserList)                     '|
+        Dim btnLoadNames As New Button
+        btnLoadNames.ID = "btnLoadNames"
+        btnLoadNames.Text = "Load lists"
+        AddHandler btnLoadNames.Click, AddressOf Me.loadNames
+        pnlStreamDropDownContainer.Controls.Add(btnLoadNames)
 
         'add newlines to div
         divNewStream.Controls.Add(New LiteralControl("<br>"))
@@ -243,13 +244,13 @@ Partial Class _Default
         divReader.ID = "divReader"                                      'Set ID
         divReader.Attributes.Add("class", "wizard")                     'Set CSS Class
 
-        Me.Master.FindControl("BodyContent").Controls.Add(divReader)    'Add the div to the page
+        pnlWizards.ContentTemplateContainer.Controls.Add(divReader)    'Add the div to the page
 
         Dim divReaderTitleBar = New HtmlGenericControl("div")           'New 'titlebar' div
         divReaderTitleBar.ID = "divReaderTitleBar"                      'Set ID
         divReaderTitleBar.Attributes.Add("class", "titleBar")           'Set CSS Class
         '                                                               'Add innerHTML incl. 'close' button
-        divReaderTitleBar.InnerHtml = "<h3>Administrator Data Reader<input style=""float: right;"" type=""button"" onclick=""HideShow('BodyContent_divReader')"" value=""X"" /></h3>"
+        divReaderTitleBar.InnerHtml = "<h3>Administrator Data Reader<input style=""float: right"" type=""button"" onclick=""location.reload()"" value=""X"" /></h3>"
         divReader.Controls.Add(divReaderTitleBar)                       'Add titlebar to div
 
         Dim lblSearch As New Label                                      '|
@@ -313,13 +314,13 @@ Partial Class _Default
         divWriter.ID = "divWriter"                                      'Set ID
         divWriter.Attributes.Add("class", "wizard")                     'Set CSS Class
 
-        Me.Master.FindControl("BodyContent").Controls.Add(divWriter)    'Add the div to the page
+        pnlWizards.ContentTemplateContainer.Controls.Add(divWriter)    'Add the div to the page
 
         Dim divWriterTitleBar = New HtmlGenericControl("div")           'New 'titlebar' div
         divWriterTitleBar.ID = "divWriterTitleBar"                      'Set ID
         divWriterTitleBar.Attributes.Add("class", "titleBar")           'Set CSS Class
         '                                                               'Add innerHTML incl. 'close' button
-        divWriterTitleBar.InnerHtml = "<h3>Administrator Data Writer<input style=""float: right;"" type=""button"" onclick=""HideShow('BodyContent_divWriter')"" value=""X"" /></h3>"
+        divWriterTitleBar.InnerHtml = "<h3>Administrator Data Writer<input style=""float: right"" type=""button"" onclick=""location.reload()"" value=""X"" /></h3>"
         divWriter.Controls.Add(divWriterTitleBar)                       'Add titlebar to div
 
         Dim lblQuery1 As New Label
@@ -354,17 +355,17 @@ Partial Class _Default
         divDataTable.ID = "divDataTable"                                 'Set ID
         divDataTable.Attributes.Add("class", "wizard")                   'Set CSS Class
 
-        Me.Master.FindControl("BodyContent").Controls.Add(divDataTable)  'Add the div to the page
+        pnlWizards.ContentTemplateContainer.Controls.Add(divDataTable)  'Add the div to the page
 
         Dim divDataTableTitleBar = New HtmlGenericControl("div")         'New 'titlebar' div
         divDataTableTitleBar.ID = "divDataTableTitleBar"                 'Set ID
         divDataTableTitleBar.Attributes.Add("class", "titleBar")         'Set CSS Class
         '                                                                'Add innerHTML incl. 'close' button
-        divDataTableTitleBar.InnerHtml = "<h3>Results DataTable<input style=""float: right;"" type=""button"" onclick=""HideShow('BodyContent_divDataTable')"" value=""X"" /></h3>"
+        divDataTableTitleBar.InnerHtml = "<h3>Results DataTable<input style=""float: right"" type=""button"" onclick=""HideShow('BodyContent_divDataTable')"" value=""X"" /></h3>"
         divDataTable.Controls.Add(divDataTableTitleBar)                  'Add titlebar to div
 
         Dim btnExport As New Button                                     '|
-        btnExport.Text = "Export to Excel"                              '|
+        btnExport.Text = "Export to HTML"                              '|
         btnExport.ID = "btnExport"                                      '| New button, add to div
         AddHandler btnExport.Click, AddressOf btn_Click                 '|
         divDataTable.Controls.Add(btnExport)                            '|
@@ -373,6 +374,42 @@ Partial Class _Default
         gvResults.ID = "gvResults"                                      '| new gridview, add to div
         divDataTable.Controls.Add(gvResults)                            '|
     End Sub
+    Sub loadNames(sender As Object, e As EventArgs)
+        Dim btn As Button = CType(sender, Button)
+        Dim txtStreamID As TextBox = CType(findDynamicBodyControl("divNewStream,txtStreamID"), TextBox)
+        Dim pnlStreamDropDownContainer As Panel = CType(findDynamicBodyControl("divNewStream,pnlStreamDropDownContainer"), Panel)
+
+        pnlStreamDropDownContainer.Controls.Clear()
+        Dim strUsers() As String = DatabaseFunctions.getUsers(txtStreamID.Text)
+
+        Dim lbl As New Label
+        lbl.Text = "Please enter the users you wish to add to the stream:" & vbCrLf
+        pnlStreamDropDownContainer.Controls.Add(lbl)
+
+        Dim i As Integer = strUsers.Length - 1
+        While i > -1
+            If Not strUsers(i) = User.Identity.Name Then
+                Dim ddlUsers As New DropDownList                                  '|
+                ddlUsers.ID = "ddlUsers" & i                                  '| Add to div
+                ddlUsers.Items.Add("")
+                For Each thing In strUsers
+                    If Not thing = User.Identity.Name Then ddlUsers.Items.Add(thing)
+                Next
+                pnlStreamDropDownContainer.Controls.Add(ddlUsers)                           '|
+            End If
+            i -= 1
+        End While
+
+        'add client button for revealing more dropdownlists
+
+        pnlStreamDropDownContainer.Controls.Add(New LiteralControl("<br>"))
+
+        Dim btnReveal As New Literal
+        btnReveal.Text = "<input type=""button"" onclick=""revealNext('BodyContent_pnlStreamDropDownContainer')"" value=""Add Recipient"" />"
+        pnlStreamDropDownContainer.Controls.Add(btnReveal)
+
+        smgrTimer.RegisterStartupScript(Page, GetType(Page), "data back", "HideShow('BodyContent_divNewStream')", True)
+    End Sub
     Sub LoadSidebar(ByVal intRole As Integer)
 
         LoadAlerts()
@@ -380,14 +417,14 @@ Partial Class _Default
         If intRole > 0 Then 'load class streams if you're not a parent / friend
             'query the database for the names of classes that I'm part of
             Dim strClassesArr() = getClasses(User.Identity.Name) 'get array of classes
-            For Each item In strClassesArr
+            For Each item As Object In strClassesArr
                 'get array of streams
                 Dim strStreamsArr() = getStreams(item, User.Identity.Name)
                 'add class header to sidebar
                 addSidebarLbl("lbl" & item, item)
                 'add streams to sidebar
-                For Each stream In strStreamsArr
-                    addSidebarBtn("btn" & item & stream, stream)
+                For Each msgStream As String In strStreamsArr
+                    addSidebarBtn("btn" & item & msgStream, msgStream)
                 Next
                 addSidebarClientBtn("NewStream('BodyContent_divNewStream', this); hamburger(document.getElementsByClassName('container')[0])", "NEW STREAM IN " & item) 'add new stream button
                 'next class
@@ -422,7 +459,7 @@ Partial Class _Default
         Dim strNotificationsArr(,) = getAlerts(User.Identity.Name)  'Get notifications for this user
         Dim intAlertButtonCount = 0 'New integer
 
-        For Each notification In strNotificationsArr                                                             'for every message
+        For Each notification As Object In strNotificationsArr                                                             'for every message
             If (Not notification = Nothing) And (Not IsNumeric(notification)) Then                               'if the message isn't blank
                 'debug(notification)
                 intAlertButtonCount += 1    'increase button count
@@ -571,7 +608,7 @@ Partial Class _Default
             Dim strUsers As String = txtUserList.Text.Replace(",", "@marist.vic.edu.au,")   'add email domains to each username
             Dim arrEmls As String() = strUsers.Replace(" ", "").Split(",")                  'remove spaces between commas if the user put them there & split the string up into an array
             Dim listUserIDs As New Generic.List(Of Integer)                                 'new list
-            For Each strEmail In arrEmls                                                    'for each email in our array
+            For Each strEmail As String In arrEmls                                                    'for each email in our array
                 Try
                     listUserIDs.Add(readUserInfo(strEmail, "int_ID"))     'add the userID from tbl_users to our list
                 Catch
@@ -583,7 +620,7 @@ Partial Class _Default
             'TODO: Need to check that classID follows correct structure
             'TODO: Need to ensure class doesn't already exist
 
-            For Each intID In listUserIDs                                                   'for each id in the list
+            For Each intID As Integer In listUserIDs                                                   'for each id in the list
                 '                                                                            attempt to update the row
                 Dim strUpdateCmd As String = runSQL("update tbl_classes set " & MakeSQLSafe(txtClassID.Text) & " = 1 where int_UserID = " & intID)
                 If strUpdateCmd.StartsWith("Success") Then                                  'if the command was successful
@@ -635,7 +672,7 @@ QueryComplete:
                 lstMembersStr.Add(User.Identity.Name.Replace("@marist.vic.edu.au", ""))         'Add me to it
             End If
 
-            For i = lstMembersStr.Count - 1 To 0 Step -1
+            For i As Integer = lstMembersStr.Count - 1 To 0 Step -1
                 If IsNullOrWhiteSpace(lstMembersStr(i)) Then
                     lstMembersStr.RemoveAt(i)
                 End If
@@ -644,7 +681,7 @@ QueryComplete:
             ReDim strMembersArr(lstMembersStr.Count - 1)                                    'Reset the array
             strMembersArr = lstMembersStr.ToArray()                                         'Set the array to have the same contents as the list
 
-            For Each strMember In strMembersArr                                                 'For each member
+            For Each strMember As String In strMembersArr                                                 'For each member
                 strStreamName += strMember                                                      'Add their name to the stream name
                 If Array.IndexOf(strMembersArr, strMember) = strMembersArr.Length - 2 Then      'If the member is the second last one in the list
                     strStreamName += " and "                                                    'Add the word 'and' after their name
@@ -726,7 +763,7 @@ QueryComplete:
             Else    'if the advanced section was used
                 Dim strTable As String  'new string
                 Dim strWordsArr() As String = txtAdvanced.Text.Split(" ") 'split the query into words
-                For Each word In strWordsArr        'for each word
+                For Each word As String In strWordsArr        'for each word
                     If word.StartsWith("tbl") Then  'if it starts with 'tbl'
                         strTable = word             'then that is the table we are querying
                         Exit For                    'disregard all the other words
@@ -740,20 +777,18 @@ QueryComplete:
             gvResults.DataBind()            'bind datasource
 
             'show results
-            Response.Write("<script>document.addEventListener(""DOMContentLoaded"", function(event) { HideShow('BodyContent_divDataTable'); });</script>")
+            ' Response.Write("<script>document.addEventListener(""DOMContentLoaded"", function(event) { HideShow('BodyContent_divDataTable') })</script>")
+            smgrTimer.RegisterStartupScript(Page, GetType(Page), "data back", "HideShow('BodyContent_divDataTable')", True)
 
         ElseIf btn.ID = "btnExport" Then
 
-            Dim strFile As String = "attachment;filename=results.xls"                                           'delcare attachment type
-            Response.ClearContent()                                                                             'clear page
-            Response.AddHeader("content-disposition", strFile)                                                  'tell the browser that we are sending a file
-            Response.ContentType = "application/ms-excel"                                                       'tell the browser it's an excel file
             Dim sw As New IO.StringWriter                                                                       'new stringwriter
             Dim htw As New HtmlTextWriter(sw)                                                                   'new htmlTextWriter
             Dim gvResults As GridView = CType(findDynamicBodyControl("divDataTable,gvResults"), GridView)       'Find the gridview
-            gvResults.RenderControl(htw)
-            Response.Write(sw.ToString())                                                                       'Write the stringwriter to the excel file we are sending
-            Response.[End]()                                                                                    'end the transfer
+            gvResults.RenderControl(htw)    'get HTML of the gridview
+
+            'save html as file
+            smgrTimer.RegisterStartupScript(Page, GetType(Page), "save", "var element = document.createElement('a'); element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent('" & sw.ToString.Replace(vbCr, "").Replace(vbLf, "") & "')); element.setAttribute('download', 'results.html'); element.style.display = 'none'; document.body.appendChild(element); element.click(); document.body.removeChild(element);", True)
 
         Else 'if button is a regular, existing stream button
 
@@ -777,7 +812,7 @@ QueryComplete:
 
         Dim intMessageCount = 0
 
-        For Each message In messagesArr                                     'for every message
+        For Each message As Object In messagesArr                                     'for every message
             If (Not message = Nothing) And (Not IsNumeric(message)) Then    'if the message isn't blank
                 'debug(message)
                 intMessageCount += 1                                    'Add one to the count
@@ -822,13 +857,13 @@ QueryComplete:
     End Sub
     Sub clearPanelControls()
         Dim lblList As New Generic.List(Of Label)
-        For Each ctrl In pnlUpdate.ContentTemplateContainer.Controls
+        For Each ctrl As Control In pnlUpdate.ContentTemplateContainer.Controls
             If TypeOf ctrl Is Label Then
                 lblList.Add(ctrl)
             End If
         Next
 
-        For Each lbl In lblList
+        For Each lbl As Label In lblList
             pnlUpdate.ContentTemplateContainer.Controls.Remove(lbl)
         Next
     End Sub
@@ -848,6 +883,11 @@ QueryComplete:
 
         'output the control defined in the path
         Return Me.Master.FindControl("frmPage").FindControl("Sidebar").FindControl(id)
+    End Function
+    Function findNewStreamDiv() As Control 'a real dirty way of doing something that should be a lot easier
+
+        'output the control defined in the path
+        Return Me.Master.FindControl("frmPage").FindControl("BodyContent").FindControl("divNewStream")
     End Function
     Private Sub tmrUpdate_Tick(sender As Object, e As EventArgs) Handles tmrUpdate.Tick
         updateMessages()

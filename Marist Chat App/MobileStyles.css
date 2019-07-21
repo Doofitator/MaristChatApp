@@ -208,7 +208,7 @@ span#topBar_lblStreamName {
     padding-top: 20px;
 }
 
-.loginForm {
+.loginForm, #BodyContent_hlkForgot {
     position: relative;
     left: 45%;
 }
@@ -282,4 +282,11 @@ span#topBar_lblStreamName {
 
 .urgent > input[type=submit] {
     color: red !important;
+}
+
+#BodyContent_lblEmailHint {
+    position: relative;
+    left: 30%;
+    max-width: 400px;
+    margin-bottom: 15px;
 }

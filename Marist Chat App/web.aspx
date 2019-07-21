@@ -24,7 +24,7 @@
                 $('#topBar_lblStreamName').css('display', 'none');
         });
         function collapse(label) {
-            
+
             var elems = $(label).nextUntil('li, hr');
             var i;
             for (i = 0; i < elems.length; i++) {
@@ -35,11 +35,27 @@
                 }
             }
         }
+        function revealNext(divelmnt) {
+            var ancestor = document.getElementById(divelmnt);
+            var descendents = ancestor.getElementsByTagName('select');
+            var i;
+            for (i = 0; i < descendents.length; ++i) {
+                if (getComputedStyle(descendents[i], null).display == "none") {
+                    descendents[i].style.display = "block";
+                    break;
+                }
+            }
+        }
     </script>
 
     <asp:ScriptManager ID="smgrTimer" runat="server" EnableCdn="true"></asp:ScriptManager>
+    <asp:UpdatePanel ID="pnlWizards" runat="server" UpdateMode="Conditional">
+        <ContentTemplate>
+
+        </ContentTemplate>
+    </asp:UpdatePanel>
     <div class="messagesContainer">
-            <asp:UpdatePanel ID="pnlUpdate" runat="server">
+            <asp:UpdatePanel ID="pnlUpdate" runat="server" UpdateMode="Conditional">
                 <ContentTemplate>                    
                     <asp:Timer ID="tmrUpdate" runat="server" Interval="1000"></asp:Timer>
                 </ContentTemplate>

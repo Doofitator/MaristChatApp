@@ -11,8 +11,10 @@
 <asp:Image ID="imgBanner" runat="server" ImageUrl="~/banner.png" CssClass="banner" />
 
     <asp:Panel runat="server" CssClass="loginWrapper">
+        <asp:Label ID="lblEmailHint" runat="server" Font-Italic="True"></asp:Label>
         <asp:Login ID="frmLogin" runat="server" CreateUserText="Register" CssClass="loginForm" CreateUserUrl="~/Register.aspx" DestinationPageUrl="~/web.aspx" UserNameLabelText="Email:" UserNameRequiredErrorMessage="Email is required." TitleText="" >
         </asp:Login>
+        <asp:HyperLink ID="hlkForgot" runat="server" NavigateUrl="~/Forgot.aspx">Forgot Password?</asp:HyperLink>
     </asp:Panel>
 
 </asp:Content>
