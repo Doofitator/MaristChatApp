@@ -14,7 +14,7 @@ function button_click(e) {
 
 function writeToTextBox(elmntID) {
     document.getElementById('BodyContent_txtStreamJsHandler').value += document.getElementById(elmntID).value + ", ";
-    console.log(document.getElementById('BodyContent_txtStreamJsHandler').value);
+    document.getElementById(elmntID).disabled = true;
 }
 
 function ScrollDown() {
