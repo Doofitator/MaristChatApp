@@ -424,6 +424,8 @@ Partial Class _Default
 
         LoadAlerts()
 
+        Dim currentIDs As String = ""
+
         If intRole > 0 Then 'load class streams if you're not a parent / friend
             'query the database for the names of classes that I'm part of
             Dim strClassesArr() = getClasses(User.Identity.Name) 'get array of classes
@@ -434,7 +436,10 @@ Partial Class _Default
                 addSidebarLbl("lbl" & item, item)
                 'add streams to sidebar
                 For Each msgStream As String In strStreamsArr
-                    addSidebarBtn("btn" & item & msgStream, msgStream)
+                    If Not Array.IndexOf(currentIDs.Split("*"), "btn" & item & msgStream) > 0 Then 'code to deal with possible stream duplicates
+                        addSidebarBtn("btn" & item & msgStream, msgStream)
+                        currentIDs += "btn" & item & msgStream & "*"
+                    End If
                 Next
                 addSidebarClientBtn("NewStream('BodyContent_divNewStream', this); hamburger(document.getElementsByClassName('container')[0])", "NEW STREAM IN " & item) 'add new stream button
                 'next class
@@ -703,12 +708,13 @@ QueryComplete:
                 If strStreamName.ToLower.Contains("@marist.vic.edu.au") Then strStreamName = strStreamName.ToLower.Replace("@marist.vic.edu.au", "")
             Next
 
-            'TODO: there's nothing here checking to see if the stream already exists before it is written
+            'Todo: there's nothing here checking to see if the stream already exists before it is written
+            'The above doesn't really matter as we remove duplicates on load anyway
+
             'run sql
             Dim strSql As String = "insert into tbl_streams (str_ClassID, bool_isClassWide, str_StreamName) VALUES ('" & MakeSQLSafe(txtStreamID.Text) & "', FALSE, '" & strStreamName & "')"
             runSQL(strSql)
-            Response.Redirect("/")
-            'TODO: add button now in the right spot (or refresh?)
+            Response.Redirect("/") 'refresh to show changes
         ElseIf btn.ID = "btnSend" Then 'if button is the send message button
             Dim txtBody As TextBox = findDynamicBodyControl("divMessageControls,txtBody")   'get the textbox
             Dim strMessage As String = txtBody.Text 'get the message
@@ -783,6 +789,9 @@ QueryComplete:
             End If
 
             Dim gvResults As GridView = CType(findDynamicBodyControl("divDataTable,gvResults"), GridView)   'find control
+            'todo: make the following thing work
+            ' AddHandler gvResults.RowDataBound, AddressOf Me.gv_RowDataBound
+
             gvResults.DataSource = dsResult 'set datasource to the results
             gvResults.DataBind()            'bind datasource
 
@@ -814,6 +823,15 @@ QueryComplete:
             loadMessages(strMessages)
         End If
     End Sub
+    'todo: make that work
+    'Protected Sub gv_RowDataBound(ByVal sender As Object, ByVal e As GridViewRowEventArgs)
+    ' If e.Row.DataItem IsNot Nothing Then
+    '   Dim htmlBtn As HtmlGenericControl = New HtmlGenericControl("button")
+    '    e.Row.Cells.Add(New TableCell)
+    '     htmlBtn.Attributes.Add("onclick", "delete the thing")
+    '      e.Row.Cells(e.Row.Cells.Count - 1).Controls.Add(htmlBtn)
+    '   End If
+    'End Sub
     Public Overrides Sub VerifyRenderingInServerForm(ByVal control As Control)
         'Fixes btnExport.click throwing errors
     End Sub
