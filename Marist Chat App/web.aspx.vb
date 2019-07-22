@@ -499,7 +499,7 @@ Partial Class _Default
         If intRole = 3 Then 'if user is an admin
             addSidebarClientBtn("HideShow('BodyContent_divNewAlert'); hamburger(document.getElementsByClassName('container')[0])", "NEW ALERT") 'add new alert button
             addSidebarClientBtn("HideShow('BodyContent_divReader'); hamburger(document.getElementsByClassName('container')[0])", "SQL READER") 'add reader button
-            addSidebarClientBtn("HideShow('BodyContent_divWriter'); hamburger(document.getElementsByClassName('container')[0])", "SQL WRITER") 'add writer button
+            'addSidebarClientBtn("HideShow('BodyContent_divWriter'); hamburger(document.getElementsByClassName('container')[0])", "SQL WRITER") 'add writer button
         End If
 
         'todo: add admin button for liveReader.aspx
@@ -713,7 +713,7 @@ QueryComplete:
             intUserCode = intRoleArray(ddlRoles.SelectedIndex)                                                  'Set the integer to the selected index of the dropdownlist
             'run sql
             runSQL("INSERT INTO tbl_notifications (str_message, int_userGroup, bool_urgent, dt_timeStamp) VALUES ('" & MakeSQLSafe(cleanHTML(txtMessage.Text)) & "', " & intUserCode & ", " & strAccessBoolFixer & ", #" & DateTime.Now & "#)")
-
+            Response.Redirect("/") 'refresh to show changes
         ElseIf btn.ID = "btnWriteStream" Then 'if button is a new stream button
             Dim txtStreamID As TextBox = CType(findDynamicBodyControl("divNewStream,txtStreamID"), TextBox) 'find the class identifier textbox
             Dim txtStreamUserList As TextBox = CType(findDynamicBodyControl("divNewStream,txtStreamJsHandler"), TextBox) 'find csv textbox

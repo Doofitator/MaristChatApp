@@ -21,6 +21,7 @@ Partial Class Forgot
         Else
             lblTextHint.Text = "New Password:"
             btnSubmit.Text = "Reset password"
+            txtInput.TextMode = TextBoxMode.Password
         End If
     End Sub
     Protected Sub btnSubmit_Click(sender As Object, e As EventArgs) Handles btnSubmit.Click
