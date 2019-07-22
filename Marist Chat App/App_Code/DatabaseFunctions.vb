@@ -647,6 +647,44 @@ Public Class DatabaseFunctions
         Return strUsers.ToArray()
     End Function
 
+    Public Shared Function getAllUsers() As String() 'returns string array of users in a specified class
+        Dim strCommand As String = "select str_email from tbl_users"
+
+        'create connection object
+        Dim oleConn As OleDb.OleDbConnection = New OleDb.OleDbConnection
+        oleConn.ConnectionString = strConn
+
+        'Create a Command object.
+        Dim oleCmd As OleDb.OleDbCommand = oleConn.CreateCommand
+        oleCmd.CommandText = strCommand
+
+        'Open the connection.
+
+        Try
+            oleConn.Open()
+        Catch ex As Exception
+            ' "FailConnOpen " & ex.Message
+        End Try
+
+        Dim strUsers As New Generic.List(Of String)   'this will be our output
+
+        Try
+            Dim reader As OleDb.OleDbDataReader = oleCmd.ExecuteReader() 'run sql script
+            While reader.Read
+                For i = 0 To reader.FieldCount - 1
+                    strUsers.Add(reader.GetString(i))
+                Next
+            End While
+            oleConn.Close() 'close connection
+        Catch ex As Exception 'if a catastrophic error occurs
+            'console.writeline(ex.ToString)
+            oleConn.Close() 'close the connection
+            'Console.WriteLine("Fail due to " & ex.Message & ex.StackTrace)
+        End Try
+
+        Return strUsers.ToArray()
+    End Function
+
     'define role names and database codes for use when sending & recieving alerts.
     Public Shared strRoleArray As String() = {"All", "Parents", "Students", "Educators", "Admins", "Parents & Students", "Parents & Educators", "Parents, Students & Educators", "Students & Educators", "Students, Educators & Admins"}
     Public Shared intRoleArray As Integer() = {4, 0, 1, 2, 3, 5, 6, 7, 8, 9}

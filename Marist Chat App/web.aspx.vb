@@ -161,14 +161,23 @@ Partial Class _Default
         'add newline to div
         divNewClass.Controls.Add(New LiteralControl("<br>"))
 
-        Dim lblUserList As New Label                                    '|
-        lblUserList.Text = "CSV user list:"                             '| New label, add to div
-        divNewClass.Controls.Add(lblUserList)                           '|
 
-        Dim txtUserList As New TextBox                                  '|
-        txtUserList.TextMode = TextBoxMode.MultiLine                    '| New textbox,
-        txtUserList.ID = "txtUserList"                                  '| Add to div
-        divNewClass.Controls.Add(txtUserList)                           '|
+        Dim pnlClassDropDownContainer As New Panel                     '| New panel to hold the eventual dropdownboxes
+        pnlClassDropDownContainer.ID = "pnlClassDropDownContainer"    '|
+        divNewClass.Controls.Add(pnlClassDropDownContainer)           '|
+
+        Dim btnLoadNames As New Button                                  '|
+        btnLoadNames.ID = "btnLoadClassNames"                          '|
+        btnLoadNames.Text = "Load lists"                                '| New button to trigger loading dropdowns
+        AddHandler btnLoadNames.Click, AddressOf Me.loadNames           '|
+        pnlClassDropDownContainer.Controls.Add(btnLoadNames)           '|
+
+        '---------------------'
+        Dim txtJsHandler As New TextBox                                 '|
+        txtJsHandler.ID = "txtClassJsHandler"                          '| Textbox to hold dropdown values as CSV (because the dropdowns are dynamic 
+        txtJsHandler.CssClass = "hiddenText"                            '| controls that aren't created every postback, so this is required
+        divNewClass.Controls.Add(txtJsHandler)                         '|
+        '---------------------'
 
         'add newline to div
         divNewClass.Controls.Add(New LiteralControl("<br>"))
@@ -403,7 +412,7 @@ Partial Class _Default
                     For Each thing In strUsers              'for each user
                         If Not thing = User.Identity.Name Then ddlUsers.Items.Add(thing) 'add their name as an option in the list
                     Next
-                    ddlUsers.Attributes.Add("onchange", "writeToTextBox(this.id)")  'tell the list to run JS that will write the CSV onchange
+                    ddlUsers.Attributes.Add("onchange", "writeToTextBox(this.id, 'Stream')")  'tell the list to run JS that will write the CSV onchange
                     pnlStreamDropDownContainer.Controls.Add(ddlUsers)                           ' add the list to the panel
                 End If
                 i -= 1
@@ -418,6 +427,42 @@ Partial Class _Default
             pnlStreamDropDownContainer.Controls.Add(btnReveal)
 
             smgrTimer.RegisterStartupScript(Page, GetType(Page), "data back", "HideShow('BodyContent_divNewStream')", True)
+
+        ElseIf btn.ID = "btnLoadClassNames" Then
+            Dim txtClassID As TextBox = CType(findDynamicBodyControl("divNewClass,txtClassID"), TextBox) 'get class ID textbox
+            Dim pnlClassDropDownContainer As Panel = CType(findDynamicBodyControl("divNewClass,pnlClassDropDownContainer"), Panel) 'get the panel we are putting it in
+
+            pnlClassDropDownContainer.Controls.Clear() 'clear the panel controls (ie delete the button that called this)
+            Dim strUsers() As String = DatabaseFunctions.getAllUsers() 'Get the users in the database
+
+            Dim lbl As New Label                                                            '|
+            lbl.Text = "Please enter the users you wish to add to the Class:" & vbCrLf     '| New label, add to panel
+            pnlClassDropDownContainer.Controls.Add(lbl)                                    '|
+
+            Dim i As Integer = strUsers.Length - 1  'For each user
+            While i > -1
+                If Not strUsers(i) = User.Identity.Name Then                'if it isn't me
+                    Dim ddlUsers As New DropDownList                        'new dropdownlist
+                    ddlUsers.ID = "ddlUsers" & i                            'Set ID
+                    ddlUsers.Items.Add("")                                  'Add blank (default) value
+                    For Each thing In strUsers              'for each user
+                        If Not thing = User.Identity.Name Then ddlUsers.Items.Add(thing) 'add their name as an option in the list
+                    Next
+                    ddlUsers.Attributes.Add("onchange", "writeToTextBox(this.id, 'Class')")  'tell the list to run JS that will write the CSV onchange
+                    pnlClassDropDownContainer.Controls.Add(ddlUsers)                           ' add the list to the panel
+                End If
+                i -= 1
+            End While
+
+            'add client button for revealing more dropdownlists
+
+            pnlClassDropDownContainer.Controls.Add(New LiteralControl("<br>"))
+
+            Dim btnReveal As New Literal
+            btnReveal.Text = "<input type=""button"" onclick=""revealNext('BodyContent_pnlClassDropDownContainer')"" value=""Add Classmember"" />"
+            pnlClassDropDownContainer.Controls.Add(btnReveal)
+
+            smgrTimer.RegisterStartupScript(Page, GetType(Page), "data back", "HideShow('BodyContent_divNewClass')", True)
         End If
     End Sub
     Sub LoadSidebar(ByVal intRole As Integer)
@@ -619,9 +664,8 @@ Partial Class _Default
             Dim txtClassID As TextBox = CType(findDynamicBodyControl("divNewClass,txtClassID"), TextBox) 'find the class identifier textbox
             runSQL("ALTER TABLE tbl_classes ADD COLUMN " & MakeSQLSafe(txtClassID.Text) & " YESNO NOT NULL")
 
-            Dim txtUserList As TextBox = CType(findDynamicBodyControl("divNewClass,txtUserList"), TextBox) 'find the user list textbox
-            Dim strUsers As String = txtUserList.Text.Replace(",", "@marist.vic.edu.au,")   'add email domains to each username
-            Dim arrEmls As String() = strUsers.Replace(" ", "").Split(",")                  'remove spaces between commas if the user put them there & split the string up into an array
+            Dim txtUserList As TextBox = CType(findDynamicBodyControl("divNewClass,txtClassJsHandler"), TextBox) 'find the user list textbox
+            Dim arrEmls As String() = txtUserList.Text.Replace(" ", "").Split(",")                  'remove spaces between commas if the user put them there & split the string up into an array
             Dim listUserIDs As New Generic.List(Of Integer)                                 'new list
             For Each strEmail As String In arrEmls                                                    'for each email in our array
                 Try
@@ -631,7 +675,6 @@ Partial Class _Default
                 End Try
             Next
             listUserIDs.Add(readUserInfo(User.Identity.Name, "int_ID"))   'Add me to the class
-
             'TODO: Need to check that classID follows correct structure
             'TODO: Need to ensure class doesn't already exist
 
@@ -656,9 +699,7 @@ QueryComplete:
             addSidebarLbl("lbl" & txtClassID.Text, txtClassID.Text) 'add new label to sidebar
             'add classwide stream
             runSQL("insert into tbl_streams (str_ClassID, bool_isClassWide, str_StreamName) VALUES ('" & MakeSQLSafe(txtClassID.Text) & "', TRUE, '" & MakeSQLSafe(txtClassStreamName.Text) & "')")
-            addSidebarBtn("btn" & txtClassID.Text & txtClassStreamName.Text, txtClassStreamName.Text)
-            addSidebarClientBtn("NewStream('BodyContent_divNewStream', this); hamburger(document.getElementsByClassName('container')[0])", "NEW STREAM IN " & txtClassID.Text) 'add new stream button
-            addSidebarDivider()
+            Response.Redirect("/") 'refresh to show changes
 
         ElseIf btn.ID = "btnWriteAlert" Then 'if button is a new alert button
             'run script to update tbl_alerts with new message

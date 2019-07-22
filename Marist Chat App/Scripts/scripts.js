@@ -12,8 +12,8 @@ function button_click(e) {
     }
 }
 
-function writeToTextBox(elmntID) {
-    document.getElementById('BodyContent_txtStreamJsHandler').value += document.getElementById(elmntID).value + ", ";
+function writeToTextBox(elmntID, textbox) {
+        document.getElementById('BodyContent_txt' + textbox + 'JsHandler').value += document.getElementById(elmntID).value + ", ";
     document.getElementById(elmntID).disabled = true;
 }
 
