@@ -155,28 +155,29 @@ Partial Class _Default
 
         Dim txtClassID As New TextBox                                   '|
         txtClassID.TextMode = TextBoxMode.SingleLine                    '| New textbox,
-        txtClassID.ID = "txtClassID"                                    '| Add to div.
+        txtClassID.MaxLength = 7                                        '| Add to div.
+        txtClassID.ID = "txtClassID"                                    '| 
         divNewClass.Controls.Add(txtClassID)                            '|
 
         'add newline to div
         divNewClass.Controls.Add(New LiteralControl("<br>"))
 
 
-        Dim pnlClassDropDownContainer As New Panel                     '| New panel to hold the eventual dropdownboxes
-        pnlClassDropDownContainer.ID = "pnlClassDropDownContainer"    '|
-        divNewClass.Controls.Add(pnlClassDropDownContainer)           '|
+        Dim pnlClassDropDownContainer As New Panel                      '| New panel to hold the eventual dropdownboxes
+        pnlClassDropDownContainer.ID = "pnlClassDropDownContainer"      '|
+        divNewClass.Controls.Add(pnlClassDropDownContainer)             '|
 
         Dim btnLoadNames As New Button                                  '|
-        btnLoadNames.ID = "btnLoadClassNames"                          '|
+        btnLoadNames.ID = "btnLoadClassNames"                           '|
         btnLoadNames.Text = "Load lists"                                '| New button to trigger loading dropdowns
         AddHandler btnLoadNames.Click, AddressOf Me.loadNames           '|
-        pnlClassDropDownContainer.Controls.Add(btnLoadNames)           '|
+        pnlClassDropDownContainer.Controls.Add(btnLoadNames)            '|
 
         '---------------------'
         Dim txtJsHandler As New TextBox                                 '|
-        txtJsHandler.ID = "txtClassJsHandler"                          '| Textbox to hold dropdown values as CSV (because the dropdowns are dynamic 
+        txtJsHandler.ID = "txtClassJsHandler"                           '| Textbox to hold dropdown values as CSV (because the dropdowns are dynamic 
         txtJsHandler.CssClass = "hiddenText"                            '| controls that aren't created every postback, so this is required
-        divNewClass.Controls.Add(txtJsHandler)                         '|
+        divNewClass.Controls.Add(txtJsHandler)                          '|
         '---------------------'
 
         'add newline to div
@@ -658,10 +659,17 @@ Partial Class _Default
 
         'if button is a new class button
         If btn.ID = "btnWriteClass" Then
-            ' make a New field in tbl_classes called classIdentifier
 
             Dim txtClassStreamName As TextBox = CType(findDynamicBodyControl("divNewClass,txtClassStreamName"), TextBox) 'find the stream name textbox
             Dim txtClassID As TextBox = CType(findDynamicBodyControl("divNewClass,txtClassID"), TextBox) 'find the class identifier textbox
+
+            'ensure the field is correct length
+            If Not txtClassID.Text.Length = 7 Then
+                smgrTimer.RegisterStartupScript(Page, GetType(Page), "classIDWarn", "alert('Please try again - Class ID must be exactly 7 characters long.')", True)
+                Exit Sub
+            End If
+            ' make a New field in tbl_classes called classIdentifier
+
             runSQL("ALTER TABLE tbl_classes ADD COLUMN " & MakeSQLSafe(txtClassID.Text) & " YESNO NOT NULL")
 
             Dim txtUserList As TextBox = CType(findDynamicBodyControl("divNewClass,txtClassJsHandler"), TextBox) 'find the user list textbox
