@@ -168,7 +168,7 @@ Partial Class _Default
 
         Dim btnLoadNames As New Button                                  '|
         btnLoadNames.ID = "btnLoadClassNames"                           '|
-        btnLoadNames.Text = "Load lists"                                '| New button to trigger loading dropdowns
+        btnLoadNames.Text = "Load available users"                                '| New button to trigger loading dropdowns
         AddHandler btnLoadNames.Click, AddressOf Me.loadNames           '|
         pnlClassDropDownContainer.Controls.Add(btnLoadNames)            '|
 
@@ -233,7 +233,7 @@ Partial Class _Default
 
         Dim btnLoadNames As New Button                                  '|
         btnLoadNames.ID = "btnLoadStreamNames"                          '|
-        btnLoadNames.Text = "Load lists"                                '| New button to trigger loading dropdowns
+        btnLoadNames.Text = "Load available users"                                '| New button to trigger loading dropdowns
         AddHandler btnLoadNames.Click, AddressOf Me.loadNames           '|
         pnlStreamDropDownContainer.Controls.Add(btnLoadNames)           '|
 
