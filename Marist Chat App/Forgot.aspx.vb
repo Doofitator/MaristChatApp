@@ -27,8 +27,8 @@ Partial Class Forgot
     Protected Sub btnSubmit_Click(sender As Object, e As EventArgs) Handles btnSubmit.Click
         If btnSubmit.Text = "Send reset email" Then
             'send reset request email & redirect
-            Dim strStore As String = DatabaseFunctions.readUserPassword(DatabaseFunctions.MakeSQLSafe(txtInput.Text))
-            If Email.resetEmailMessage(txtInput.Text, strStore) = True Then
+            Dim strStore As String = DatabaseFunctions.readUserPassword(DatabaseFunctions.MakeSQLSafe(txtInput.Text.ToLower))
+            If Email.resetEmailMessage(txtInput.Text.ToLower, strStore) = True Then
                 Response.Redirect("/Default.aspx?reset=true")
             Else
                 Response.Redirect("/Default.aspx?reset=false")

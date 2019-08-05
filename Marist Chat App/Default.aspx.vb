@@ -12,7 +12,7 @@ Partial Class _Default
     End Sub
 
     Protected Sub frmLogin_Authenticate(sender As Object, e As AuthenticateEventArgs) Handles frmLogin.Authenticate
-        Dim strEml As String = frmLogin.UserName 'get username
+        Dim strEml As String = frmLogin.UserName.ToLower 'get username
         Dim strPw As String = frmLogin.Password 'get password
         'check that strEml is actually an email address
         Try

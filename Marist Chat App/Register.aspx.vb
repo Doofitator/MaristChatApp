@@ -13,7 +13,7 @@ Partial Class Register
         End If
     End Sub
     Protected Sub btnSignUp_Click(sender As Object, e As EventArgs) Handles btnSignUp.Click
-        Dim strEml As String = Email.Text           '|
+        Dim strEml As String = Email.Text.ToLower   '|
         Dim strPW1 As String = Password.Text        '|
         Dim strPW2 As String = ConfirmPassword.Text '| Declare variables
         Dim intRole As Integer                      '|
