@@ -93,7 +93,7 @@ body {
         cursor: pointer;
     }
 
-    .sidebar > ul > input[type=submit], .sidebar > ul > input[type=button], .sidebar > ul > div > input[type=submit] {
+    .sidebar > ul > input[type=submit], .sidebar > ul > input[type=button], .sidebar > ul > .urgent > input[type=button] {
         background: var(--main-colour);
         border: 0px;
         color: var(--text-colour);
@@ -102,7 +102,7 @@ body {
         text-align: left;
     }
 
-        .sidebar > ul > input[type=submit]:hover, .sidebar > ul > input[type=button]:hover, .sidebar > ul > div > input[type=submit]:hover {
+        .sidebar > ul > input[type=submit]:hover, .sidebar > ul > input[type=button]:hover, .sidebar > ul > .urgent > input[type=button]:hover {
             background: var(--light-colour);
             color: #fff;
             cursor: pointer;

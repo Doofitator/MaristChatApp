@@ -244,6 +244,14 @@ Partial Class _Default
         divNewStream.Controls.Add(txtJsHandler)                         '|
         '---------------------'
 
+        'add newline
+        divNewStream.Controls.Add(New LiteralControl("<br>"))
+
+        'add label to avoid confusion
+        Dim lblNameHint As New Label
+        lblNameHint.Text = "Note: New stream name will consist of selected member's usernames."
+        divNewStream.Controls.Add(lblNameHint)
+
         'add newlines to div
         divNewStream.Controls.Add(New LiteralControl("<br>"))
         divNewStream.Controls.Add(New LiteralControl("<br>"))
