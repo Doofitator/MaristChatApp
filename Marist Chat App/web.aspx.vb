@@ -48,8 +48,7 @@ Partial Class _Default
         End If
         btn.ID = controlID                                  'set button ID
         btn.Text = controlContent                           'set button text
-        'TODO: The following line needs to be uncommented in order to allow enter click in the message field, however it can't because it breaks something in javascript.
-        'btn.UseSubmitBehavior = False                       'disable button from submitting form on enter
+        btn.UseSubmitBehavior = False                       'disable button from submitting form on enter
         AddHandler btn.Click, AddressOf Me.btn_Click        'add button onclick event
         If isUrgentAlert Then pnl.Controls.Add(btn) Else Me.Master.FindControl("sidebar").Controls.Add(btn)  'add button to sidebar / form accordingly
     End Sub
@@ -483,7 +482,7 @@ Partial Class _Default
                 'add streams to sidebar
                 For Each msgStream As String In strStreamsArr
                     If Not Array.IndexOf(currentIDs.Split("*"), "btn" & item & msgStream) > 0 Then 'code to deal with possible stream duplicates
-                        addSidebarBtn("btn" & item & msgStream, msgStream)
+                        addSidebarBtn("btn" & item & msgStream.Replace("'", ""), msgStream)
                         currentIDs += "btn" & item & msgStream & "*"
                     End If
                 Next
@@ -860,9 +859,8 @@ QueryComplete:
 
         Else 'if button is a regular, existing stream button
 
-            Dim strStreamName As String = btn.ID.Replace("btn", "")             '|get stream name
-            Dim strClassID As String = strStreamName.Substring(0, 7)
-            strStreamName = strStreamName.Remove(0, 7)                          '|remove SIMON ID
+            Dim strClassID As String = btn.ID.Replace("btn", "").Substring(0, 7)              'get class name from button ID
+            Dim strStreamName As String = btn.Text                                            'get button text
             'debug("You pressed the """ & strStreamName & """ stream!")         'debug to make sure that worked
             lblStreamName.Text = strClassID & " > " & strStreamName              'set heading label text
 

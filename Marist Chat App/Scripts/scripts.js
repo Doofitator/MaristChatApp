@@ -9,6 +9,7 @@ function button_click(e) {
     if (keyCode == 13) {
         document.getElementById('BodyContent_btnSend').focus();
         document.getElementById('BodyContent_btnSend').click();
+        e.preventDefault();
     }
 }
 
