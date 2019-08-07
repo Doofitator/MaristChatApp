@@ -26,6 +26,9 @@ function writeToTextBox(elmntID, textbox) {
 function ScrollDown() {
     var objDiv = document.getElementById("BodyContent_pnlUpdate");
     objDiv.scrollTop = objDiv.scrollHeight;
+
+    //todo: doesn't work on mobile. Been a bug since early 2010 :(
+    //need to find an alternative
 }
 
 function HideShow(div) {
