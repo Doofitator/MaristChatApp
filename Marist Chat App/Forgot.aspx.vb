@@ -6,7 +6,10 @@ Partial Class Forgot
         'check if device is mobile & set master page accordingly
         If Request.Browser.IsMobileDevice Then MasterPageFile = "~/MobileMasterPage.master"
 
-        If User.Identity.IsAuthenticated = True Then 'if remember me was checked
+        Dim urlReferrer As String = String.Empty
+        If Request.UrlReferrer IsNot Nothing Then urlReferrer = Request.UrlReferrer.ToString 'get previous page URL
+
+        If User.Identity.IsAuthenticated = True And Not urlReferrer.EndsWith("web.aspx") Then 'if remember me was checked
             Response.Redirect("web.aspx") 'login
         End If
     End Sub

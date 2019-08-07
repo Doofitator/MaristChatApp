@@ -10,6 +10,7 @@
 
 <asp:Content ID="Content2" ContentPlaceHolderID="topBar" Runat="Server">
     <asp:LoginStatus id="LoginStatus" runat="server" CssClass="loginStatus" />
+    <asp:HyperLink ID="aChangePW" runat="server" CssClass="loginStatus" NavigateUrl="~/Forgot.aspx">Change Password</asp:HyperLink>
 </asp:Content>
 
 <asp:Content ID="Content3" ContentPlaceHolderID="BodyContent" Runat="Server">
