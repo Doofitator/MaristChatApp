@@ -10,6 +10,11 @@ function button_click(e) {
         document.getElementById('BodyContent_btnSend').focus();
         document.getElementById('BodyContent_btnSend').click();
         e.preventDefault();
+
+        // todo: the below work, but then the timer steals focus
+        // document.getElementById('BodyContent_txtBody').focus();
+        // document.getElementById('BodyContent_txtBody').select();
+
     }
 }
 
