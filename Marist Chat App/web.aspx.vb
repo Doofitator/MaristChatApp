@@ -635,7 +635,7 @@ Partial Class _Default
     Public Function cleanHTML(ByVal badHTML As String) As String
         'https://stackoverflow.com/questions/307013/how-do-i-filter-all-html-tags-except-a-certain-whitelist
         'todo: this still doesn't block iframes
-        Dim AcceptableTags As String = "i|b|u|sup|sub|ol|ul|li|br|h2|h3|h4|h5|span|div|p|a|img|blockquote"
+        Dim AcceptableTags As String = "i|b|u|sup|sub|ol|ul|li|br|h1|h2|h3|h4|h5|span|div|p|a|img|blockquote"
         Dim WhiteListPattern As String = "</?(?(?=" & AcceptableTags & ")notag|[a-zA-Z0-9]+)(?:\s[a-zA-Z0-9\-]+=?(?:([""']?).*?\1?)?)*\s*/?>"
         'debug(Regex.Replace(badHTML, WhiteListPattern, "", RegexOptions.Compiled))
         Return Regex.Replace(badHTML, WhiteListPattern, "", RegexOptions.Compiled)
@@ -773,8 +773,8 @@ QueryComplete:
             Response.Redirect("/") 'refresh to show changes
         ElseIf btn.ID = "btnSend" Then 'if button is the send message button
             Dim txtBody As TextBox = findDynamicBodyControl("divMessageControls,txtBody")   'get the textbox
-            Dim strMessage As String = txtBody.Text 'get the message
-
+            Dim strMessage As String = cleanHTML(txtBody.Text).Replace("""", """""") 'get the message
+            smgrTimer.RegisterStartupScript(Page, GetType(Page), "SkDeet", "alert('" & "insert into tbl_messages (int_streamID, int_fromID, dt_timeStamp, str_message, bool_active, bool_read) VALUES (" & readStreamID(lblStreamName.Text.Split(">")(1).Substring(1), lblStreamName.Text.Split(">")(0).Replace(" ", "")) & ", " & readUserInfo(User.Identity.Name, "int_ID") & ", """ & DateTime.Now & """, """ & MakeSQLSafe(strMessage) & """, True, False)" & "')", True)
             'Write the message to the database
             runSQL("insert into tbl_messages (int_streamID, int_fromID, dt_timeStamp, str_message, bool_active, bool_read) VALUES (" & readStreamID(lblStreamName.Text.Split(">")(1).Substring(1), lblStreamName.Text.Split(">")(0).Replace(" ", "")) & ", " & readUserInfo(User.Identity.Name, "int_ID") & ", """ & DateTime.Now & """, """ & MakeSQLSafe(strMessage) & """, True, False)")
             txtBody.Text = ""   'clear the textbox
