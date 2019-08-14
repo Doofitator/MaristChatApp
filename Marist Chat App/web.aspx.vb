@@ -5,7 +5,6 @@ Imports System.Xml
 
 Partial Class _Default
     Inherits System.Web.UI.Page
-    'TODO: If someone reloads, their last request is re-processed. This is relatively harmless if their last request was opening a stream, but an issue if it was something like writing a new class.
 
     Protected Sub Page_PreInit(sender As Object, e As EventArgs) Handles Me.PreInit
         'check if device is mobile & set master page accordingly
@@ -878,7 +877,7 @@ QueryComplete:
             loadMessages(strMessages)
         End If
     End Sub
-    'todo: make that work
+    'todo: make this work (adds 'delete' row to datagridview)
     'Protected Sub gv_RowDataBound(ByVal sender As Object, ByVal e As GridViewRowEventArgs)
     ' If e.Row.DataItem IsNot Nothing Then
     '   Dim htmlBtn As HtmlGenericControl = New HtmlGenericControl("button")
