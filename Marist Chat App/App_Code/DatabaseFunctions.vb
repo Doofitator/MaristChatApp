@@ -3,7 +3,8 @@ Imports System.Data.SqlClient
 Imports Microsoft.VisualBasic
 
 Public Class DatabaseFunctions
-    Public Shared strConn As String = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=e:\hshome\marist2\mca.maristapps.com\App_Data\mca_db.accdb"
+    'set connectionString (hardcoded ACCDB path with password)
+    Public Shared strConn As String = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=e:\hshome\marist2\mca.maristapps.com\App_Data\mca_db.accdb;Jet OLEDB:Database Password=OD3Qo5oIBy"
 
     Public Shared Sub eDebug(ByVal strOutput As String) 'emergency debug
         Throw New Exception(strOutput)
